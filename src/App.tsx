@@ -13,6 +13,7 @@ import {
   Award, 
   Check, 
   ArrowUpRight, 
+  ArrowUp,
   FolderLock, 
   Sliders, 
   AlertCircle,
@@ -29,10 +30,29 @@ export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
-      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+      if (saved === 'light' || saved === 'dark') {
+        return saved;
+      }
+      // Automatical matching of the visitor's preferred system colorscheme
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return systemPrefersDark ? 'dark' : 'light';
     }
     return 'dark';
   });
+
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -284,12 +304,54 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white ${
+    <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white relative ${
       theme === 'dark' 
         ? 'bg-[#090a0f] text-slate-300' 
         : 'bg-[#fafbfe] text-slate-700'
     }`}>
       
+      {/* Dynamic tech blueprint grid and responsive particle background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10 bg-no-repeat bg-cover">
+        {/* Dynamic tech grid overlay - blueprint style */}
+        <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808007_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]`} />
+
+        {/* Floating digital packet nodes in background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 15 }).map((_, i) => {
+            const size = (i % 3) + 2; // 2px to 4px
+            const duration = 18 + (i * 4); // 18s to 78s
+            const startX = (i * 7) % 100;
+            const startY = (i * 11) % 100;
+            return (
+              <motion.div
+                key={i}
+                className={`absolute rounded-full ${
+                  i % 2 === 0 ? 'bg-teal-400' : 'bg-indigo-400'
+                }`}
+                style={{
+                  width: size,
+                  height: size,
+                  left: `${startX}%`,
+                  top: `${startY}%`,
+                  opacity: theme === 'dark' ? 0.12 : 0.07,
+                }}
+                animate={{
+                  y: [-60, 60, -60],
+                  x: [-35, 35, -35],
+                  opacity: theme === 'dark' ? [0.06, 0.28, 0.06] : [0.03, 0.15, 0.03],
+                }}
+                transition={{
+                  duration,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.4,
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+
       {/* Background decoration - soft floating artistic glow blurs & shadows */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden -z-10">
         <motion.div 
@@ -900,7 +962,7 @@ export default function App() {
           ? 'border-white/[0.04] bg-slate-950/20' 
           : 'border-slate-200 bg-slate-50/50'
       }`}>
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           
           {/* Header */}
           <div className="text-center space-y-3 mb-10">
@@ -913,7 +975,7 @@ export default function App() {
           </div>
 
           {/* Dynamic Grid of GitHub Pinned Projects */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 auto-rows-fr">
             {reposLoading ? (
               Array.from({ length: 3 }).map((_, idx) => (
                 <div key={idx} className={`border p-6 rounded-2xl space-y-4 animate-pulse ${
@@ -1272,6 +1334,29 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+            whileHover={{ scale: 1.08, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            id="back-to-top-floating"
+            className={`fixed bottom-6 right-6 p-3 rounded-full shadow-2xl border transition-all cursor-pointer z-50 focus:outline-none ${
+              theme === 'dark'
+                ? 'bg-slate-900/90 backdrop-blur-md border-white/10 text-teal-400 hover:text-teal-300 hover:border-teal-500/30'
+                : 'bg-white/90 backdrop-blur-md border-slate-200 text-teal-500 hover:text-teal-600 hover:border-teal-400'
+            }`}
+            aria-label="Retour en haut"
+          >
+            <ArrowUp className="h-4 w-4" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
     </div>
   );
