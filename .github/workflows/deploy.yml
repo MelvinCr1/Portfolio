@@ -2,16 +2,27 @@ name: Deploy Portfolio to IONOS
 on:
   push:
     branches:
-      - main # Change en "master" si besoin
+      - main
 
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Build & Deploy
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v3
-    
+
+    - name: ⚙️ Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20' # Version standard et stable de Node
+
+    - name: 📦 Install dependencies
+      run: npm install
+
+    - name: 🛠️ Build project
+      run: npm run build
+
     - name: 📂 Sync files via SFTP
       uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
@@ -20,5 +31,5 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         port: 22
         sftp_only: true
-        local_path: './*' # Prend tous les fichiers à la racine du repo
-        remote_path: '/'  # sous-dossier sur IONOS
+        local_path: './dist/*' # Seulement le dossier compilé
+        remote_path: '/'
