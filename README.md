@@ -48,7 +48,7 @@ Pour y remédier définitivement, suivez cette démarche officielle de soumissio
 
 ---
 
-## 🛠️ Stack Technique & Segmentation de Code
+## 🛠️ Stack Technique & Segmentation
 
 L'application utilise une architecture Single Page Application (SPA) ultra-rapide, modulaire et structurée pour maximiser la propreté du code :
 
@@ -107,11 +107,3 @@ Pour compiler l'application de façon optimisée pour la mise en ligne (généra
 ```bash
 npm run build
 ```
-
----
-
-## 🎨 Philosophie de Design : Cosmic Dark
-Le portfolio respecte scrupuleusement les exigences de design les plus sophistiquées :
-* **Précision typographique** : Utilisation de graisses contrastées pour délimiter les structures sans fatiguer la vue. Une hiérarchie forte entre les composants standard d'interface et les blocs monospace pour souligner le cachet technique SecOps hautement professionnel.
-* **Zéro Clutter** : Pas de faux journaux serveurs inutiles, de logs simulés artificiels ou de faux pings sur la page. Place à l'essentiel et à un design ultra-propre et lisible.
-* **Ergonomie Mobile** : Les cibles de touch tactiles disposent d'un minimum de `44px` réglementaire, et la totalité des grilles s'adapte élégamment selon l'espace horizontal disponible.
