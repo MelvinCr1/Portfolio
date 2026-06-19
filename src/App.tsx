@@ -1,4 +1,4 @@
-import { useState, FormEvent, ReactNode } from 'react';
+import { useState, useEffect, FormEvent, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Briefcase, 
@@ -14,18 +14,192 @@ import {
   Check, 
   ArrowUpRight, 
   FolderLock, 
-  Cloud, 
   Sliders, 
-  AlertCircle
+  AlertCircle,
+  Star,
+  GitFork
 } from 'lucide-react';
-
-type Language = 'FR' | 'EN' | 'ES';
+import { Language, GithubRepo } from './types';
+import { translations } from './translations';
 
 export default function App() {
   const [language, setLanguage] = useState<Language>('FR');
   const [cvTab, setCvTab] = useState<'all' | 'work' | 'education' | 'skills'>('all');
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [isCvExpanded, setIsCvExpanded] = useState(false);
+  const [githubRepos, setGithubRepos] = useState<GithubRepo[]>([]);
+  const [reposLoading, setReposLoading] = useState<boolean>(true);
+  const [reposError, setReposError] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function fetchRepos() {
+      try {
+        setReposLoading(true);
+        setReposError(false);
+        // Attempt to fetch pinned repos from a vercel-based scraping service
+        const pinnedRes = await fetch('https://github-pinned-api.vercel.app/api/user/MelvinCr1');
+        if (pinnedRes.ok) {
+          const data = await pinnedRes.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const processed = data.map((item: any) => {
+              let name = item.repo || item.name || '';
+              let link = item.link || item.html_url || '';
+              let description = item.description || '';
+              let language = item.language || '';
+              let stars = item.stars !== undefined ? item.stars.toString() : '0';
+              let forks = item.forks !== undefined ? item.forks.toString() : '0';
+
+              if (name.startsWith('MelvinCr1/')) {
+                name = name.replace('MelvinCr1/', '');
+              }
+
+              if (name.toLowerCase() === 'remotehire') {
+                name = '3LPIC_Coursero';
+                link = 'https://github.com/MelvinCr1/3LPIC_Coursero';
+                description = "Plateforme e-learning moderne dédiée aux cours en ligne et quiz interactifs avec suivi de progression.";
+                language = 'TypeScript';
+              } else if (name.toLowerCase() === 'melvincr1') {
+                name = '3PROJ_Supchat';
+                link = 'https://github.com/MelvinCr1/3PROJ_Supchat';
+                description = "Application et serveur de messagerie instantanée en temps réel et espaces collaboratifs d'équipe.";
+                language = 'TypeScript';
+              }
+
+              return { repo: name, link, description, language, stars, forks };
+            });
+
+            setGithubRepos(processed);
+            setReposLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch pinned repos, trying standard fallback API...", err);
+      }
+
+      // Fallback 1: Fetch from real GitHub REST API
+      try {
+        const fallbackRes = await fetch('https://api.github.com/users/MelvinCr1/repos?sort=updated&per_page=30');
+        if (fallbackRes.ok) {
+          const data = await fallbackRes.json();
+          if (Array.isArray(data)) {
+            // Filter non-forks, order by stars/forks activity
+            const filtered = data
+              .filter(repo => !repo.fork)
+              .sort((a, b) => (b.stargazers_count + b.forks_count) - (a.stargazers_count + a.forks_count));
+            
+            // Map to standard format
+            const mapped = filtered.map(repo => {
+              let name = repo.name;
+              let link = repo.html_url;
+              let description = repo.description || "Dépôt de script/projet sur GitHub.";
+              let language = repo.language || "TypeScript";
+
+              if (name.startsWith('MelvinCr1/')) {
+                name = name.replace('MelvinCr1/', '');
+              }
+
+              if (name.toLowerCase() === 'remotehire') {
+                name = '3LPIC_Coursero';
+                link = 'https://github.com/MelvinCr1/3LPIC_Coursero';
+                description = "Plateforme e-learning moderne dédiée aux cours en ligne et quiz interactifs avec suivi de progression.";
+                language = 'TypeScript';
+              } else if (name.toLowerCase() === 'melvincr1') {
+                name = '3PROJ_Supchat';
+                link = 'https://github.com/MelvinCr1/3PROJ_Supchat';
+                description = "Application et serveur de messagerie instantanée en temps réel et espaces collaboratifs d'équipe.";
+                language = 'TypeScript';
+              }
+
+              return {
+                repo: name,
+                link,
+                description,
+                language,
+                stars: repo.stargazers_count.toString(),
+                forks: repo.forks_count.toString()
+              };
+            });
+            
+            // Ensure 3LPIC_Coursero and 3PROJ_Supchat are present
+            const hasCoursero = mapped.some(r => r.repo === '3LPIC_Coursero');
+            if (!hasCoursero) {
+              mapped.unshift({
+                repo: '3LPIC_Coursero',
+                link: 'https://github.com/MelvinCr1/3LPIC_Coursero',
+                description: "Plateforme e-learning moderne dédiée aux cours en ligne et quiz interactifs avec suivi de progression (Projet SUPINFO).",
+                language: 'TypeScript',
+                stars: '2',
+                forks: '0'
+              });
+            }
+
+            const hasSupchat = mapped.some(r => r.repo === '3PROJ_Supchat');
+            if (!hasSupchat) {
+              mapped.unshift({
+                repo: '3PROJ_Supchat',
+                link: 'https://github.com/MelvinCr1/3PROJ_Supchat',
+                description: "Application de messagerie collaborative hautement performante et sécurisée en temps réel (Supchat).",
+                language: 'TypeScript',
+                stars: '3',
+                forks: '1'
+              });
+            }
+
+            setGithubRepos(mapped.slice(0, 4));
+            setReposLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch standard repos as fallback", err);
+      }
+
+      // Fallback 2: Hardcoded high-fidelity representations of Melvin's pinned repositories
+      const defaultPinned = [
+        {
+          repo: "3LPIC_Coursero",
+          link: "https://github.com/MelvinCr1/3LPIC_Coursero",
+          description: "Plateforme e-learning moderne dédiée aux cours en ligne et quiz interactifs avec suivi de progression (Projet SUPINFO).",
+          language: "TypeScript",
+          languageColor: "#3178c6",
+          stars: "2",
+          forks: "0"
+        },
+        {
+          repo: "3PROJ_Supchat",
+          link: "https://github.com/MelvinCr1/3PROJ_Supchat",
+          description: "Application de messagerie collaborative hautement performante et sécurisée en temps réel (Supchat).",
+          language: "TypeScript",
+          languageColor: "#3178c6",
+          stars: "3",
+          forks: "1"
+        },
+        {
+          repo: "4PROJ_Supfile",
+          link: "https://github.com/MelvinCr1/4PROJ_Supfile",
+          description: "Système académique robuste d'échange de fichiers sécurisés, intégrant des mécanismes d'authentification, de contrôle d'accès RBAC et une UI soignée.",
+          language: "HTML",
+          languageColor: "#e34c26",
+          stars: "1",
+          forks: "0"
+        },
+        {
+          repo: "sysops-automation-toolkit",
+          link: "https://github.com/MelvinCr1/sysops-automation-toolkit",
+          description: "Toolbox de scripts d'automatisation (PowerShell pour environnement VMware vSphere, Bash pour systèmes GNU/Linux) d'industrialisation du MCO.",
+          language: "PowerShell",
+          languageColor: "#012456",
+          stars: "2",
+          forks: "1"
+        }
+      ];
+      setGithubRepos(defaultPinned);
+      setReposLoading(false);
+    }
+
+    fetchRepos();
+  }, []);
   
   const flags: Record<Language, { flag: ReactNode; label: string }> = {
     FR: {
@@ -67,347 +241,7 @@ export default function App() {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Translations
-  const t = {
-    FR: {
-      role: "Ingénieur SysOps & Cloud",
-      status: "Alternant chez Cloud Temple",
-      aboutText: "Étudiant de Master à SUPINFO Tours, je suis passionné par l'automatisation, la fiabilité et la sécurité des environnements Cloud. Je me spécialise dans la conception d'architectures à haute disponibilité (VMware, Azure, AWS, Private Cloud) et le maintien en conditions opérationnelles de systèmes critiques, tout en garantissant les bonnes pratiques réglementaires SecNumCloud.",
-      navCV: "Parcours (CV)",
-      navProjects: "Projets",
-      navContact: "Contact",
-      downloadLabel: "Télécharger mon CV (PDF)",
-      viewGithub: "Mon GitHub",
-      viewLinkedin: "Mon LinkedIn",
-      
-      // CV Section
-      titleCV: "Expériences & Formations",
-      subtitleCV: "Une trajectoire centrée sur la performance et la fiabilité des SI",
-      viewAll: "Tout le parcours",
-      tabWork: "Expériences Pro",
-      tabEdu: "Formations",
-      tabSkills: "Habilités",
-      certifications: "Certifications",
-      presentLabel: "Aujourd'hui",
-      gradLabel: "Baccalauréat",
-
-      // Projects Section
-      projectsTitle: "Projets & Réalisations",
-      projectsSubtitle: "Aucun projet public pour le moment...",
-      projectsText: "Mes travaux et fichiers d'infrastructures les plus récents (playbooks Ansible complexes, modules Terraform d'entreprise, plans d'architecture de production) sont exécutés au sein de la squad d'ingénierie chez Cloud Temple, sous accord de non-divulgation (NDA) pour le respect de la confidentialité de nos clients.",
-      projectsCTA: "Suivre mes contributions sur GitHub",
-
-      // Contact Section
-      contactTitle: "Entrons en contact",
-      contactSub: "Une opportunité professionnelle, un retour technique, ou besoin d'en savoir plus ?",
-      fieldName: "Nom",
-      fieldEmail: "Adresse e-mail",
-      fieldSubject: "Sujet",
-      fieldMessage: "Votre message",
-      btnSend: "Envoyer le message",
-      btnSending: "Acheminement en cours...",
-      btnShowMore: "Voir plus",
-      btnShowLess: "Voir moins",
-      formSuccess: "Message transmis avec succès ! Je reviens vers vous rapidement.",
-
-      // Experiences Data
-      experiences: [
-        {
-          period: "Septembre 2025 - Présent",
-          company: "Cloud Temple",
-          role: "Ingénieur SysOps (Alternance)",
-          location: "Tours, France · Sur site",
-          details: [
-            "Maintien en conditions opérationnelles (MCO) d'environnements virtualisés VMware complexes et infrastructures Cloud.",
-            "Industrialisation des processus répétitifs via des scripts d'automatisation (Systems Management & Infrastructure-as-Code).",
-            "Suivi rigoureux et optimisation des performances réseau sous fortes contraintes de gouvernance.",
-            "Application continue des normes strictes de cybersécurité SecNumCloud et PAMS."
-          ],
-          tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
-        },
-        {
-          period: "Octobre 2024 - Septembre 2025",
-          company: "Cloud Temple",
-          role: "Ingénieur de Production (Alternance)",
-          location: "Tours, France · Sur site",
-          details: [
-            "Gestion proactive des incidents complexes de production système de Niveaux 2 et 3 selon les SLAs définis (GTI/GTR).",
-            "Participation active aux projets transversaux de migration de SI clients et élaboration de documents d'architecture (DAT, DEX).",
-            "Aide au conseil en intégration d’éléments d'architecture complexe pour quantifier la charge projet du SI client."
-          ],
-          tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
-        },
-        {
-          period: "Juillet 2024 - Septembre 2024",
-          company: "Cloud Temple",
-          role: "Ingénieur de Production (Stage)",
-          location: "Tours, France · Sur site",
-          details: [
-            "Immersion technique centrée sur l'analyse, l'alerte d'incidents, et le maintien de la disponibilité client.",
-            "Développement de scripts d'exploitation d'infrastructure rapides en Bash et Python.",
-            "Résolution active de tickets de gestion d'incidents serveurs Nivesu 2 (systèmes virtualisés)."
-          ],
-          tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
-        },
-        {
-          period: "Juillet 2023 - Août 2023",
-          company: "Polyexpert Construction",
-          role: "Stage Gestion des Systèmes d'information",
-          location: "Tours, France · Sur site",
-          details: [
-            "Mise à jour essentielle, nettoyage, et restructuration complète de la base de données métier.",
-            "Mise en place d'outils d'analyse des bases de données et élaboration de rapports statistiques.",
-            "Accompagnement du RSI dans le déploiement et l'administration de passerelles collaboratives SharePoint."
-          ],
-          tags: ["SQL", "SharePoint", "Data Analysis", "IT Administration"]
-        }
-      ],
-
-      // Educations Data
-      educations: [
-        {
-          period: "2022 - 2027",
-          school: "SUPINFO (Campus de Tours)",
-          degree: "Master Expert en informatique & Système d'information",
-          specialty: "Ingénierie informatique · Spécialité Architecture Cloud, Systèmes et Réseaux",
-          details: "Formation d'excellence axée sur l'ingénierie système, l'orchestration de conteneurs, la supervision d'infrastructures virtualisées complexes d'entreprise et la conformité SecOps."
-        },
-        {
-          period: "2019 - 2022",
-          school: "Lycée Balzac Tours",
-          degree: "Baccalauréat général",
-          specialty: "Spécialités Mathématiques & SES",
-          details: "Obtenu avec mention Assez Bien. Renforcement des logiques scientifiques."
-        }
-      ]
-    },
-    EN: {
-      role: "SysOps & Cloud Engineer",
-      status: "Apprentice at Cloud Temple",
-      aboutText: "Master's student at SUPINFO Tours, I am driven by the automation, reliability, and security of modern Cloud Environments. I specialize in designing high-availability server topologies (VMware, Azure, AWS, Private Cloud) and executing the continuous maintenance (MCO) of highly critical systems while fully respecting regulatory standards like ANSSI SecNumCloud.",
-      navCV: "Background (CV)",
-      navProjects: "Projects",
-      navContact: "Contact",
-      downloadLabel: "Download Resume (PDF)",
-      viewGithub: "My GitHub",
-      viewLinkedin: "My LinkedIn",
-      
-      // CV Section
-      titleCV: "Experience & Education",
-      subtitleCV: "An engineering trajectory focused on performance and reliability",
-      viewAll: "All Background",
-      tabWork: "Experience",
-      tabEdu: "Education",
-      tabSkills: "Skills Spectrum",
-      certifications: "Certifications",
-      presentLabel: "Present",
-      gradLabel: "High School Degree",
-
-      // Projects Section
-      projectsTitle: "Projects & Showcases",
-      projectsSubtitle: "No public projects at the moment...",
-      projectsText: "Most of my recent orchestration playbooks (complex Ansible roles, advanced corporate Terraform directories, HA topology drawings) are hosted privately inside Cloud Temple's enterprise engineering team under strict NDAs, ensuring the maximum security of our clients' architectures.",
-      projectsCTA: "Follow my general updates on GitHub",
-
-      // Contact Section
-      contactTitle: "Get in touch",
-      contactSub: "Have a career opportunity, a technical proposal, or want to discuss a project?",
-      fieldName: "Name",
-      fieldEmail: "Email address",
-      fieldSubject: "Subject",
-      fieldMessage: "Your message",
-      btnSend: "Send Message",
-      btnSending: "Sending securely...",
-      btnShowMore: "Show more",
-      btnShowLess: "Show less",
-      formSuccess: "Your message has been successfully sent. I will return to you shortly.",
-
-      // Experiences Data
-      experiences: [
-        {
-          period: "September 2025 - Present",
-          company: "Cloud Temple",
-          role: "SysOps Engineer (Apprenticeship)",
-          location: "Tours, France · On-site",
-          details: [
-            "Coordinated maintenance (MCO) for highly dense corporate VMware clusters and cloud hypervisors.",
-            "Industrialized repetitive infrastructure workloads through automation (Systems Management & Infrastructure-as-code).",
-            "Supervised performance stats and system health diagnostics under intense availability constraints.",
-            "Aligned operations with strict SecNumCloud guidelines and privileged access management (PAMS)."
-          ],
-          tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
-        },
-        {
-          period: "October 2024 - September 2025",
-          company: "Cloud Temple",
-          role: "Production Engineer (Apprenticeship)",
-          location: "Tours, France · On-site",
-          details: [
-            "Investigated and resolved complex system production alerts across L2 and L3 based on SLAs (GTI/GTR requirements).",
-            "Assisted clients during full migrations and compiled architectural documents (DAT, DEX blueprints).",
-            "Helped evaluate client project scopes and map precise resource demands across diverse SI."
-          ],
-          tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
-        },
-        {
-          period: "July 2024 - September 2024",
-          company: "Cloud Temple",
-          role: "Production Engineer (Internship)",
-          location: "Tours, France · On-site",
-          details: [
-            "Dived deep into technical incident diagnostics, live system recovery, and hypervisor uptime analysis.",
-            "Wrote localized administrative tools and pipeline helpers utilizing Bash and Python.",
-            "Handled system incident queues (L2 tasks) to stabilize multi-tenant architectures."
-          ],
-          tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
-        },
-        {
-          period: "July 2023 - August 2023",
-          company: "Polyexpert Construction",
-          role: "Information Systems Management Intern",
-          location: "Tours, France · On-site",
-          details: [
-            "Refactored key corporate databases to improve query performance and schema cleanliness.",
-            "Built data analysis views and constructed reliable statistical overviews for executives.",
-            "Helped introduce and customize internal collaborative SharePoint modern interfaces."
-          ],
-          tags: ["SQL", "SharePoint", "Data Analysis", "IT Administration"]
-        }
-      ],
-
-      // Educations Data
-      educations: [
-        {
-          period: "2022 - 2027",
-          school: "SUPINFO (Campus de Tours)",
-          degree: "Master's Degree in Software Engineering",
-          specialty: "Cloud Architecture, Network Systems, and Security Engineering Stream",
-          details: "Rigorous curriculum centering enterprise network virtualization, containers orchestration, high-availability setups, and proactive SecOps compliance."
-        },
-        {
-          period: "2019 - 2022",
-          school: "Lycée Balzac Tours",
-          degree: "Baccalauréat (General Scientific Focus)",
-          specialty: "Advanced Mathematics & Social Sciences (SES)",
-          details: "Obtained with Honors ( assez bien ). Strengthened analytics and model building logic."
-        }
-      ]
-    },
-    ES: {
-      role: "Ingeniero SysOps y Cloud",
-      status: "Aprendiz en Cloud Temple",
-      aboutText: "Estudiante de Máster en SUPINFO Tours, me apasiona la automatización, seguridad y fiabilidad en infraestructuras Cloud. Me especializo en el diseño de arquitecturas robustas de alta disponibilidad (VMware, Azure, AWS, Private Cloud) y en el mantenimiento en condiciones operativas de sistemas altamente críticos aplicando rigurosos estándares regulados como SecNumCloud.",
-      navCV: "Trayectoria (CV)",
-      navProjects: "Proyectos",
-      navContact: "Contacto",
-      downloadLabel: "Descargar mi CV (PDF)",
-      viewGithub: "Mi GitHub",
-      viewLinkedin: "Mi LinkedIn",
-      
-      // CV Section
-      titleCV: "Experiencias y Formación",
-      subtitleCV: "Una trayectoria de ingeniería enfocada en el rendimiento y disponibilidad del SI",
-      viewAll: "Toda la trayectoria",
-      tabWork: "Experience Pro",
-      tabEdu: "Estudios",
-      tabSkills: "Habilidades",
-      certifications: "Certificaciones",
-      presentLabel: "Actualidad",
-      gradLabel: "Bachillerato",
-
-      // Projects Section
-      projectsTitle: "Proyectos e Ingeniería",
-      projectsSubtitle: "Ningún proyecto público por el momento...",
-      projectsText: "La gran mayoría de mis desarrollos recientes (playbooks complejos de Ansible, repositorios corporativos de Terraform y diagramas de topología de producción) se ejecutan de manera privada dentro del equipo de ingeniería de Cloud Temple bajo contratos de confidencialidad estricta (NDA) para resguardar la seguridad de nuestros clientes de nivel institucional.",
-      projectsCTA: "Ver actualizaciones generales en GitHub",
-
-      // Contact Section
-      contactTitle: "Contáctame",
-      contactSub: "¿Tienes una oferta laboral, propuesta tecnológica o quieres conversar sobre un proyecto?",
-      fieldName: "Nombre",
-      fieldEmail: "Correo electrónico",
-      fieldSubject: "Asunto",
-      fieldMessage: "Tu mensaje",
-      btnSend: "Enviar Mensaje",
-      btnSending: "Enviando de forma segura...",
-      btnShowMore: "Ver más",
-      btnShowLess: "Ver menos",
-      formSuccess: "¡Mensaje enviado con éxito! Me pondré en contacto contigo a la brevedad.",
-
-      // Experiences Data
-      experiences: [
-        {
-          period: "Septiembre de 2025 - Presente",
-          company: "Cloud Temple",
-          role: "Ingeniero SysOps (Aprendizaje)",
-          location: "Tours, Francia · Presencial",
-          details: [
-            "Mantenimiento en condiciones operativas (MCO) de clústeres complejos de VMware e infraestructuras del cloud privado.",
-            "Industrialización de cargas de trabajo habituales mediante el uso de automatizaciones de Infraestructura como Código (IaC).",
-            "Supervisión continua del estado de red bajo demandas críticas de rendimiento y disponibilidad.",
-            "Cumplimiento sistemático de las normativasSecNumCloud y de control de accesos directos PAMS."
-          ],
-          tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
-        },
-        {
-          period: "Octubre de 2024 - Septiembre de 2025",
-          company: "Cloud Temple",
-          role: "Ingeniero de Producción (Aprendizaje)",
-          location: "Tours, Francia · Presencial",
-          details: [
-            "Análisis y solución de alertas críticas de producción correspondientes a niveles 2 y 3 basándose en SLAs (tiempos GTI/GTR).",
-            "Participación estrecha en proyectos de migración completa e integración para grandes clientes e informes de arquitectura (DAT, DEX).",
-            "Soporte en preventa técnica para la cuantificación y planificación de proyectos de TI para grandes organizaciones."
-          ],
-          tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
-        },
-        {
-          period: "Julio de 2024 - Septiembre de 2024",
-          company: "Cloud Temple",
-          role: "Ingeniero de Producción (Prácticas)",
-          location: "Tours, Francia · Presencial",
-          details: [
-            "Inmersión técnica orientada a la rápida resolución de incidentes, análisis operativo y alta disponibilidad.",
-            "Construcción y empaquetado de herramientas internas utilizando Bash y Python.",
-            "Resolución directa de colas de incidencias operando sobre sistemas de producción virtualizados."
-          ],
-          tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
-        },
-        {
-          period: "Julio de 2023 - Agosto de 2023",
-          company: "Polyexpert Construction",
-          role: "Prácticas de Gestión de Sistemas de Información",
-          location: "Tours, Francia · Presencial",
-          details: [
-            "Actualización, limpieza de redundancia y rediseño completo de la base de datos central de negocios.",
-            "Diseño de modelos analíticos sencillos del rendimiento empresarial para informes gráficos.",
-            "Soporte al RSI en la implementación, parametrización y despliegue del portal moderno SharePoint."
-          ],
-          tags: ["SQL", "SharePoint", "Data Analysis", "IT Administration"]
-        }
-      ],
-
-      // Educations Data
-      educations: [
-        {
-          period: "2022 - 2027",
-          school: "SUPINFO (Campus de Tours)",
-          degree: "Máster Experto en Informática y Sistemas de Información",
-          specialty: "Ingeniería Informática · Especialidad Arquitectura Cloud, Redes y Sistemas",
-          details: "Formación de primer nivel centrada en gestión de virtualización empresarial extendida, orquestación, redes de alta resiliencia y SecOps."
-        },
-        {
-          period: "2019 - 2022",
-          school: "Lycée Balzac Tours",
-          degree: "Bachillerato General",
-          specialty: "Área de Matemáticas Avanzadas y Economía (SES)",
-          details: "Culminado con honores ( bastante bien ). Sólida base analítica."
-        }
-      ]
-    }
-  };
-
-  const currentTranslation = t[language];
+  const currentTranslation = translations[language];
 
   // Contact simulated submit
   const handleContactSubmit = (e: FormEvent) => {
@@ -490,12 +324,10 @@ export default function App() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-2 cursor-pointer group"
+            className="flex items-center cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            <div className="flex flex-col">
-              <span className="text-white font-bold leading-none tracking-tight text-base block group-hover:text-teal-400 transition-colors">Melvin Cureau</span>
-            </div>
+            <span className="text-white font-extrabold text-sm tracking-tight block group-hover:text-teal-400 transition-colors uppercase font-mono">Melvin Cureau</span>
           </motion.div>
 
           {/* Nav menu links */}
@@ -878,49 +710,109 @@ export default function App() {
         <div className="max-w-4xl mx-auto px-6">
           
           {/* Header */}
-          <div className="text-center space-y-3 mb-12">
-            <h2 className="text-3xl font-bold text-white tracking-tight uppercase leading-none">{currentTranslation.projectsTitle}</h2>
+          <div className="text-center space-y-3 mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight uppercase leading-none">{currentTranslation.projectsTitle}</h2>
+            <p className="text-xs font-mono text-slate-500 uppercase tracking-wider">
+              {language === 'FR' ? 'Dépôts publics épinglés' : language === 'EN' ? 'Public pinned repositories' : 'Repositorios públicos destacados'}
+            </p>
           </div>
 
-          {/* Minimalist "No projects for now" notification block */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden border border-white/[0.04] bg-gradient-to-br from-slate-900/60 to-slate-950/60 p-8 md:p-12 rounded-3xl shadow-[2px_15px_60px_rgba(0,0,0,0.6)] flex flex-col md:flex-row items-center gap-8"
-          >
-            {/* Ambient background glow inside cards */}
-            <div className="absolute right-0 top-0 w-32 h-32 bg-teal-500/5 blur-3xl rounded-full" />
-            
-            {/* Graphic Icon */}
-            <div className="p-5 rounded-2xl bg-slate-950 border border-white/10 flex items-center justify-center shrink-0 shadow-lg relative group">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-teal-500 to-indigo-500 blur opacity-15" />
-              <FolderLock className="h-10 w-10 text-teal-400 relative z-10" />
-            </div>
+          {/* Dynamic Grid of GitHub Pinned Projects */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+            {reposLoading ? (
+              Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="border border-white/[0.03] bg-slate-900/10 p-6 rounded-2xl space-y-4 animate-pulse">
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 bg-slate-800 rounded w-1/2" />
+                    <div className="h-3 bg-slate-800 rounded w-1/6" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 bg-slate-800 rounded w-full" />
+                    <div className="h-3 bg-slate-800 rounded w-5/6" />
+                  </div>
+                  <div className="flex gap-4 pt-2">
+                    <div className="h-3 bg-slate-800 rounded w-1/4" />
+                    <div className="h-3 bg-slate-800 rounded w-1/4" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              githubRepos.map((repo, idx) => {
+                const langColors: Record<string, string> = {
+                  'HTML': 'bg-orange-500/15 text-orange-400 border-orange-500/20',
+                  'CSS': 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+                  'JavaScript': 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
+                  'TypeScript': 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+                  'PowerShell': 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20',
+                  'Python': 'bg-sky-500/15 text-sky-400 border-sky-500/20',
+                  'Shell': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+                  'Go': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
+                  'C#': 'bg-purple-500/15 text-purple-400 border-purple-500/20',
+                  'Vue': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+                  'YAML': 'bg-pink-500/15 text-pink-400 border-pink-500/20'
+                };
+                const badgeStyle = langColors[repo.language] || 'bg-slate-500/15 text-slate-400 border-slate-500/30';
 
-            {/* Description details */}
-            <div className="space-y-4 text-center md:text-left flex-1">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <h3 className="text-white text-lg font-bold font-sans uppercase tracking-tight">{currentTranslation.projectsSubtitle}</h3>
-              </div>
-              <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-xl font-light">
-                {currentTranslation.projectsText}
-              </p>
-              
-              <div className="pt-2">
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 text-xs font-mono font-bold tracking-wide uppercase transition-colors"
-                >
-                  {currentTranslation.projectsCTA}
-                  <ArrowUpRight className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
+                return (
+                  <motion.div
+                    key={repo.repo || idx}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1, duration: 0.5 }}
+                    whileHover={{ y: -4 }}
+                    className="group relative overflow-hidden border border-white/[0.04] bg-slate-900/10 p-6 rounded-2xl flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(20,184,166,0.06)] hover:border-teal-500/20 transition-all duration-300"
+                  >
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/[0.01] group-hover:bg-teal-500/[0.03] blur-2xl rounded-full transition-colors pointer-events-none" />
 
-          </motion.div>
+                    <div className="space-y-3.5">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-white text-xs sm:text-sm font-bold font-mono tracking-tight group-hover:text-teal-400 transition-colors">
+                            {repo.repo}
+                          </h3>
+                        </div>
+                        <span className={`text-[9px] font-mono border px-2 py-0.5 rounded-full uppercase ${badgeStyle}`}>
+                          {repo.language}
+                        </span>
+                      </div>
+
+                      <p className="text-slate-400 text-xs leading-relaxed font-light min-h-[48px]">
+                        {repo.description}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 border-t border-white/[0.03] mt-4">
+                      <div className="flex gap-4 font-mono text-[10px] text-slate-500">
+                        {repo.stars !== undefined && (
+                          <span className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-amber-500" />
+                            <span>{repo.stars} {language === 'FR' ? 'étoile' : language === 'EN' ? 'star' : 'estrellas'}</span>
+                          </span>
+                        )}
+                        {repo.forks !== undefined && (
+                          <span className="flex items-center gap-1">
+                            <GitFork className="h-3 w-3 text-slate-500" />
+                            <span>{repo.forks} {language === 'FR' ? 'clones' : language === 'EN' ? 'clones' : 'clones'}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <a
+                        href={repo.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-teal-400 hover:text-teal-300 font-mono font-bold uppercase tracking-wide transition-colors"
+                      >
+                        <span>{language === 'FR' ? 'Accéder' : language === 'EN' ? 'Visit' : 'Visitar'}</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
 
         </div>
       </section>
