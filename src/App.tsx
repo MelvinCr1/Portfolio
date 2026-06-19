@@ -20,10 +20,13 @@ import {
   Star,
   GitFork,
   Sun,
-  Moon
+  Moon,
+  Download
 } from 'lucide-react';
 import { Language, GithubRepo } from './types';
 import { translations } from './translations';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 export default function App() {
   const [language, setLanguage] = useState<Language>('FR');
@@ -41,6 +44,8 @@ export default function App() {
   });
 
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showPrintIframeNotice, setShowPrintIframeNotice] = useState(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -295,28 +300,164 @@ export default function App() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [formErrors, setFormErrors] = useState({ name: '', email: '', subject: '', message: '' });
+  const [touchedFields, setTouchedFields] = useState({ name: false, email: false, subject: false, message: false });
 
   const currentTranslation = translations[language];
 
-  // Contact submit with dynamic redirection
+  // Helper validation function
+  const validateField = (fieldName: 'name' | 'email' | 'subject' | 'message', value: string): string => {
+    const trimmed = value.trim();
+    if (fieldName === 'name') {
+      if (!trimmed) return language === 'FR' ? 'Le nom est requis.' : language === 'ES' ? 'El nombre es obligatorio.' : 'Name is required.';
+      if (trimmed.length < 2 || trimmed.length > 50) {
+        return currentTranslation.errName || 'Name must be between 2 and 50 characters.';
+      }
+    }
+    if (fieldName === 'email') {
+      if (!trimmed) return language === 'FR' ? "L'e-mail est requis." : language === 'ES' ? 'El correo es obligatorio.' : 'Email is required.';
+      // Safe, strict email validation regex
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      if (!emailRegex.test(trimmed)) {
+        return currentTranslation.errEmail || 'Please enter a valid email address.';
+      }
+    }
+    if (fieldName === 'subject') {
+      if (!trimmed) return language === 'FR' ? 'Le sujet est requis.' : language === 'ES' ? 'El asunto es obligatorio.' : 'Subject is required.';
+      if (trimmed.length < 3 || trimmed.length > 100) {
+        return currentTranslation.errSubject || 'Subject must be between 3 and 100 characters.';
+      }
+    }
+    if (fieldName === 'message') {
+      if (!trimmed) return language === 'FR' ? 'Le message est requis.' : language === 'ES' ? 'El mensaje es obligatorio.' : 'Message is required.';
+      if (trimmed.length < 10 || trimmed.length > 2000) {
+        return currentTranslation.errMessage || 'Message must be between 10 and 2000 characters.';
+      }
+    }
+    return '';
+  };
+
+  const handleInputChange = (field: 'name' | 'email' | 'subject' | 'message', val: string) => {
+    setFormData(prev => ({ ...prev, [field]: val }));
+    if (touchedFields[field]) {
+      const err = validateField(field, val);
+      setFormErrors(prev => ({ ...prev, [field]: err }));
+    }
+  };
+
+  const handleBlur = (field: 'name' | 'email' | 'subject' | 'message') => {
+    setTouchedFields(prev => ({ ...prev, [field]: true }));
+    const err = validateField(field, formData[field]);
+    setFormErrors(prev => ({ ...prev, [field]: err }));
+  };
+
+  // Contact submit with dynamic redirection & validation checks
   const handleContactSubmit = (e: FormEvent) => {
     e.preventDefault();
+    
+    // Perform full validation sweeps
+    const errors = {
+      name: validateField('name', formData.name),
+      email: validateField('email', formData.email),
+      subject: validateField('subject', formData.subject),
+      message: validateField('message', formData.message)
+    };
+
+    setFormErrors(errors);
+    setTouchedFields({ name: true, email: true, subject: true, message: true });
+
+    const hasAnyError = Object.values(errors).some(err => err !== '');
+    if (hasAnyError) {
+      return;
+    }
+
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
       setFormSubmitted(true);
       
-      const subjectEncoded = encodeURIComponent(formData.subject || 'Contact depuis Portfolio');
-      const bodyEncoded = encodeURIComponent(
-        `Bonjour Melvin,\n\n${formData.message}\n\nCordialement,\n${formData.name}`
-      );
+      // Clean inputs to avoid Header Injection / CR-LF threats:
+      const cleanSubject = (formData.subject || 'Contact depuis Portfolio')
+        .replace(/[\r\n]/g, ' ')
+        .trim();
+      const cleanName = formData.name
+        .replace(/[\r\n]/g, ' ')
+        .trim();
+      const cleanEmail = formData.email.trim();
+      const cleanMessage = formData.message.trim();
+      
+      const subjectEncoded = encodeURIComponent(cleanSubject);
+      const mailtoBody = `Bonjour Melvin,\n\nVous avez reçu un message de la part de ${cleanName} (${cleanEmail}) :\n\n${cleanMessage}\n\nCordialement,\n${cleanName}`;
+      const bodyEncoded = encodeURIComponent(mailtoBody);
       
       // Redirect to standard secure client mail composer
       window.location.href = `mailto:portfolio@melvincureau.com?subject=${subjectEncoded}&body=${bodyEncoded}`;
       
+      // Reset logic
       setFormData({ name: '', email: '', subject: '', message: '' });
+      setTouchedFields({ name: false, email: false, subject: false, message: false });
+      setFormErrors({ name: '', email: '', subject: '', message: '' });
+      
       setTimeout(() => setFormSubmitted(false), 6000);
     }, 1000);
+  };
+
+  // Custom, direct PDF generation & download feature bypassing standard window.print() issues
+  const handleDownloadCV = () => {
+    if (isPdfGenerating) return;
+    
+    // Store original expansion and tab settings to restore them afterwards
+    const originalExpanded = isCvExpanded;
+    const originalTab = cvTab;
+
+    setIsPdfGenerating(true);
+    
+    // Force complete view for the PDF export so the file is not cropped/collapsed
+    setIsCvExpanded(true);
+    setCvTab('all');
+
+    // Wait a brief tick for React state and DOM rendering to finish
+    setTimeout(() => {
+      // Toggle printable body style
+      document.body.classList.add('pdf-generator-active');
+
+      const element = document.body;
+      const opt = {
+        margin:       [8, 10, 8, 10] as [number, number, number, number], // Margins in mm: top, left, bottom, right
+        filename:     `CV_Melvin_Cureau_${language}.pdf`,
+        image:        { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          logging: false,
+          scrollY: 0,
+          scrollX: 0
+        },
+        jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+      };
+
+      // Generate local PDF directly in client browser and trigger download
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save()
+        .then(() => {
+          // Revert styles and restore previous state
+          document.body.classList.remove('pdf-generator-active');
+          setIsCvExpanded(originalExpanded);
+          setCvTab(originalTab);
+          setIsPdfGenerating(false);
+        })
+        .catch((err: any) => {
+          console.error("PDF generation failed, falling back to printer print", err);
+          document.body.classList.remove('pdf-generator-active');
+          setIsCvExpanded(originalExpanded);
+          setCvTab(originalTab);
+          setIsPdfGenerating(false);
+          // Fallback
+          window.print();
+        });
+    }, 150);
   };
 
   return (
@@ -326,119 +467,33 @@ export default function App() {
         : 'bg-[#fafbfe] text-slate-700'
     }`}>
       
-      {/* Dynamic tech blueprint grid and responsive particle background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10 bg-no-repeat bg-cover">
-        {/* Dynamic tech grid overlay - blueprint style */}
-        <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808007_1px,transparent_1px),linear-gradient(to_bottom,#80808007_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]`} />
-
-        {/* Floating digital packet nodes in background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {Array.from({ length: 15 }).map((_, i) => {
-            const size = (i % 3) + 2; // 2px to 4px
-            const duration = 18 + (i * 4); // 18s to 78s
-            const startX = (i * 7) % 100;
-            const startY = (i * 11) % 100;
-            return (
-              <motion.div
-                key={i}
-                className={`absolute rounded-full ${
-                  i % 2 === 0 ? 'bg-teal-400' : 'bg-indigo-400'
-                }`}
-                style={{
-                  width: size,
-                  height: size,
-                  left: `${startX}%`,
-                  top: `${startY}%`,
-                  opacity: theme === 'dark' ? 0.12 : 0.07,
-                }}
-                animate={{
-                  y: [-60, 60, -60],
-                  x: [-35, 35, -35],
-                  opacity: theme === 'dark' ? [0.06, 0.28, 0.06] : [0.03, 0.15, 0.03],
-                }}
-                transition={{
-                  duration,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.4,
-                }}
-              />
-            );
-          })}
-        </div>
+      {/* Designer background: Clean, fine architectural grid lines and organic feel */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
+        {/* Crisp designer hairline grid */}
+        <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808004_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:48px_48px]`} />
+        
+        {/* Subtle, natural, ultra-faint warm ambient shadow center (gives depth but no tech-neon look) */}
+        <div className={`absolute top-[-300px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full blur-[140px] opacity-40 transition-all duration-500 ${
+          theme === 'dark' 
+            ? 'bg-indigo-950/15' 
+            : 'bg-amber-100/25'
+        }`} />
       </div>
 
-      {/* Background decoration - soft floating artistic glow blurs & shadows */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden -z-10">
-        <motion.div 
-          animate={{
-            y: [-12, 12, -12],
-            x: [-8, 8, -8],
-            scale: [1, 1.04, 1],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className={`absolute top-[-250px] left-[12%] w-[550px] h-[550px] rounded-full blur-[120px] transition-all duration-300 ${
-            theme === 'dark' 
-              ? 'bg-teal-500/5 shadow-[0_0_120px_rgba(20,184,166,0.15)]' 
-              : 'bg-teal-500/[0.04] shadow-[0_0_120px_rgba(20,184,166,0.06)]'
-          }`}
-        />
-        <motion.div 
-          animate={{
-            y: [12, -12, 12],
-            x: [8, -8, 8],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className={`absolute top-[-200px] right-[15%] w-[500px] h-[500px] rounded-full blur-[120px] transition-all duration-300 ${
-            theme === 'dark' 
-              ? 'bg-indigo-500/5 shadow-[0_0_120px_rgba(99,102,241,0.15)]' 
-              : 'bg-indigo-500/[0.04] shadow-[0_0_120px_rgba(99,102,241,0.06)]'
-          }`}
-        />
-        {/* Additional organic ambient glow/shadow centers for depth further down */}
-        <motion.div 
-          animate={{
-            y: [-20, 20, -20],
-            x: [10, -10, 10],
-            scale: [0.95, 1.05, 0.95],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className={`absolute top-[800px] right-[10%] w-[600px] h-[600px] rounded-full blur-[130px] transition-all duration-300 ${
-            theme === 'dark' 
-              ? 'bg-teal-500/[0.03] shadow-[0_0_150px_rgba(20,184,166,0.06)]' 
-              : 'bg-teal-500/[0.02] shadow-[0_0_150px_rgba(20,184,166,0.03)]'
-          }`}
-        />
-        <motion.div 
-          animate={{
-            y: [15, -15, 15],
-            x: [-15, 15, -15],
-            scale: [1, 1.08, 1],
-          }}
-          transition={{
-            duration: 22,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className={`absolute top-[1800px] left-[5%] w-[550px] h-[550px] rounded-full blur-[130px] transition-all duration-300 ${
-            theme === 'dark' 
-              ? 'bg-indigo-500/[0.03] shadow-[0_0_150px_rgba(99,102,241,0.06)]' 
-              : 'bg-indigo-500/[0.02] shadow-[0_0_150px_rgba(99,102,241,0.03)]'
-          }`}
-        />
+      {/* PRINT-ONLY RESUME HEADER */}
+      <div className="hidden print:block border-b-2 border-slate-300 pb-3 mb-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-extrabold uppercase tracking-tight text-slate-900 leading-none">Melvin Cureau</h1>
+            <p className="text-sm font-bold text-slate-700 mt-1">{currentTranslation.role}</p>
+            {currentTranslation.status && <p className="text-xs text-slate-400 mt-0.5">{currentTranslation.status}</p>}
+          </div>
+          <div className="text-right text-xs text-slate-600 font-mono space-y-0.5">
+            <p className="font-semibold text-slate-900">melvin.cureau2004@gmail.com</p>
+            <p>linkedin.com/in/melvin-cureau-83a812252</p>
+            <p>github.com/melvin-cureau</p>
+          </div>
+        </div>
       </div>
 
       {/* HEADER */}
@@ -447,21 +502,8 @@ export default function App() {
           ? 'bg-[#090a0f]/85 border-white/[0.04]'
           : 'bg-[#fafbfe]/85 border-slate-200/80'
       }`}>
-        <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex justify-end md:justify-between items-center gap-4">
           
-          {/* Main Logo */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center cursor-pointer group"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          >
-            <span className={`font-extrabold text-sm tracking-tight block group-hover:text-teal-400 transition-colors uppercase font-mono ${
-              theme === 'dark' ? 'text-white' : 'text-slate-900'
-            }`}>Melvin Cureau</span>
-          </motion.div>
-
           {/* Nav menu links */}
           <nav className={`hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-wider transition-colors ${
             theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
@@ -576,28 +618,29 @@ export default function App() {
       <section className="relative py-20 md:py-32">
         <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
           
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-400 rounded-full text-xs font-mono"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
-            {currentTranslation.status}
-          </motion.div>
+          {/* Status badge removed as requested */}
 
           <motion.h1 
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className={`text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r ${
-              theme === 'dark'
-                ? 'from-white via-slate-100 to-slate-400'
-                : 'from-slate-950 via-slate-800 to-slate-700'
+            className={`text-5xl sm:text-7xl font-black tracking-tight leading-none ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}
+          >
+            Melvin Cureau
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className={`text-lg sm:text-xl font-bold tracking-tight uppercase ${
+              theme === 'dark' ? 'text-teal-400' : 'text-teal-600'
             }`}
           >
             {currentTranslation.role}
-          </motion.h1>
+          </motion.p>
 
           <motion.p 
             initial={{ opacity: 0, y: 25 }}
@@ -614,13 +657,17 @@ export default function App() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 pt-6"
+            className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 pt-6 w-full max-w-sm sm:max-w-none mx-auto"
           >
             <a
               href="https://www.linkedin.com/in/melvin-cureau-83a812252/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-bold text-xs tracking-wider uppercase rounded-xl shadow-[0_15px_30px_rgba(20,184,166,0.25)] hover:shadow-[0_15px_35px_rgba(20,184,166,0.35)] transition-all flex items-center gap-2 group transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              className={`w-full sm:w-auto justify-center px-6 py-3 font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 group transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer duration-200 border ${
+                theme === 'dark'
+                  ? 'bg-teal-500 border-teal-400 text-slate-950 hover:bg-teal-400'
+                  : 'bg-slate-950 border-slate-950 text-white hover:bg-slate-800'
+              }`}
             >
               <Linkedin className="h-4 w-4" />
               {currentTranslation.viewLinkedin}
@@ -631,15 +678,39 @@ export default function App() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className={`px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg hover:shadow-xl ${
+              className={`w-full sm:w-auto justify-center px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
                 theme === 'dark'
-                  ? 'bg-slate-900 border-white/10 hover:border-white/20 text-slate-200 hover:text-white'
-                  : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-100 hover:text-slate-950'
+                  ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-200 hover:text-white'
+                  : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
               <Github className="h-4 w-4" />
               {currentTranslation.viewGithub}
             </a>
+            
+            <button
+              onClick={handleDownloadCV}
+              disabled={isPdfGenerating}
+              className={`w-full sm:w-auto justify-center px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer disabled:opacity-75 disabled:pointer-events-none ${
+                theme === 'dark'
+                  ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-200 hover:text-white'
+                  : 'bg-teal-50/30 border-teal-100 text-teal-700 hover:bg-teal-50/80 hover:text-teal-800'
+              }`}
+            >
+              {isPdfGenerating ? (
+                <>
+                  <span className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-current border-t-transparent" />
+                  <span>
+                    {language === 'FR' ? 'Génération...' : language === 'ES' ? 'Generando...' : 'Generating...'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  <span>{currentTranslation.downloadLabel}</span>
+                </>
+              )}
+            </button>
           </motion.div>
 
         </div>
@@ -708,7 +779,7 @@ export default function App() {
             <AnimatePresence mode="popLayout">
               
               {/* Experiences lists */}
-              {(cvTab === 'all' || cvTab === 'work') && (
+              <div key="work-block-wrapper" className={cvTab === 'all' || cvTab === 'work' ? 'block' : 'hidden print:block'}>
                 <motion.div
                   key="work-block"
                   initial={{ opacity: 0, y: 20 }}
@@ -727,14 +798,14 @@ export default function App() {
                   <div className={`space-y-6 border-l ml-3 pl-6 transition-colors ${
                     theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
                   }`}>
-                    {(isCvExpanded ? currentTranslation.experiences : currentTranslation.experiences.slice(0, 1)).map((exp, index) => (
+                    {currentTranslation.experiences.map((exp, index) => (
                       <motion.div 
                         key={index}
                         whileHover={{ y: -3 }}
-                        className={`relative group p-5 rounded-2xl hover:border-teal-500/20 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(20,184,166,0.12)] border transition-all duration-300 ${
+                        className={`${!isCvExpanded && index >= 2 ? 'hidden print:block' : 'block'} relative group p-5 rounded-xl border transition-all duration-200 ${
                           theme === 'dark' 
-                            ? 'bg-slate-900/40 border-white/[0.04] hover:bg-slate-900/60' 
-                            : 'bg-white border-slate-200 hover:bg-slate-50/80 shadow-sm'
+                            ? 'bg-slate-900/20 border-slate-900/60 hover:border-slate-800 hover:bg-slate-900/40 shadow-none' 
+                            : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/50 shadow-sm'
                         }`}
                       >
                         {/* Timeline point indicator */}
@@ -789,10 +860,10 @@ export default function App() {
                     ))}
                   </div>
                 </motion.div>
-              )}
+              </div>
 
               {/* Education section */}
-              {(cvTab === 'all' || cvTab === 'education') && (
+              <div key="edu-block-wrapper" className={cvTab === 'all' || cvTab === 'education' ? 'block' : 'hidden print:block'}>
                 <motion.div
                   key="edu-block"
                   initial={{ opacity: 0, y: 20 }}
@@ -811,14 +882,14 @@ export default function App() {
                   <div className={`space-y-5 border-l ml-3 pl-6 transition-colors ${
                     theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
                   }`}>
-                    {(isCvExpanded ? currentTranslation.educations : currentTranslation.educations.slice(0, 1)).map((edu, index) => (
+                    {currentTranslation.educations.map((edu, index) => (
                       <motion.div 
                         key={index}
                         whileHover={{ y: -3 }}
-                        className={`relative group p-5 rounded-2xl hover:border-indigo-500/20 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(99,102,241,0.12)] border transition-all duration-300 ${
+                        className={`${!isCvExpanded && index >= 1 ? 'hidden print:block' : 'block'} relative group p-5 rounded-xl border transition-all duration-200 ${
                           theme === 'dark'
-                            ? 'bg-slate-900/40 border-white/[0.04] hover:bg-slate-900/60'
-                            : 'bg-white border-slate-200 hover:bg-slate-50/80 shadow-sm'
+                            ? 'bg-slate-900/20 border-slate-900/60 hover:border-slate-800 hover:bg-slate-900/40 shadow-none'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/50 shadow-sm'
                         }`}
                       >
                         {/* Bullet point */}
@@ -850,7 +921,7 @@ export default function App() {
                     ))}
                   </div>
                 </motion.div>
-              )}
+              </div>
 
             </AnimatePresence>
 
@@ -873,7 +944,7 @@ export default function App() {
           </div>
 
           {/* Right sidebar: Skills spectrum */}
-          <div className="space-y-6.5">
+          <div className="space-y-6.5 right-sidebar">
             
             {/* Certifications and Key assets */}
             <div className={`border p-6 rounded-2xl shadow-xl transition-all duration-300 space-y-4 ${
@@ -884,7 +955,7 @@ export default function App() {
               <h3 className={`text-xs font-mono uppercase tracking-wider flex items-center gap-2 ${
                 theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
               }`}>
-                <Award className="h-4.5 w-4.5 text-teal-400 animate-pulse" />
+                <Award className="h-4.5 w-4.5 text-teal-400" />
                 {currentTranslation.certifications}
               </h3>
 
@@ -1016,9 +1087,7 @@ export default function App() {
             <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
               theme === 'dark' ? 'text-white' : 'text-slate-900'
             }`}>{currentTranslation.projectsTitle}</h2>
-            <p className="text-xs font-mono text-slate-500 uppercase tracking-wider">
-              {language === 'FR' ? 'Dépôts publics épinglés' : language === 'EN' ? 'Public pinned repositories' : 'Repositorios públicos destacados'}
-            </p>
+
           </div>
 
           {/* Dynamic Grid of GitHub Pinned Projects */}
@@ -1029,16 +1098,16 @@ export default function App() {
                   theme === 'dark' ? 'border-white/[0.03] bg-slate-900/10' : 'border-slate-200 bg-white'
                 }`}>
                   <div className="flex justify-between items-center">
-                    <div className="h-4 bg-slate-800 rounded w-1/2" />
-                    <div className="h-3 bg-slate-800 rounded w-1/6" />
+                    <div className={`h-4 rounded w-1/2 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
+                    <div className={`h-3 rounded w-1/6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
                   </div>
                   <div className="space-y-2">
-                    <div className="h-3 bg-slate-800 rounded w-full" />
-                    <div className="h-3 bg-slate-800 rounded w-5/6" />
+                    <div className={`h-3 rounded w-full ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
+                    <div className={`h-3 rounded w-5/6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
                   </div>
                   <div className="flex gap-4 pt-2">
-                    <div className="h-3 bg-slate-800 rounded w-1/4" />
-                    <div className="h-3 bg-slate-800 rounded w-1/4" />
+                    <div className={`h-3 rounded w-1/4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
+                    <div className={`h-3 rounded w-1/4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
                   </div>
                 </div>
               ))
@@ -1073,16 +1142,16 @@ export default function App() {
 
                 return (
                   <motion.div
-                    key={repo.repo || idx}
+                    key={`${repo.repo || 'repo'}-${idx}`}
                     initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1, duration: 0.5 }}
                     whileHover={{ y: -4 }}
-                    className={`group relative overflow-hidden border p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 ${
+                    className={`group relative overflow-hidden border p-6 rounded-xl flex flex-col justify-between transition-all duration-200 ${
                       theme === 'dark'
-                        ? 'border-white/[0.04] bg-slate-900/10 hover:border-teal-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(20,184,166,0.06)]'
-                        : 'border-slate-200 bg-white hover:border-teal-400/80 shadow-sm hover:shadow-md'
+                        ? 'border-slate-900/60 bg-slate-900/20 hover:border-slate-800 hover:bg-slate-900/40 shadow-none'
+                        : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
                     }`}
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/[0.01] group-hover:bg-teal-500/[0.03] blur-2xl rounded-full transition-colors pointer-events-none" />
@@ -1225,64 +1294,132 @@ export default function App() {
               }`}>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 align-top">
                     <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">{currentTranslation.fieldName}</label>
                     <input
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onBlur={() => handleBlur('name')}
+                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:ring-1 transition-all duration-200 font-light ${
+                        formErrors.name && touchedFields.name
+                          ? 'border-rose-500/50 focus:border-rose-500/80 focus:ring-rose-500/30 bg-rose-500/[0.01]'
+                          : 'focus:border-teal-500/40 focus:ring-teal-500/40'
+                      } ${
                         theme === 'dark'
                           ? 'bg-slate-950 border-white/5 text-white'
                           : 'bg-slate-50 border-slate-200 text-slate-800'
                       }`}
                     />
+                    <AnimatePresence>
+                      {formErrors.name && touchedFields.name && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          className="text-[10px] font-mono text-rose-500 mt-1 flex items-center gap-1"
+                        >
+                          <span>●</span> {formErrors.name}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 align-top">
                     <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">{currentTranslation.fieldEmail}</label>
                     <input
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onBlur={() => handleBlur('email')}
+                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:ring-1 transition-all duration-200 font-light ${
+                        formErrors.email && touchedFields.email
+                          ? 'border-rose-500/50 focus:border-rose-500/80 focus:ring-rose-500/30 bg-rose-500/[0.01]'
+                          : 'focus:border-teal-500/40 focus:ring-teal-500/40'
+                      } ${
                         theme === 'dark'
                           ? 'bg-slate-950 border-white/5 text-white'
                           : 'bg-slate-50 border-slate-200 text-slate-800'
                       }`}
                     />
+                    <AnimatePresence>
+                      {formErrors.email && touchedFields.email && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          className="text-[10px] font-mono text-rose-500 mt-1 flex items-center gap-1"
+                        >
+                          <span>●</span> {formErrors.email}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pb-1">
                   <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">{currentTranslation.fieldSubject}</label>
                   <input
                     type="text"
                     required
                     value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    onBlur={() => handleBlur('subject')}
+                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:ring-1 transition-all duration-200 font-light ${
+                      formErrors.subject && touchedFields.subject
+                        ? 'border-rose-500/50 focus:border-rose-500/80 focus:ring-rose-500/30 bg-rose-500/[0.01]'
+                        : 'focus:border-teal-500/40 focus:ring-teal-500/40'
+                    } ${
                       theme === 'dark'
                         ? 'bg-slate-950 border-white/5 text-white'
                         : 'bg-slate-50 border-slate-200 text-slate-800'
                     }`}
                   />
+                  <AnimatePresence>
+                    {formErrors.subject && touchedFields.subject && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        className="text-[10px] font-mono text-rose-500 mt-1 flex items-center gap-1"
+                      >
+                        <span>●</span> {formErrors.subject}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pb-1">
                   <label className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">{currentTranslation.fieldMessage}</label>
                   <textarea
                     rows={4}
                     required
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all resize-none font-light ${
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    onBlur={() => handleBlur('message')}
+                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:ring-1 transition-all duration-200 resize-none font-light ${
+                      formErrors.message && touchedFields.message
+                        ? 'border-rose-500/50 focus:border-rose-500/80 focus:ring-rose-500/30 bg-rose-500/[0.01]'
+                        : 'focus:border-teal-500/40 focus:ring-teal-500/40'
+                    } ${
                       theme === 'dark'
                         ? 'bg-slate-950 border-white/5 text-white'
                         : 'bg-slate-50 border-slate-200 text-slate-800'
                     }`}
                   />
+                  <AnimatePresence>
+                    {formErrors.message && touchedFields.message && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        className="text-[10px] font-mono text-rose-500 mt-1 flex items-center gap-1"
+                      >
+                        <span>●</span> {formErrors.message}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <AnimatePresence>
@@ -1302,7 +1439,11 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 bg-gradient-to-r from-teal-500 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer flex items-center justify-center gap-2 hover:shadow-[0_12px_30px_rgba(20,184,166,0.2)] transition-all disabled:opacity-50"
+                  className={`w-full py-3 font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-50 border ${
+                    theme === 'dark'
+                      ? 'bg-teal-500 border-teal-400 text-slate-950 hover:bg-teal-400'
+                      : 'bg-slate-950 border-slate-950 text-white hover:bg-slate-800'
+                  }`}
                 >
                   {isSubmitting ? (
                     <>
@@ -1390,6 +1531,53 @@ export default function App() {
           >
             <ArrowUp className="h-4 w-4" />
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Block/Iframe Printing Notice Modal */}
+      <AnimatePresence>
+        {showPrintIframeNotice && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className={`max-w-md w-full p-6 rounded-2xl border shadow-2xl relative ${
+                theme === 'dark'
+                  ? 'bg-slate-950 border-slate-800 text-white'
+                  : 'bg-white border-slate-100 text-slate-900'
+              }`}
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="p-3 bg-teal-500/10 text-teal-400 rounded-xl shrink-0">
+                  <AlertCircle className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold tracking-tight">
+                    {currentTranslation.iframeNoticeTitle}
+                  </h3>
+                  <p className={`text-xs mt-2 leading-relaxed ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  }`}>
+                    {currentTranslation.iframeNoticeText}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setShowPrintIframeNotice(false)}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
+                    theme === 'dark'
+                      ? 'bg-teal-500 text-slate-950 hover:bg-teal-400'
+                      : 'bg-teal-600 text-white hover:bg-teal-700'
+                  }`}
+                >
+                  {currentTranslation.iframeNoticeClose}
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

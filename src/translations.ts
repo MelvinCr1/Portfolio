@@ -5,7 +5,7 @@ export const translations: Record<Language, TranslationSet> = {
     role: "Ingénieur SysOps & Cloud",
     status: "Alternant chez Cloud Temple",
     aboutText: "Étudiant de Master à SUPINFO Tours, je suis passionné par l'automatisation, la fiabilité et la sécurité des environnements Cloud. Je me spécialise dans la conception d'architectures à haute disponibilité (VMware, Azure, AWS, Private Cloud) et le maintien en conditions opérationnelles de systèmes critiques, tout en garantissant les bonnes pratiques réglementaires SecNumCloud.",
-    navCV: "Parcours (CV)",
+    navCV: "Parcours",
     navProjects: "Projets",
     navContact: "Contact",
     downloadLabel: "Télécharger mon CV (PDF)",
@@ -41,6 +41,13 @@ export const translations: Record<Language, TranslationSet> = {
     btnShowMore: "Voir plus",
     btnShowLess: "Voir moins",
     formSuccess: "Envoyé...",
+    errName: "Le nom doit comporter entre 2 et 50 caractères.",
+    errEmail: "Veuillez entrer une adresse e-mail valide et sécurisée.",
+    errSubject: "Le sujet doit comporter entre 3 et 100 caractères.",
+    errMessage: "Le message doit comporter entre 10 et 2000 caractères.",
+    iframeNoticeTitle: "Impression dans l'aperçu",
+    iframeNoticeText: "Pour imprimer ou enregistrer en PDF depuis l'aperçu de l'éditeur, veuillez ouvrir l'application dans un nouvel onglet en cliquant sur le bouton en haut à droite de l'aperçu (icône d'ouverture externe), puis cliquez à nouveau sur le bouton Télécharger.",
+    iframeNoticeClose: "Compris",
 
     // Experiences Data
     experiences: [
@@ -117,7 +124,7 @@ export const translations: Record<Language, TranslationSet> = {
     role: "SysOps & Cloud Engineer",
     status: "Apprentice at Cloud Temple",
     aboutText: "Master's student at SUPINFO Tours, I am driven by the automation, reliability, and security of modern Cloud Environments. I specialize in designing high-availability server topologies (VMware, Azure, AWS, Private Cloud) and executing the continuous maintenance (MCO) of highly critical systems while fully respecting regulatory standards like ANSSI SecNumCloud.",
-    navCV: "Background (CV)",
+    navCV: "Background",
     navProjects: "Projects",
     navContact: "Contact",
     downloadLabel: "Download Resume (PDF)",
@@ -153,6 +160,13 @@ export const translations: Record<Language, TranslationSet> = {
     btnShowMore: "Show more",
     btnShowLess: "Show less",
     formSuccess: "Sent...",
+    errName: "Name must be between 2 and 50 characters.",
+    errEmail: "Please enter a valid, safe email address.",
+    errSubject: "Subject must be between 3 and 100 characters.",
+    errMessage: "Message must be between 10 and 2000 characters.",
+    iframeNoticeTitle: "Printing from Preview",
+    iframeNoticeText: "To print or save as PDF from the editor's live preview, please open the application in a new tab by clicking the icon at the top right of the preview frame, then click the Download button again.",
+    iframeNoticeClose: "Got it",
 
     // Experiences Data
     experiences: [
@@ -229,7 +243,7 @@ export const translations: Record<Language, TranslationSet> = {
     role: "Ingeniero SysOps y Cloud",
     status: "Aprendiz en Cloud Temple",
     aboutText: "Estudiante de Máster en SUPINFO Tours, me apasiona la automatización, seguridad y fiabilidad en infraestructuras Cloud. Me especializo en el diseño de arquitecturas robustas de alta disponibilidad (VMware, Azure, AWS, Private Cloud) y en el mantenimiento en condiciones operativas de sistemas altamente críticos aplicando rigurosos estándares regulados como SecNumCloud.",
-    navCV: "Trayectoria (CV)",
+    navCV: "Trayectoria",
     navProjects: "Proyectos",
     navContact: "Contacto",
     downloadLabel: "Descargar mi CV (PDF)",
@@ -265,6 +279,13 @@ export const translations: Record<Language, TranslationSet> = {
     btnShowMore: "Ver más",
     btnShowLess: "Ver menos",
     formSuccess: "¡Enviado!",
+    errName: "El nombre debe tener entre 2 y 50 caracteres.",
+    errEmail: "Por favor, introduce una dirección de correo válida y segura.",
+    errSubject: "El asunto debe tener entre 3 y 100 caracteres.",
+    errMessage: "El mensaje debe tener entre 10 y 2000 caracteres.",
+    iframeNoticeTitle: "Impresión en la Vista Previa",
+    iframeNoticeText: "Para imprimir o guardar como PDF desde la vista previa del editor, por favor abre la aplicación en una pestaña nueva haciendo clic en el icono superior derecho de la vista previa, luego haz clic de nuevo en Descargar.",
+    iframeNoticeClose: "Entendido",
 
     // Experiences Data
     experiences: [

@@ -53,6 +53,13 @@ export interface TranslationSet {
   btnShowMore: string;
   btnShowLess: string;
   formSuccess: string;
+  iframeNoticeTitle: string;
+  iframeNoticeText: string;
+  iframeNoticeClose: string;
+  errName?: string;
+  errEmail?: string;
+  errSubject?: string;
+  errMessage?: string;
   experiences: ExperienceItem[];
   educations: EducationItem[];
 }
