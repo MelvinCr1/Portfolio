@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, ReactNode } from 'react';
+import { useState, useEffect, useRef, FormEvent, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Briefcase, 
@@ -65,6 +65,22 @@ export default function App() {
 
   const [cvTab, setCvTab] = useState<'all' | 'work' | 'education' | 'skills'>('all');
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
+        setLangMenuOpen(false);
+      }
+    }
+    if (langMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [langMenuOpen]);
+
   const [isCvExpanded, setIsCvExpanded] = useState(false);
   const [githubRepos, setGithubRepos] = useState<GithubRepo[]>([]);
   const [reposLoading, setReposLoading] = useState<boolean>(true);
@@ -490,6 +506,7 @@ export default function App() {
 
             {/* Premium dropdown language selector */}
             <motion.div 
+              ref={langMenuRef}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -1349,18 +1366,6 @@ export default function App() {
               <Github className="h-3 w-3 shrink-0" />
               <span>GitHub</span>
             </a>
-            
-            <button 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-              className={`transition-colors flex items-center gap-1 border-l pl-6 cursor-pointer ${
-                theme === 'dark' 
-                  ? 'text-slate-500 hover:text-white border-white/10' 
-                  : 'text-slate-500 hover:text-slate-900 border-slate-200'
-              }`}
-            >
-              <span>{language === 'FR' ? 'Retour en haut' : language === 'EN' ? 'Back to top' : 'Volver arriba'}</span>
-              <span className="font-sans text-[11px] leading-none shrink-0 inline-block hover:translate-y-[-2px] transition-transform">↑</span>
-            </button>
           </div>
         </div>
       </footer>
