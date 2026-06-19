@@ -19,5 +19,6 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         port: 22
+        sftp_only: true
         local_path: './*' # Prend tous les fichiers à la racine du repo
         remote_path: '/'  # sous-dossier sur IONOS
