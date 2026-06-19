@@ -32,4 +32,4 @@ jobs:
         port: 22
         sftp_only: true
         local_path: './dist/*' # Seulement le dossier compilé
-        remote_path: '/'
+        remote_path: '/public'
