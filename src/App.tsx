@@ -272,7 +272,7 @@ export default function App() {
       
       const subjectEncoded = encodeURIComponent(formData.subject || 'Contact depuis Portfolio');
       const bodyEncoded = encodeURIComponent(
-        `Bonjour Melvin,\n\nVous avez reçu un message de ${formData.name} (${formData.email}) :\n\n-----------------\n${formData.message}\n-----------------\n\nCordialement,\n${formData.name}`
+        `Bonjour Melvin,\n\n${formData.message}\n\nCordialement,\n${formData.name}`
       );
       
       // Redirect to standard secure client mail composer
@@ -555,7 +555,7 @@ export default function App() {
               className={`px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg hover:shadow-xl ${
                 theme === 'dark'
                   ? 'bg-slate-900 border-white/10 hover:border-white/20 text-slate-200 hover:text-white'
-                  : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-950'
+                  : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-100 hover:text-slate-950'
               }`}
             >
               <Github className="h-4 w-4" />
@@ -687,7 +687,7 @@ export default function App() {
                         <ul className="space-y-2 mt-4">
                           {exp.details.map((detail, dIdx) => (
                             <li key={dIdx} className={`text-xs leading-relaxed flex items-start gap-2 transition-colors ${
-                              theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                              theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
                             }`}>
                               <span className="text-teal-400 mt-1.5 shrink-0 block w-1 h-1 rounded-full bg-teal-400" />
                               <span>{detail}</span>
@@ -700,7 +700,7 @@ export default function App() {
                             <span key={tIdx} className={`text-[10px] font-mono px-2 py-0.5 border rounded-md transition-colors ${
                               theme === 'dark'
                                 ? 'border-white/5 bg-slate-950 text-slate-400'
-                                : 'border-slate-200 bg-slate-50 text-slate-600'
+                                : 'border-slate-200 bg-slate-50 text-slate-800 font-medium'
                             }`}>
                               {tag}
                             </span>
@@ -765,7 +765,7 @@ export default function App() {
 
                         <p className="text-xs text-indigo-300 font-mono mt-1 font-semibold">{edu.specialty}</p>
                         <p className={`text-xs mt-3 leading-relaxed font-light transition-colors ${
-                          theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                          theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
                         }`}>{edu.details}</p>
                       </motion.div>
                     ))}
@@ -935,7 +935,7 @@ export default function App() {
               ))
             ) : (
               githubRepos.map((repo, idx) => {
-                const langColors: Record<string, string> = {
+                const langColors: Record<string, string> = theme === 'dark' ? {
                   'HTML': 'bg-orange-500/15 text-orange-400 border-orange-500/20',
                   'CSS': 'bg-blue-500/15 text-blue-400 border-blue-500/20',
                   'JavaScript': 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
@@ -947,8 +947,20 @@ export default function App() {
                   'C#': 'bg-purple-500/15 text-purple-400 border-purple-500/20',
                   'Vue': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
                   'YAML': 'bg-pink-500/15 text-pink-400 border-pink-500/20'
+                } : {
+                  'HTML': 'bg-orange-50 border-orange-200 text-orange-800 font-semibold',
+                  'CSS': 'bg-blue-50 border-blue-200 text-blue-800 font-semibold',
+                  'JavaScript': 'bg-yellow-50 border-yellow-200 text-amber-900 font-semibold',
+                  'TypeScript': 'bg-blue-50 border-blue-250 text-blue-800 font-semibold',
+                  'PowerShell': 'bg-indigo-50 border-indigo-200 text-indigo-800 font-semibold',
+                  'Python': 'bg-sky-50 border-sky-200 text-sky-800 font-semibold',
+                  'Shell': 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold',
+                  'Go': 'bg-cyan-50 border-cyan-200 text-cyan-800 font-semibold',
+                  'C#': 'bg-purple-50 border-purple-200 text-purple-850 font-semibold',
+                  'Vue': 'bg-emerald-50 border-emerald-250 text-emerald-800 font-semibold',
+                  'YAML': 'bg-pink-50 border-pink-200 text-pink-850 font-semibold'
                 };
-                const badgeStyle = langColors[repo.language] || 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+                const badgeStyle = langColors[repo.language] || (theme === 'dark' ? 'bg-slate-500/15 text-slate-400 border-slate-500/30' : 'bg-slate-100 text-slate-700 border-slate-200 font-semibold');
 
                 return (
                   <motion.div
@@ -981,7 +993,7 @@ export default function App() {
                       </div>
 
                       <p className={`text-xs leading-relaxed font-light min-h-[48px] transition-colors ${
-                        theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                        theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
                       }`}>
                         {repo.description}
                       </p>

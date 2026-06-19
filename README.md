@@ -1,93 +1,86 @@
 # 💻 Portfolio
 
-<p align="center">
-  <a href="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /></a>
-  <a href="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
-  <a href="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" /></a>
-  <a href="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /></a>
-  <a href="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer&logoColor=14b8a6"><img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer&logoColor=14b8a6" alt="Framer Motion" /></a>
-</p>
+Ce dépôt héberge le code complet de mon site portfolio. Conçu pour être ultra-rapide, moderne et accessible, ce portfolio me permet de présenter mes compétences en ingénierie système, cloud computing et DevOps, tout en servant de vitrine interactive pour mes réalisations.
 
 ---
 
-## Présentation Générale
+## Fonctionnalités Majeures du Site
 
-Ce projet héberge le code complet de son site portfolio interactif : moderne, fluide, accessible (conformité aux standards WCAG), traduisible en temps réels en trois langues (**Français**, **Anglais**, **Espagnol**), doté d'un commutateur de thèmes (sombre/clair) et entièrement synchronisé avec l'API GitHub pour exposer ses réalisations à jour.
-
----
-
-## Fonctionnalités Majeures du Portfolio
-
-1. **Traduction Instantanée In-App** : Changement dynamique à la volée entre FR, EN et ES avec conservation optimale de l'UX.
-2. **Double Système de Thème** : Mode sombre soigné (*Cosmic Dark*) pour l'identité d'ingénierie système, et mode alternatif clair contrasté.
-3. **Synchronisation API Live** : Requêtes asynchrones fiables pour récupérer les dépôts épinglés sous forme de composants interactifs.
-4. **Parcours Modulaire & Accordéons Intelligents** : Permet une vision condensée immédiate (idéale pour les chargés de recrutement) extensible pour un examen approfondi du CV.
-5. **Formulaire de Contact Intégré** : Interface soignée avec simulation de transfert et sécurité anti-abus locale.
+1. **Double Système de Thème** : Mode sombre soigné (*Cosmic Dark*) pour une esthétique technique, et un mode clair enrichi avec un excellent taux de contraste pour une lisibilité et une accessibilité optimales (conforme aux normes d'accessibilité WCAG).
+2. **Traduction Instantanée Multilingue** : Choix dynamique à la volée entre trois langues (**Français**, **Anglais**, **Espagnol**) avec une gestion rigoureuse des polices et de l'alignement pour une expérience fluide.
+3. **Intégration Active avec l'API GitHub** : Requêtes asynchrones en temps réel pour récupérer automatiquement mes dépôts publics épinglés et les afficher de manière interactive.
+4. **Parcours Interactif Réduit & Extensible** : Une vue du parcours condensée et claire (optimale pour les recruteurs), extensible d'un simple clic pour lire les détails des expériences et cursus académiques.
+5. **Formulaire de Contact Réactif** : Formulaire interactif en direct qui préremplit et ouvre automatiquement votre messagerie pour un acheminement direct et sécurisé vers `portfolio@melvincureau.com`.
 
 ---
 
-## Stack Technique de l'Application
+## Stack Technique
 
-* **React 19 & TypeScript 5** : Robustesse de typage strict des structures d'interfaces.
-* **Vite** : Bundleur ultra-rapide garantissant des scores de chargement Web exceptionnels.
-* **Tailwind CSS v4** : Styling moderne natif, hautement optimisé et hautement réactif.
-* **motion** : Transitions fluides et réactivité physique aux survols et lancements.
-* **Lucide React** : Icônes vectorielles légères et modernes.
+* **Framework** : React (v19) avec **TypeScript** pour un typage strict et une robustesse accrue.
+* **Build Tool** : **Vite** pour un démarrage instantané en développement et une mise en groupe hautement optimisée pour la production.
+* **Design & Animations** : **Tailwind CSS (v4)** pour le design réactif et **motion** pour les transitions physiques fluides et interactives.
+* **Icônes** : **Lucide React** pour des icônes vectorielles légères et personnalisables sans impact sur le temps de chargement.
 
 ---
 
-## Structure Tracée du Projet
+## Structure du Projet
 
 ```bash
 .
-├── metadata.json       # Métadonnées d'identification du portfolio
-├── package.json        # Manifeste npm (dépendances standardisées)
-├── tsconfig.json       # Configuration stricte du compilateur TypeScript
-├── vite.config.ts      # Configuration optimisée du bundleur Vite
-├── index.html          # Point d'entrée avec balises méta SEO complètes
-├── README.md           # Ce guide technique et professionnel
-└── src
-    ├── main.tsx        # Point d'ancrage React au DOM virtuel
-    ├── index.css       # Intégration globale de la couche Tailwind CSS v4
-    ├── types.ts        # Interfaces et signatures de types strictes
-    ├── translations.ts # Dictionnaires multilingues (FR / EN / ES)
-    └── App.tsx         # Dashboard interactif et logique d'animation globale
+├── .github/workflows/deploy.yml # Pipeline de déploiement automatique via GitHub Actions (SFTP)
+├── public
+│   └── .htaccess                # Règles de redirection HTTPS et routage pour Apache/IONOS
+├── src
+│   ├── main.tsx                 # Point de montage de l'application React
+│   ├── App.tsx                  # Composant maître, logique d'état et animations
+│   ├── translations.ts          # Dictionnaires statiques multilingues (FR / EN / ES)
+│   ├── types.ts                 # Contrats de types de données
+│   └── index.css                # Base de styles Tailwind CSS et intégration de Google Fonts
+├── package.json                 # Gestion des scripts et des paquets npm
+└── vite.config.ts               # Configuration du build de l'application
 ```
 
 ---
 
-## Installation & Démarrage Local
+## Configuration & Bonnes Pratiques du Serveur
 
-Pour cloner et exécuter le projet dans votre environnement de test local :
+Pour garantir un fonctionnement maximal sur l'environnement de production, deux aspects majeurs d'infrastructure ont été intégrés :
+
+### 1. Routage SPA & Redirection HTTPS (`.htaccess`)
+Comme le portfolio est une Single Page Application (SPA), le routage côté client nécessite que toutes les requêtes soient renvoyées vers le fichier `index.html`. Le fichier `/public/.htaccess` configure automatiquement ce comportement sous Apache (idéal pour un hébergement chez IONOS) tout en forçant l'usage de connexions sécurisées HTTPS.
+
+Il assure les réglages indispensables suivants :
+* **Forçage HTTPS** de toutes les requêtes HTTP entravées.
+* **Routage de secours** (`RewriteRule . /index.html [L]`) pour éviter les erreurs de type 404 lors du rechargement d'une page consultée.
+* **En-têtes de Sécurité Recommandés** (à ajouter directement sur l'hébergeur ou via configurations supplémentaires).
+
+### 2. Déploiement Automatique (Workflows GitHub Actions)
+Le fichier `.github/workflows/deploy.yml` est configuré pour déployer automatiquement le code compilé dès qu'un push est effectué sur la branche `main`.
+* Il installe les dépendances et compile le projet en production via `npm run build`.
+* Il synchronise le répertoire de build `/dist` vers le dossier cible de l'hébergeur par protocole sécurisé **SFTP** en utilisant des secrets chiffrés.
+
+---
+
+## Démarrage Local
+
+Pour exécuter et tester le projet dans votre environnement :
 
 ### 1. Prérequis
-Vous devez disposer de [Node.js](https://nodejs.org/) (version 18 ou supérieure recommandée) et d'`npm` ou `yarn`.
+Disposer de [Node.js](https://nodejs.org/) (version 18 ou supérieure recommandée) et de npm.
 
-### 2. Cloner et Installer les Dépendances
+### 2. Installation des Dépendances
 ```bash
-git clone https://github.com/votre_profil/portfolio-melvin.git
-cd portfolio-melvin
 npm install
 ```
 
-### 3. Lancer en Mode Développement
+### 3. Exécuter en Mode Développement
 ```bash
 npm run dev
 ```
-Accédez au site en local à l'adresse suivante : [http://localhost:3000](http://localhost:3000).
+Ouvrez votre navigateur à l'adresse [http://localhost:3000](http://localhost:3000).
 
 ### 4. Compiler pour la Production
-Pour auditer ou générer le code buildé et minifié à déployer :
 ```bash
 npm run build
 ```
-Les fichiers d'exploitation optimisés seront générés au sein du répertoire `/dist`.
-
----
-
-## Me Contacter
-
-N'hésitez pas à me joindre pour des opportunités professionnelles, d'ingénierie ou un échange technologique :
-
-* **Email** : `portfolio@melvincureau.com`
-* **LinkedIn** : [Melvin Cureau](https://www.linkedin.com/in/melvin-cureau-83a812252/)
+Les fichiers statiques optimisés seront produits dans le répertoire `/dist` et seront prêts pour le déploiement sur votre hébergement.

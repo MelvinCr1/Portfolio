@@ -12,3 +12,24 @@
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
+
+# 3. EN-TÊTES DE SÉCURITÉ RECOMMANDÉS (HTTP SECURITY HEADERS)
+<IfModule mod_headers.c>
+  # Forcer la sécurité maximale TLS côté client via HTTP Strict Transport Security (HSTS)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Éviter le détournement de clic (Clickjacking) en limitant l'affichage sur d'autres iframes
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Empêcher le détournement du type MIME (reniflage de contenu indésirable)
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Activer les filtres anti-XSS des navigateurs modernes
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Gérer de manière sécurisée la transmission de l'en-tête Referrer
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Content Security Policy (CSP) robuste
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://avatars.githubusercontent.com https://raw.githubusercontent.com; connect-src 'self' https://api.github.com; frame-src 'self';"
+</IfModule>
