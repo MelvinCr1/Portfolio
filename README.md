@@ -1,6 +1,6 @@
-# Portfolio de Melvin Cureau - SysOps & Cloud Engineer
+# Portfolio
 
-Un portfolio moderne, épuré, ultra-performant et de haute fidélité conçu pour présenter l'expertise et la trajectoire de **Melvin Cureau**, futur ingénieur spécialisé en **Ingénierie SysOps & Architectures Cloud** (alternant chez **Cloud Temple**).
+Portfolio moderne, épuré, ultra-performant et de haute fidélité conçu pour présenter l'expertise et ma trajectoire, futur ingénieur spécialisé en **Ingénierie SysOps & Architectures Cloud** (alternant chez **Cloud Temple**).
 
 Ce projet respecte les meilleurs standards en ingénierie logicielle : séparation stricte des préoccupations (segmentation de code experte), conformité absolue d'accessibilité (WCAG), métadonnées SEO complètes facilitant la classification par les moteurs de recherche et les passerelles de filtrage web, et une interface fluide traduisible à la volée en **Français (FR)**, **Anglais (EN)** et **Espagnol (ES)**.
 
