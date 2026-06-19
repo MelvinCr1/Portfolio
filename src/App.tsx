@@ -20,13 +20,10 @@ import {
   Star,
   GitFork,
   Sun,
-  Moon,
-  Download
+  Moon
 } from 'lucide-react';
 import { Language, GithubRepo } from './types';
 import { translations } from './translations';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 
 export default function App() {
   const [language, setLanguage] = useState<Language>('FR');
@@ -44,8 +41,6 @@ export default function App() {
   });
 
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [showPrintIframeNotice, setShowPrintIframeNotice] = useState(false);
-  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -402,64 +397,6 @@ export default function App() {
     }, 1000);
   };
 
-  // Custom, direct PDF generation & download feature bypassing standard window.print() issues
-  const handleDownloadCV = () => {
-    if (isPdfGenerating) return;
-    
-    // Store original expansion and tab settings to restore them afterwards
-    const originalExpanded = isCvExpanded;
-    const originalTab = cvTab;
-
-    setIsPdfGenerating(true);
-    
-    // Force complete view for the PDF export so the file is not cropped/collapsed
-    setIsCvExpanded(true);
-    setCvTab('all');
-
-    // Wait a brief tick for React state and DOM rendering to finish
-    setTimeout(() => {
-      // Toggle printable body style
-      document.body.classList.add('pdf-generator-active');
-
-      const element = document.body;
-      const opt = {
-        margin:       [8, 10, 8, 10] as [number, number, number, number], // Margins in mm: top, left, bottom, right
-        filename:     `CV_Melvin_Cureau_${language}.pdf`,
-        image:        { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas:  { 
-          scale: 2, 
-          useCORS: true, 
-          logging: false,
-          scrollY: 0,
-          scrollX: 0
-        },
-        jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
-      };
-
-      // Generate local PDF directly in client browser and trigger download
-      html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(() => {
-          // Revert styles and restore previous state
-          document.body.classList.remove('pdf-generator-active');
-          setIsCvExpanded(originalExpanded);
-          setCvTab(originalTab);
-          setIsPdfGenerating(false);
-        })
-        .catch((err: any) => {
-          console.error("PDF generation failed, falling back to printer print", err);
-          document.body.classList.remove('pdf-generator-active');
-          setIsCvExpanded(originalExpanded);
-          setCvTab(originalTab);
-          setIsPdfGenerating(false);
-          // Fallback
-          window.print();
-        });
-    }, 150);
-  };
-
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white relative ${
       theme === 'dark' 
@@ -687,30 +624,6 @@ export default function App() {
               <Github className="h-4 w-4" />
               {currentTranslation.viewGithub}
             </a>
-            
-            <button
-              onClick={handleDownloadCV}
-              disabled={isPdfGenerating}
-              className={`w-full sm:w-auto justify-center px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer disabled:opacity-75 disabled:pointer-events-none ${
-                theme === 'dark'
-                  ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-200 hover:text-white'
-                  : 'bg-teal-50/30 border-teal-100 text-teal-700 hover:bg-teal-50/80 hover:text-teal-800'
-              }`}
-            >
-              {isPdfGenerating ? (
-                <>
-                  <span className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-current border-t-transparent" />
-                  <span>
-                    {language === 'FR' ? 'Génération...' : language === 'ES' ? 'Generando...' : 'Generating...'}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  <span>{currentTranslation.downloadLabel}</span>
-                </>
-              )}
-            </button>
           </motion.div>
 
         </div>
@@ -1531,53 +1444,6 @@ export default function App() {
           >
             <ArrowUp className="h-4 w-4" />
           </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Block/Iframe Printing Notice Modal */}
-      <AnimatePresence>
-        {showPrintIframeNotice && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className={`max-w-md w-full p-6 rounded-2xl border shadow-2xl relative ${
-                theme === 'dark'
-                  ? 'bg-slate-950 border-slate-800 text-white'
-                  : 'bg-white border-slate-100 text-slate-900'
-              }`}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-teal-500/10 text-teal-400 rounded-xl shrink-0">
-                  <AlertCircle className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold tracking-tight">
-                    {currentTranslation.iframeNoticeTitle}
-                  </h3>
-                  <p className={`text-xs mt-2 leading-relaxed ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
-                    {currentTranslation.iframeNoticeText}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowPrintIframeNotice(false)}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${
-                    theme === 'dark'
-                      ? 'bg-teal-500 text-slate-950 hover:bg-teal-400'
-                      : 'bg-teal-600 text-white hover:bg-teal-700'
-                  }`}
-                >
-                  {currentTranslation.iframeNoticeClose}
-                </button>
-              </div>
-            </motion.div>
-          </div>
         )}
       </AnimatePresence>
 
