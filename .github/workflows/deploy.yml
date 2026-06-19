@@ -2,7 +2,7 @@ name: Deploy Portfolio to IONOS
 on:
   push:
     branches:
-      - main # Change "main" si ta branche principale porte un autre nom
+      - main # Change en "master" si besoin
 
 jobs:
   web-deploy:
@@ -12,10 +12,12 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v3
     
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: 📂 Sync files via SFTP
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: / # Change ceci si tu veux cibler un sous-dossier spécifique sur IONOS
+        port: 22
+        local_path: './*' # Prend tous les fichiers à la racine du repo
+        remote_path: '/'  # sous-dossier sur IONOS
