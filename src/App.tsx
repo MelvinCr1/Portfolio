@@ -17,13 +17,32 @@ import {
   Sliders, 
   AlertCircle,
   Star,
-  GitFork
+  GitFork,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { Language, GithubRepo } from './types';
 import { translations } from './translations';
 
 export default function App() {
   const [language, setLanguage] = useState<Language>('FR');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+  }, [theme]);
+
   const [cvTab, setCvTab] = useState<'all' | 'work' | 'education' | 'skills'>('all');
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [isCvExpanded, setIsCvExpanded] = useState(false);
@@ -256,7 +275,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-slate-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white">
+    <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white ${
+      theme === 'dark' 
+        ? 'bg-[#090a0f] text-slate-300' 
+        : 'bg-[#fafbfe] text-slate-700'
+    }`}>
       
       {/* Background decoration - soft floating artistic glow blurs & shadows */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden -z-10">
@@ -271,7 +294,11 @@ export default function App() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-[-250px] left-[12%] w-[550px] h-[550px] rounded-full bg-teal-500/5 shadow-[0_0_120px_rgba(20,184,166,0.15)] blur-[120px]" 
+          className={`absolute top-[-250px] left-[12%] w-[550px] h-[550px] rounded-full blur-[120px] transition-all duration-300 ${
+            theme === 'dark' 
+              ? 'bg-teal-500/5 shadow-[0_0_120px_rgba(20,184,166,0.15)]' 
+              : 'bg-teal-500/[0.04] shadow-[0_0_120px_rgba(20,184,166,0.06)]'
+          }`}
         />
         <motion.div 
           animate={{
@@ -284,7 +311,11 @@ export default function App() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-[-200px] right-[15%] w-[500px] h-[500px] rounded-full bg-indigo-500/5 shadow-[0_0_120px_rgba(99,102,241,0.15)] blur-[120px]" 
+          className={`absolute top-[-200px] right-[15%] w-[500px] h-[500px] rounded-full blur-[120px] transition-all duration-300 ${
+            theme === 'dark' 
+              ? 'bg-indigo-500/5 shadow-[0_0_120px_rgba(99,102,241,0.15)]' 
+              : 'bg-indigo-500/[0.04] shadow-[0_0_120px_rgba(99,102,241,0.06)]'
+          }`}
         />
         {/* Additional organic ambient glow/shadow centers for depth further down */}
         <motion.div 
@@ -298,7 +329,11 @@ export default function App() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-[800px] right-[10%] w-[600px] h-[600px] rounded-full bg-teal-500/[0.03] shadow-[0_0_150px_rgba(20,184,166,0.06)] blur-[130px]" 
+          className={`absolute top-[800px] right-[10%] w-[600px] h-[600px] rounded-full blur-[130px] transition-all duration-300 ${
+            theme === 'dark' 
+              ? 'bg-teal-500/[0.03] shadow-[0_0_150px_rgba(20,184,166,0.06)]' 
+              : 'bg-teal-500/[0.02] shadow-[0_0_150px_rgba(20,184,166,0.03)]'
+          }`}
         />
         <motion.div 
           animate={{
@@ -311,12 +346,20 @@ export default function App() {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-[1800px] left-[5%] w-[550px] h-[550px] rounded-full bg-indigo-500/[0.03] shadow-[0_0_150px_rgba(99,102,241,0.06)] blur-[130px]" 
+          className={`absolute top-[1800px] left-[5%] w-[550px] h-[550px] rounded-full blur-[130px] transition-all duration-300 ${
+            theme === 'dark' 
+              ? 'bg-indigo-500/[0.03] shadow-[0_0_150px_rgba(99,102,241,0.06)]' 
+              : 'bg-indigo-500/[0.02] shadow-[0_0_150px_rgba(99,102,241,0.03)]'
+          }`}
         />
       </div>
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-[#090a0f]/85 backdrop-blur-md border-b border-white/[0.04]">
+      <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 border-b ${
+        theme === 'dark'
+          ? 'bg-[#090a0f]/85 border-white/[0.04]'
+          : 'bg-[#fafbfe]/85 border-slate-200/80'
+      }`}>
         <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
           
           {/* Main Logo */}
@@ -327,77 +370,116 @@ export default function App() {
             className="flex items-center cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            <span className="text-white font-extrabold text-sm tracking-tight block group-hover:text-teal-400 transition-colors uppercase font-mono">Melvin Cureau</span>
+            <span className={`font-extrabold text-sm tracking-tight block group-hover:text-teal-400 transition-colors uppercase font-mono ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>Melvin Cureau</span>
           </motion.div>
 
           {/* Nav menu links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-wider text-slate-400">
-            <a href="#cv-section" className="hover:text-white transition-colors py-1 relative group">
+          <nav className={`hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-wider transition-colors ${
+            theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            <a href="#cv-section" className={`transition-colors py-1 relative group ${
+              theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
+            }`}>
               {currentTranslation.navCV}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
             </a>
-            <a href="#projects-section" className="hover:text-white transition-colors py-1 relative group">
+            <a href="#projects-section" className={`transition-colors py-1 relative group ${
+              theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
+            }`}>
               {currentTranslation.navProjects}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
             </a>
-            <a href="#contact-section" className="hover:text-white transition-colors py-1 relative group">
+            <a href="#contact-section" className={`transition-colors py-1 relative group ${
+              theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
+            }`}>
               {currentTranslation.navContact}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
             </a>
           </nav>
 
-          {/* Premium dropdown language selector */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="relative"
-          >
-            <button
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="flex items-center gap-2 bg-slate-950 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-300 hover:text-white hover:border-white/20 transition-all cursor-pointer shadow-md select-none"
+          <div className="flex items-center gap-3">
+            {/* Theme Switcher Button */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className={`p-2 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm flex items-center justify-center ${
+                theme === 'dark' 
+                  ? 'bg-slate-950/60 border-white/10 text-teal-400 hover:text-teal-300 hover:bg-slate-900' 
+                  : 'bg-white border-slate-200 text-teal-600 hover:text-teal-500 hover:bg-slate-50'
+              }`}
+              title={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
+              id="theme-toggler"
             >
-              <span className="text-sm leading-none">{flags[language].flag}</span>
-              <span>{language}</span>
-              <span className={`text-[8px] opacity-60 transition-transform duration-200 inline-block ${langMenuOpen ? 'rotate-180' : ''}`}>▼</span>
-            </button>
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </motion.button>
 
-            <AnimatePresence>
-              {langMenuOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setLangMenuOpen(false)} 
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-36 bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-1 z-50 overflow-hidden"
-                  >
-                    {(['FR', 'EN', 'ES'] as Language[]).map((lng) => (
-                      <button
-                        key={lng}
-                        onClick={() => {
-                          setLanguage(lng);
-                          setLangMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-mono text-left rounded-lg transition-all cursor-pointer ${
-                          language === lng 
-                            ? 'bg-teal-500/10 text-teal-400 font-extrabold' 
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                        }`}
-                      >
-                        <span className="text-sm leading-none">{flags[lng].flag}</span>
-                        <span>{flags[lng].label}</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-          </motion.div>
+            {/* Premium dropdown language selector */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              <button
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                className={`flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shadow-sm select-none ${
+                  theme === 'dark'
+                    ? 'bg-slate-950 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
+                    : 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 hover:bg-slate-50'
+                }`}
+              >
+                <span className="text-sm leading-none">{flags[language].flag}</span>
+                <span>{language}</span>
+                <span className={`text-[8px] opacity-60 transition-transform duration-200 inline-block ${langMenuOpen ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+
+              <AnimatePresence>
+                {langMenuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setLangMenuOpen(false)} 
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className={`absolute right-0 mt-2 w-36 border rounded-xl shadow-2xl p-1 z-50 overflow-hidden ${
+                        theme === 'dark'
+                          ? 'bg-slate-900 border-white/10'
+                          : 'bg-white border-slate-200 shadow-md'
+                      }`}
+                    >
+                      {(['FR', 'EN', 'ES'] as Language[]).map((lng) => (
+                        <button
+                          key={lng}
+                          onClick={() => {
+                            setLanguage(lng);
+                            setLangMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-mono text-left rounded-lg transition-all cursor-pointer ${
+                            language === lng 
+                              ? 'bg-teal-500/10 text-teal-400 font-extrabold' 
+                              : theme === 'dark'
+                                ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="text-sm leading-none">{flags[lng].flag}</span>
+                          <span>{flags[lng].label}</span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
 
         </div>
       </header>
@@ -455,7 +537,11 @@ export default function App() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-slate-900 border border-white/10 hover:border-white/20 text-slate-200 hover:text-white font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg hover:shadow-xl"
+              className={`px-6 py-3 border font-bold text-xs tracking-wider uppercase rounded-xl transition-all flex items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg hover:shadow-xl ${
+                theme === 'dark'
+                  ? 'bg-slate-900 border-white/10 hover:border-white/20 text-slate-200 hover:text-white'
+                  : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-950'
+              }`}
             >
               <Github className="h-4 w-4" />
               {currentTranslation.viewGithub}
@@ -470,12 +556,20 @@ export default function App() {
         
         {/* Title Block */}
         <div className="text-center space-y-3 mb-16">
-          <h2 className="text-3xl font-bold text-white tracking-tight uppercase leading-none">{currentTranslation.titleCV}</h2>
-          <p className="text-sm text-slate-500 max-w-md mx-auto">{currentTranslation.subtitleCV}</p>
+          <h2 className={`text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
+            theme === 'dark' ? 'text-white' : 'text-slate-900'
+          }`}>{currentTranslation.titleCV}</h2>
+          {currentTranslation.subtitleCV && (
+            <p className="text-sm text-slate-500 max-w-md mx-auto">{currentTranslation.subtitleCV}</p>
+          )}
         </div>
 
         {/* Tab selector buttons */}
-        <div className="flex bg-slate-950 border border-white/5 p-1 rounded-2xl max-w-md mx-auto mb-12 shadow-2xl relative overflow-hidden">
+        <div className={`flex p-1 rounded-2xl max-w-md mx-auto mb-12 shadow-2xl relative overflow-hidden border transition-colors ${
+          theme === 'dark' 
+            ? 'bg-slate-950 border-white/5' 
+            : 'bg-slate-100 border-slate-200'
+        }`}>
           {[
             { id: 'all', label: currentTranslation.viewAll },
             { id: 'work', label: currentTranslation.tabWork },
@@ -491,11 +585,21 @@ export default function App() {
                 {isActive && (
                   <motion.span
                     layoutId="activeCVSwitch"
-                    className="absolute inset-0 bg-slate-900 border border-white/10 rounded-xl shadow-lg"
+                    className={`absolute inset-0 rounded-xl shadow-lg border ${
+                      theme === 'dark' 
+                        ? 'bg-slate-900 border-white/10' 
+                        : 'bg-white border-slate-200'
+                    }`}
                     transition={{ type: "spring", stiffness: 140, damping: 20 }}
                   />
                 )}
-                <span className={`relative z-10 ${isActive ? 'text-teal-400 font-extrabold' : 'text-slate-400 hover:text-slate-300'}`}>
+                <span className={`relative z-10 transition-colors ${
+                  isActive 
+                    ? 'text-teal-400 font-extrabold' 
+                    : theme === 'dark' 
+                      ? 'text-slate-400 hover:text-slate-300' 
+                      : 'text-slate-500 hover:text-slate-800'
+                }`}>
                   {tab.label}
                 </span>
               </button>
@@ -519,27 +623,43 @@ export default function App() {
                   transition={{ duration: 0.4 }}
                   className="space-y-6"
                 >
-                  <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <h3 className={`text-xs font-mono uppercase tracking-widest flex items-center gap-2 transition-colors ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
                     <Briefcase className="h-4 w-4 text-teal-400" />
                     {currentTranslation.tabWork}
                   </h3>
 
-                  <div className="space-y-6 border-l border-slate-800 ml-3 pl-6">
+                  <div className={`space-y-6 border-l ml-3 pl-6 transition-colors ${
+                    theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+                  }`}>
                     {(isCvExpanded ? currentTranslation.experiences : currentTranslation.experiences.slice(0, 2)).map((exp, index) => (
                       <motion.div 
                         key={index}
                         whileHover={{ y: -3 }}
-                        className="relative group bg-slate-900/40 border border-white/[0.04] p-5 rounded-2xl hover:border-teal-500/20 hover:bg-slate-900/60 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(20,184,166,0.12)] transition-all duration-300"
+                        className={`relative group p-5 rounded-2xl hover:border-teal-500/20 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(20,184,166,0.12)] border transition-all duration-300 ${
+                          theme === 'dark' 
+                            ? 'bg-slate-900/40 border-white/[0.04] hover:bg-slate-900/60' 
+                            : 'bg-white border-slate-200 hover:bg-slate-50/80 shadow-sm'
+                        }`}
                       >
                         {/* Timeline point indicator */}
-                        <div className="absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-teal-400 bg-[#090a0f] rounded-full group-hover:scale-130 transition-transform" />
+                        <div className={`absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-teal-400 rounded-full group-hover:scale-130 transition-all ${
+                          theme === 'dark' ? 'bg-[#090a0f]' : 'bg-slate-50'
+                        }`} />
                         
                         <div className="flex flex-wrap justify-between items-start gap-2">
                           <div>
                             <span className="text-[10px] font-mono text-teal-400 uppercase tracking-wider block mb-1">{exp.period}</span>
-                            <h4 className="text-white text-base font-bold tracking-tight">{exp.role}</h4>
+                            <h4 className={`text-base font-bold tracking-tight transition-colors ${
+                              theme === 'dark' ? 'text-white' : 'text-slate-900'
+                            }`}>{exp.role}</h4>
                           </div>
-                          <span className="text-xs font-semibold px-2.5 py-1 bg-slate-950 border border-white/5 rounded-lg text-slate-300">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
+                            theme === 'dark'
+                              ? 'bg-slate-950 border-white/5 text-slate-300'
+                              : 'bg-slate-100 border-slate-200 text-slate-700'
+                          }`}>
                             {exp.company}
                           </span>
                         </div>
@@ -551,7 +671,9 @@ export default function App() {
 
                         <ul className="space-y-2 mt-4">
                           {exp.details.map((detail, dIdx) => (
-                            <li key={dIdx} className="text-slate-400 text-xs leading-relaxed flex items-start gap-2">
+                            <li key={dIdx} className={`text-xs leading-relaxed flex items-start gap-2 transition-colors ${
+                              theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                            }`}>
                               <span className="text-teal-400 mt-1.5 shrink-0 block w-1 h-1 rounded-full bg-teal-400" />
                               <span>{detail}</span>
                             </li>
@@ -560,7 +682,11 @@ export default function App() {
 
                         <div className="flex flex-wrap gap-1.5 pt-4">
                           {exp.tags.map((tag, tIdx) => (
-                            <span key={tIdx} className="text-[10px] font-mono px-2 py-0.5 border border-white/5 bg-slate-950 text-slate-400 rounded-md">
+                            <span key={tIdx} className={`text-[10px] font-mono px-2 py-0.5 border rounded-md transition-colors ${
+                              theme === 'dark'
+                                ? 'border-white/5 bg-slate-950 text-slate-400'
+                                : 'border-slate-200 bg-slate-50 text-slate-600'
+                            }`}>
                               {tag}
                             </span>
                           ))}
@@ -581,33 +707,51 @@ export default function App() {
                   transition={{ duration: 0.4 }}
                   className="space-y-6 pt-4"
                 >
-                  <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <h3 className={`text-xs font-mono uppercase tracking-widest flex items-center gap-2 transition-colors ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
                     <GraduationCap className="h-4 w-4 text-indigo-400" />
                     {currentTranslation.tabEdu}
                   </h3>
 
-                  <div className="space-y-5 border-l border-slate-800 ml-3 pl-6">
+                  <div className={`space-y-5 border-l ml-3 pl-6 transition-colors ${
+                    theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
+                  }`}>
                     {(isCvExpanded ? currentTranslation.educations : currentTranslation.educations.slice(0, 1)).map((edu, index) => (
                       <motion.div 
                         key={index}
                         whileHover={{ y: -3 }}
-                        className="relative group bg-slate-900/40 border border-white/[0.04] p-5 rounded-2xl hover:border-indigo-500/20 hover:bg-slate-900/60 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(99,102,241,0.12)] transition-all duration-300"
+                        className={`relative group p-5 rounded-2xl hover:border-indigo-500/20 shadow-lg hover:shadow-[0_20px_45px_-12px_rgba(99,102,241,0.12)] border transition-all duration-300 ${
+                          theme === 'dark'
+                            ? 'bg-slate-900/40 border-white/[0.04] hover:bg-slate-900/60'
+                            : 'bg-white border-slate-200 hover:bg-slate-50/80 shadow-sm'
+                        }`}
                       >
                         {/* Bullet point */}
-                        <div className="absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-indigo-500 bg-[#090a0f] rounded-full group-hover:scale-130 transition-transform" />
+                        <div className={`absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-indigo-500 rounded-full group-hover:scale-130 transition-all ${
+                          theme === 'dark' ? 'bg-[#090a0f]' : 'bg-slate-50'
+                        }`} />
                         
                         <div className="flex flex-wrap justify-between items-start gap-2">
                           <div>
                             <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider block mb-1">{edu.period}</span>
-                            <h4 className="text-white text-base font-bold tracking-tight">{edu.degree}</h4>
+                            <h4 className={`text-base font-bold tracking-tight transition-colors ${
+                              theme === 'dark' ? 'text-white' : 'text-slate-900'
+                            }`}>{edu.degree}</h4>
                           </div>
-                          <span className="text-xs font-semibold px-2.5 py-1 bg-slate-950 border border-white/5 rounded-lg text-slate-300">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all ${
+                            theme === 'dark'
+                              ? 'bg-slate-950 border-white/5 text-slate-300'
+                              : 'bg-slate-100 border-slate-200 text-slate-700'
+                          }`}>
                             {edu.school}
                           </span>
                         </div>
 
                         <p className="text-xs text-indigo-300 font-mono mt-1 font-semibold">{edu.specialty}</p>
-                        <p className="text-slate-400 text-xs mt-3 leading-relaxed font-light">{edu.details}</p>
+                        <p className={`text-xs mt-3 leading-relaxed font-light transition-colors ${
+                          theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                        }`}>{edu.details}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -620,7 +764,11 @@ export default function App() {
             <div className="flex justify-center pt-6">
               <button
                 onClick={() => setIsCvExpanded(!isCvExpanded)}
-                className="group flex items-center gap-2 px-5 py-2.5 bg-slate-950 hover:bg-slate-900 border border-white/10 hover:border-teal-500/30 text-xs font-mono font-bold text-slate-300 hover:text-teal-400 transition-all rounded-xl cursor-pointer shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_35px_-2px_rgba(20,184,166,0.1)] active:scale-95 select-none"
+                className={`group flex items-center gap-2 px-5 py-2.5 border text-xs font-mono font-bold transition-all rounded-xl cursor-pointer active:scale-95 select-none ${
+                  theme === 'dark'
+                    ? 'bg-slate-950 hover:bg-slate-900 border-white/10 hover:border-teal-500/30 text-slate-300 hover:text-teal-400 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)]'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-teal-500 text-slate-700 hover:text-teal-600 shadow-sm'
+                }`}
               >
                 <span>{isCvExpanded ? currentTranslation.btnShowLess : currentTranslation.btnShowMore}</span>
                 <span className={`text-[10px] transition-transform duration-300 inline-block ${isCvExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'}`}>
@@ -634,17 +782,25 @@ export default function App() {
           <div className="space-y-6.5">
             
             {/* Certifications and Key assets */}
-            <div className="border border-white/[0.04] bg-slate-900/30 p-6 rounded-2xl shadow-xl hover:shadow-[0_20px_50px_rgba(20,184,166,0.05)] transition-all duration-300 space-y-4">
-              <h3 className="text-xs font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <div className={`border p-6 rounded-2xl shadow-xl transition-all duration-300 space-y-4 ${
+              theme === 'dark'
+                ? 'border-white/[0.04] bg-slate-900/30 hover:shadow-[0_20px_50px_rgba(20,184,166,0.05)]'
+                : 'border-slate-200 bg-white shadow-sm'
+            }`}>
+              <h3 className={`text-xs font-mono uppercase tracking-wider flex items-center gap-2 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
+              }`}>
                 <Award className="h-4.5 w-4.5 text-teal-400 animate-pulse" />
                 {currentTranslation.certifications}
               </h3>
 
               <div className="space-y-3">
                 {/* AZ-900 Certification */}
-                <div className="bg-slate-950 border border-white/5 px-4 py-3 rounded-xl hover:border-blue-500/30 transition-colors">
+                <div className={`border px-4 py-3 rounded-xl transition-colors ${
+                  theme === 'dark' ? 'bg-slate-950 border-white/5 hover:border-blue-500/30' : 'bg-slate-50 border-slate-200 hover:border-blue-500'
+                }`}>
                   <div className="flex justify-between items-start">
-                    <span className="text-white text-xs font-bold font-mono">Microsoft Azure (AZ-900)</span>
+                    <span className={`text-xs font-bold font-mono ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>Microsoft Azure (AZ-900)</span>
                     <span className="text-[9px] font-mono bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 uppercase rounded-md">
                       {language === 'FR' ? 'En cours' : language === 'EN' ? 'In progress' : 'En curso'}
                     </span>
@@ -657,8 +813,14 @@ export default function App() {
             </div>
 
             {/* Categorized Skills badges (Sleek minimalist panel) */}
-            <div className="border border-white/[0.04] bg-slate-900/30 p-6 rounded-2xl shadow-xl space-y-6">
-              <h3 className="text-xs font-mono text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <div className={`border p-6 rounded-2xl shadow-xl space-y-6 ${
+              theme === 'dark'
+                ? 'border-white/[0.04] bg-slate-900/30'
+                : 'border-slate-200 bg-white shadow-sm'
+            }`}>
+              <h3 className={`text-xs font-mono uppercase tracking-wider flex items-center gap-2 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
+              }`}>
                 <Cpu className="h-4.5 w-4.5 text-indigo-400" />
                 <span>Habilités techniques</span>
               </h3>
@@ -668,7 +830,11 @@ export default function App() {
                   <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">DevOps & Automation</span>
                   <div className="flex flex-wrap gap-1.5">
                     {["Docker", "Kubernetes", "Terraform", "Ansible", "GitLab CI", "PowerShell", "Bash"].map((s) => (
-                      <span key={s} className="text-[10px] font-mono px-2.5 py-1 bg-slate-950 border border-white/5 rounded-lg text-slate-300 hover:border-teal-500/20 transition-colors">
+                      <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-500 hover:text-teal-600'
+                      }`}>
                         {s}
                       </span>
                     ))}
@@ -679,7 +845,11 @@ export default function App() {
                   <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Cloud & Virtualization</span>
                   <div className="flex flex-wrap gap-1.5">
                     {["Azure", "Google Cloud", "AWS", "VMware", "Linux Server", "Windows Server"].map((s) => (
-                      <span key={s} className="text-[10px] font-mono px-2.5 py-1 bg-slate-950 border border-white/5 rounded-lg text-slate-300 hover:border-indigo-500/20 transition-colors">
+                      <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-indigo-500/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-500 hover:text-indigo-600'
+                      }`}>
                         {s}
                       </span>
                     ))}
@@ -690,7 +860,11 @@ export default function App() {
                   <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Monitoring & Ops</span>
                   <div className="flex flex-wrap gap-1.5">
                     {["Grafana", "Prometheus", "DAT/DEX Blueprints", "Jira & Confluence"].map((s) => (
-                      <span key={s} className="text-[10px] font-mono px-2.5 py-1 bg-slate-950 border border-white/5 rounded-lg text-slate-300 hover:border-teal-500/20 transition-colors">
+                      <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600'
+                      }`}>
                         {s}
                       </span>
                     ))}
@@ -706,12 +880,18 @@ export default function App() {
       </section>
 
       {/* SECTION 2: PROJECTS */}
-      <section id="projects-section" className="relative py-20 border-t border-white/[0.04] bg-slate-950/20 scroll-mt-12">
+      <section id="projects-section" className={`relative py-20 border-t scroll-mt-12 transition-all duration-300 ${
+        theme === 'dark' 
+          ? 'border-white/[0.04] bg-slate-950/20' 
+          : 'border-slate-200 bg-slate-50/50'
+      }`}>
         <div className="max-w-4xl mx-auto px-6">
           
           {/* Header */}
           <div className="text-center space-y-3 mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight uppercase leading-none">{currentTranslation.projectsTitle}</h2>
+            <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>{currentTranslation.projectsTitle}</h2>
             <p className="text-xs font-mono text-slate-500 uppercase tracking-wider">
               {language === 'FR' ? 'Dépôts publics épinglés' : language === 'EN' ? 'Public pinned repositories' : 'Repositorios públicos destacados'}
             </p>
@@ -721,7 +901,9 @@ export default function App() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
             {reposLoading ? (
               Array.from({ length: 3 }).map((_, idx) => (
-                <div key={idx} className="border border-white/[0.03] bg-slate-900/10 p-6 rounded-2xl space-y-4 animate-pulse">
+                <div key={idx} className={`border p-6 rounded-2xl space-y-4 animate-pulse ${
+                  theme === 'dark' ? 'border-white/[0.03] bg-slate-900/10' : 'border-slate-200 bg-white'
+                }`}>
                   <div className="flex justify-between items-center">
                     <div className="h-4 bg-slate-800 rounded w-1/2" />
                     <div className="h-3 bg-slate-800 rounded w-1/6" />
@@ -761,14 +943,20 @@ export default function App() {
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1, duration: 0.5 }}
                     whileHover={{ y: -4 }}
-                    className="group relative overflow-hidden border border-white/[0.04] bg-slate-900/10 p-6 rounded-2xl flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(20,184,166,0.06)] hover:border-teal-500/20 transition-all duration-300"
+                    className={`group relative overflow-hidden border p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 ${
+                      theme === 'dark'
+                        ? 'border-white/[0.04] bg-slate-900/10 hover:border-teal-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(20,184,166,0.06)]'
+                        : 'border-slate-200 bg-white hover:border-teal-400/80 shadow-sm hover:shadow-md'
+                    }`}
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/[0.01] group-hover:bg-teal-500/[0.03] blur-2xl rounded-full transition-colors pointer-events-none" />
 
                     <div className="space-y-3.5">
                       <div className="flex justify-between items-start gap-2">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-white text-xs sm:text-sm font-bold font-mono tracking-tight group-hover:text-teal-400 transition-colors">
+                          <h3 className={`text-xs sm:text-sm font-bold font-mono tracking-tight group-hover:text-teal-400 transition-colors ${
+                            theme === 'dark' ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {repo.repo}
                           </h3>
                         </div>
@@ -777,12 +965,16 @@ export default function App() {
                         </span>
                       </div>
 
-                      <p className="text-slate-400 text-xs leading-relaxed font-light min-h-[48px]">
+                      <p className={`text-xs leading-relaxed font-light min-h-[48px] transition-colors ${
+                        theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                      }`}>
                         {repo.description}
                       </p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-4 border-t border-white/[0.03] mt-4">
+                    <div className={`flex justify-between items-center pt-4 border-t mt-4 transition-colors ${
+                      theme === 'dark' ? 'border-white/[0.03]' : 'border-slate-100'
+                    }`}>
                       <div className="flex gap-4 font-mono text-[10px] text-slate-500">
                         {repo.stars !== undefined && (
                           <span className="flex items-center gap-1">
@@ -818,29 +1010,43 @@ export default function App() {
       </section>
 
       {/* SECTION 3: CONTACT FORM */}
-      <section id="contact-section" className="relative py-20 px-6 border-t border-white/[0.04] scroll-mt-12">
+      <section id="contact-section" className={`relative py-20 px-6 border-t scroll-mt-12 transition-all duration-300 ${
+        theme === 'dark' ? 'border-white/[0.04]' : 'border-slate-200 bg-slate-50/[0.15]'
+      }`}>
         <div className="max-w-4xl mx-auto">
           
           <div className="text-center space-y-3 mb-16">
-            <h2 className="text-3xl font-bold text-white tracking-tight uppercase leading-none">{currentTranslation.contactTitle}</h2>
+            <h2 className={`text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>{currentTranslation.contactTitle}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
             
             {/* Info Column */}
             <div className="md:col-span-5 space-y-6">
-              <p className="text-slate-400 text-sm leading-relaxed font-light">
+              <p className={`text-sm leading-relaxed font-light transition-colors ${
+                theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+              }`}>
                 {currentTranslation.contactSub}
               </p>
 
               <div className="space-y-4 font-mono text-xs">
-                <div className="p-4 bg-slate-900/30 border border-white/[0.04] rounded-2xl flex items-center gap-3">
+                <div className={`p-4 border rounded-2xl flex items-center gap-3 transition-all ${
+                  theme === 'dark' 
+                    ? 'bg-slate-900/30 border-white/[0.04] text-slate-300' 
+                    : 'bg-white border-slate-200 text-slate-755 shadow-sm'
+                }`}>
                   <Mail className="h-4.5 w-4.5 text-teal-400 shrink-0" />
-                  <span className="text-slate-300 truncate font-light select-all">melvin.cureau2004@gmail.com</span>
+                  <span className="truncate font-light select-all">portfolio@melvincureau.com</span>
                 </div>
-                <div className="p-4 bg-slate-900/30 border border-white/[0.04] rounded-2xl flex items-center gap-3">
+                <div className={`p-4 border rounded-2xl flex items-center gap-3 transition-all ${
+                  theme === 'dark' 
+                    ? 'bg-slate-900/30 border-white/[0.04] text-slate-300' 
+                    : 'bg-white border-slate-200 text-slate-755 shadow-sm'
+                }`}>
                   <Globe className="h-4.5 w-4.5 text-indigo-400 shrink-0" />
-                  <span className="text-slate-300 font-light">Tours, France</span>
+                  <span className="font-light">Tours, France</span>
                 </div>
               </div>
 
@@ -849,7 +1055,11 @@ export default function App() {
                   href="https://www.linkedin.com/in/melvin-cureau-83a812252/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 py-3 bg-slate-900/60 hover:bg-slate-900 border border-white/[0.06] rounded-xl text-center text-xs font-mono font-bold uppercase tracking-wider text-slate-400 hover:text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className={`flex-1 py-3 border rounded-xl text-center text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    theme === 'dark'
+                      ? 'bg-slate-900/60 hover:bg-slate-900 border-white/[0.06] text-slate-400 hover:text-white'
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
+                  }`}
                 >
                   <Linkedin className="h-4 w-4 text-teal-400" />
                   LinkedIn
@@ -858,9 +1068,13 @@ export default function App() {
                   href="https://github.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 py-3 bg-slate-900/60 hover:bg-slate-900 border border-white/[0.06] rounded-xl text-center text-xs font-mono font-bold uppercase tracking-wider text-slate-400 hover:text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className={`flex-1 py-3 border rounded-xl text-center text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    theme === 'dark'
+                      ? 'bg-slate-900/60 hover:bg-slate-900 border-white/[0.06] text-slate-400 hover:text-white'
+                      : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
+                  }`}
                 >
-                  <Github className="h-4 w-4 text-slate-300" />
+                  <Github className="h-4 w-4 text-slate-500" />
                   GitHub
                 </a>
               </div>
@@ -868,7 +1082,11 @@ export default function App() {
 
             {/* Form Column */}
             <div className="md:col-span-7">
-              <form onSubmit={handleContactSubmit} className="border border-white/[0.04] bg-slate-900/20 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-5">
+              <form onSubmit={handleContactSubmit} className={`border p-6 sm:p-8 rounded-3xl shadow-2xl space-y-5 transition-all ${
+                theme === 'dark' 
+                  ? 'border-white/[0.04] bg-slate-900/20' 
+                  : 'bg-white border-slate-200 shadow-sm'
+              }`}>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
@@ -878,7 +1096,11 @@ export default function App() {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-950 border border-white/5 rounded-xl text-white text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light"
+                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-white'
+                          : 'bg-slate-50 border-slate-200 text-slate-800'
+                      }`}
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -888,7 +1110,11 @@ export default function App() {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-950 border border-white/5 rounded-xl text-white text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light"
+                      className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-white'
+                          : 'bg-slate-50 border-slate-200 text-slate-800'
+                      }`}
                     />
                   </div>
                 </div>
@@ -900,7 +1126,11 @@ export default function App() {
                     required
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-white/5 rounded-xl text-white text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all font-light ${
+                      theme === 'dark'
+                        ? 'bg-slate-950 border-white/5 text-white'
+                        : 'bg-slate-50 border-slate-200 text-slate-800'
+                    }`}
                   />
                 </div>
 
@@ -911,7 +1141,11 @@ export default function App() {
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-white/5 rounded-xl text-white text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all resize-none font-light"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-xs font-sans focus:outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/40 transition-all resize-none font-light ${
+                      theme === 'dark'
+                        ? 'bg-slate-950 border-white/5 text-white'
+                        : 'bg-slate-50 border-slate-200 text-slate-800'
+                    }`}
                   />
                 </div>
 
@@ -956,7 +1190,11 @@ export default function App() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative bg-[#06070a] border-t border-white/[0.04] py-12 overflow-hidden shadow-[0_-15px_40px_rgba(0,0,0,0.4)]">
+      <footer className={`relative py-12 overflow-hidden border-t transition-all duration-300 ${
+        theme === 'dark'
+          ? 'bg-[#06070a] border-white/[0.04] shadow-[0_-15px_40px_rgba(0,0,0,0.4)]'
+          : 'bg-white border-slate-200/80 shadow-sm'
+      }`}>
         {/* Design Accents */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[1px] bg-gradient-to-r from-transparent via-teal-500/20 to-transparent" />
         
@@ -964,7 +1202,9 @@ export default function App() {
           {/* Brand & Signature info */}
           <div className="text-center md:text-left space-y-2">
             <div className="flex items-center justify-center md:justify-start gap-2">
-              <span className="text-white font-extrabold uppercase tracking-widest text-[11px] font-mono">Melvin Cureau</span>
+              <span className={`font-extrabold uppercase tracking-widest text-[11px] font-mono transition-colors ${
+                theme === 'dark' ? 'text-white' : 'text-slate-900'
+              }`}>Melvin Cureau</span>
               <span className="text-slate-600 font-mono text-[10px]">-</span>
               <span className="text-slate-500 text-[10px] font-mono">2026</span>
             </div>
@@ -993,7 +1233,11 @@ export default function App() {
             
             <button 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-              className="text-slate-500 hover:text-white transition-colors flex items-center gap-1 border-l border-white/10 pl-6 cursor-pointer"
+              className={`transition-colors flex items-center gap-1 border-l pl-6 cursor-pointer ${
+                theme === 'dark' 
+                  ? 'text-slate-500 hover:text-white border-white/10' 
+                  : 'text-slate-500 hover:text-slate-900 border-slate-200'
+              }`}
             >
               <span>{language === 'FR' ? 'Retour en haut' : language === 'EN' ? 'Back to top' : 'Volver arriba'}</span>
               <span className="font-sans text-[11px] leading-none shrink-0 inline-block hover:translate-y-[-2px] transition-transform">↑</span>

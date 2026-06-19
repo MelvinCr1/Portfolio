@@ -14,7 +14,7 @@ export const translations: Record<Language, TranslationSet> = {
     
     // CV Section
     titleCV: "Expériences & Formations",
-    subtitleCV: "Une trajectoire centrée sur la performance et la fiabilité des SI",
+    subtitleCV: "",
     viewAll: "Tout le parcours",
     tabWork: "Expériences Pro",
     tabEdu: "Formations",
@@ -126,7 +126,7 @@ export const translations: Record<Language, TranslationSet> = {
     
     // CV Section
     titleCV: "Experience & Education",
-    subtitleCV: "An engineering trajectory focused on performance and reliability",
+    subtitleCV: "",
     viewAll: "All Background",
     tabWork: "Experience",
     tabEdu: "Education",
@@ -238,7 +238,7 @@ export const translations: Record<Language, TranslationSet> = {
     
     // CV Section
     titleCV: "Experiencias y Formación",
-    subtitleCV: "Una trayectoria de ingeniería enfocada en el rendimiento y disponibilidad del SI",
+    subtitleCV: "",
     viewAll: "Toda la trayectoria",
     tabWork: "Experience Pro",
     tabEdu: "Estudios",
