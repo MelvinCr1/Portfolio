@@ -10,13 +10,13 @@
 
 ---
 
-## 🌟 Présentation Générale
+## Présentation Générale
 
 Ce projet héberge le code complet de son site portfolio interactif : moderne, fluide, accessible (conformité aux standards WCAG), traduisible en temps réels en trois langues (**Français**, **Anglais**, **Espagnol**), doté d'un commutateur de thèmes (sombre/clair) et entièrement synchronisé avec l'API GitHub pour exposer ses réalisations à jour.
 
 ---
 
-## 🚀 Fonctionnalités Majeures du Portfolio
+## Fonctionnalités Majeures du Portfolio
 
 1. **Traduction Instantanée In-App** : Changement dynamique à la volée entre FR, EN et ES avec conservation optimale de l'UX.
 2. **Double Système de Thème** : Mode sombre soigné (*Cosmic Dark*) pour l'identité d'ingénierie système, et mode alternatif clair contrasté.
@@ -26,7 +26,7 @@ Ce projet héberge le code complet de son site portfolio interactif : moderne, f
 
 ---
 
-## 🛠️ Stack Technique de l'Application
+## Stack Technique de l'Application
 
 * **React 19 & TypeScript 5** : Robustesse de typage strict des structures d'interfaces.
 * **Vite** : Bundleur ultra-rapide garantissant des scores de chargement Web exceptionnels.
@@ -36,7 +36,7 @@ Ce projet héberge le code complet de son site portfolio interactif : moderne, f
 
 ---
 
-## 📂 Structure Tracée du Projet
+## Structure Tracée du Projet
 
 ```bash
 .
@@ -56,7 +56,7 @@ Ce projet héberge le code complet de son site portfolio interactif : moderne, f
 
 ---
 
-## ⚙️ Installation & Démarrage Local
+## Installation & Démarrage Local
 
 Pour cloner et exécuter le projet dans votre environnement de test local :
 
@@ -85,7 +85,7 @@ Les fichiers d'exploitation optimisés seront générés au sein du répertoire 
 
 ---
 
-## 📬 Me Contacter
+## Me Contacter
 
 N'hésitez pas à me joindre pour des opportunités professionnelles, d'ingénierie ou un échange technologique :
 
