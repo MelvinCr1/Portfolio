@@ -710,7 +710,7 @@ export default function App() {
                   <div className={`space-y-6 border-l ml-3 pl-6 transition-colors ${
                     theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
                   }`}>
-                    {(isCvExpanded ? currentTranslation.experiences : currentTranslation.experiences.slice(0, 2)).map((exp, index) => (
+                    {(isCvExpanded ? currentTranslation.experiences : currentTranslation.experiences.slice(0, 1)).map((exp, index) => (
                       <motion.div 
                         key={index}
                         whileHover={{ y: -3 }}
@@ -878,7 +878,7 @@ export default function App() {
                 }`}>
                   <div className="flex justify-between items-start">
                     <span className={`text-xs font-bold font-mono ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>Microsoft Azure (AZ-900)</span>
-                    <span className="text-[9px] font-mono bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 uppercase rounded-md">
+                    <span className="text-[9px] font-mono bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 uppercase rounded-md shrink-0 ml-1">
                       {language === 'FR' ? 'En cours' : language === 'EN' ? 'In progress' : 'En curso'}
                     </span>
                   </div>
@@ -899,14 +899,14 @@ export default function App() {
                 theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
               }`}>
                 <Cpu className="h-4.5 w-4.5 text-indigo-400" />
-                <span>Habilités techniques</span>
+                <span>{language === 'FR' ? 'Compétences' : language === 'EN' ? 'Skills' : 'Competencias'}</span>
               </h3>
               
               <div className="space-y-4">
                 <div>
                   <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">DevOps & Automation</span>
                   <div className="flex flex-wrap gap-1.5">
-                    {["Docker", "Kubernetes", "Terraform", "Ansible", "GitLab CI", "PowerShell", "Bash"].map((s) => (
+                    {["Ansible", "Terraform", "Docker", "Gitlab / Github", "AWS CloudFormation"].map((s) => (
                       <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
                         theme === 'dark'
                           ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
@@ -919,9 +919,9 @@ export default function App() {
                 </div>
 
                 <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Cloud & Virtualization</span>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Cloud & Virtualisation</span>
                   <div className="flex flex-wrap gap-1.5">
-                    {["Azure", "Google Cloud", "AWS", "VMware", "Linux Server", "Windows Server"].map((s) => (
+                    {["Cloud Architecture", "VMware", "Clouds privés", "Virtualisation", "Microsoft Azure", "AWS"].map((s) => (
                       <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
                         theme === 'dark'
                           ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-indigo-500/20'
@@ -934,13 +934,43 @@ export default function App() {
                 </div>
 
                 <div>
-                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Monitoring & Ops</span>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Admin Système & Réseau</span>
                   <div className="flex flex-wrap gap-1.5">
-                    {["Grafana", "Prometheus", "DAT/DEX Blueprints", "Jira & Confluence"].map((s) => (
+                    {["Linux", "Windows Server", "Firewall Fortigate", "Networking Basics"].map((s) => (
                       <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
                         theme === 'dark'
                           ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600'
+                      }`}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Observabilité & Scripting</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Monitoring & Observability", "PowerShell", "Python", "SQL", "Algorithmes"].map((s) => (
+                      <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600'
+                      }`}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">{language === 'FR' ? 'Savoir-être & Méthodes' : language === 'EN' ? 'Soft-Skills & Methods' : 'Habilidades y Métodos'}</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Résolution de problèmes", "Gestion de projet", "Documentation technique"].map((s) => (
+                      <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-indigo-500/20'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-500 hover:text-indigo-600'
                       }`}>
                         {s}
                       </span>
