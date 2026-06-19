@@ -40,7 +40,7 @@ export const translations: Record<Language, TranslationSet> = {
     btnSending: "Acheminement en cours...",
     btnShowMore: "Voir plus",
     btnShowLess: "Voir moins",
-    formSuccess: "Message transmis avec succès ! Je reviens vers vous rapidement.",
+    formSuccess: "Formulaire complété ! Ouverture de votre messagerie pour envoi vers portfolio@melvincureau.com...",
 
     // Experiences Data
     experiences: [
@@ -152,7 +152,7 @@ export const translations: Record<Language, TranslationSet> = {
     btnSending: "Sending securely...",
     btnShowMore: "Show more",
     btnShowLess: "Show less",
-    formSuccess: "Your message has been successfully sent. I will return to you shortly.",
+    formSuccess: "Form completed! Opening your mail client to send to portfolio@melvincureau.com...",
 
     // Experiences Data
     experiences: [
@@ -264,7 +264,7 @@ export const translations: Record<Language, TranslationSet> = {
     btnSending: "Enviando de forma segura...",
     btnShowMore: "Ver más",
     btnShowLess: "Ver menos",
-    formSuccess: "¡Mensaje enviado con éxito! Me pondré en contacto contigo a la brevedad.",
+    formSuccess: "¡Formulario completado! Abriendo su cliente de correo para enviar a portfolio@melvincureau.com...",
 
     // Experiences Data
     experiences: [

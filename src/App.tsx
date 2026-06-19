@@ -262,16 +262,25 @@ export default function App() {
 
   const currentTranslation = translations[language];
 
-  // Contact simulated submit
+  // Contact submit with dynamic redirection
   const handleContactSubmit = (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
       setFormSubmitted(true);
+      
+      const subjectEncoded = encodeURIComponent(formData.subject || 'Contact depuis Portfolio');
+      const bodyEncoded = encodeURIComponent(
+        `Bonjour Melvin,\n\nVous avez reçu un message de ${formData.name} (${formData.email}) :\n\n-----------------\n${formData.message}\n-----------------\n\nCordialement,\n${formData.name}`
+      );
+      
+      // Redirect to standard secure client mail composer
+      window.location.href = `mailto:portfolio@melvincureau.com?subject=${subjectEncoded}&body=${bodyEncoded}`;
+      
       setFormData({ name: '', email: '', subject: '', message: '' });
-      setTimeout(() => setFormSubmitted(false), 5000);
-    }, 1200);
+      setTimeout(() => setFormSubmitted(false), 6000);
+    }, 1000);
   };
 
   return (
@@ -502,7 +511,11 @@ export default function App() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-400"
+            className={`text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r ${
+              theme === 'dark'
+                ? 'from-white via-slate-100 to-slate-400'
+                : 'from-slate-950 via-slate-800 to-slate-700'
+            }`}
           >
             {currentTranslation.role}
           </motion.h1>
@@ -511,7 +524,9 @@ export default function App() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="max-w-2xl mx-auto text-slate-400 text-sm sm:text-base leading-relaxed font-sans font-light"
+            className={`max-w-2xl mx-auto text-sm sm:text-base leading-relaxed font-sans font-light transition-colors ${
+              theme === 'dark' ? 'text-slate-400' : 'text-slate-700 font-medium'
+            }`}
           >
             {currentTranslation.aboutText}
           </motion.p>
