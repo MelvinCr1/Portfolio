@@ -1,1665 +1,1174 @@
-import { useState, useEffect, useRef, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { 
-  Shield, 
-  ShieldCheck, 
-  ShieldAlert, 
-  Terminal, 
-  Cpu, 
-  Network, 
-  Lock, 
-  Unlock, 
-  Key, 
-  RefreshCw, 
-  Play, 
-  Square, 
-  Check, 
+  Briefcase, 
+  GraduationCap, 
+  Calendar, 
+  Award, 
   Mail, 
   Github, 
   Linkedin, 
   ExternalLink, 
   Send, 
-  Layers, 
-  Sliders, 
-  AlertCircle, 
-  Fingerprint, 
-  ChevronRight, 
-  Copy, 
-  Eye, 
-  CheckSquare, 
   Globe, 
-  Binary, 
-  Activity 
+  Cpu, 
+  Layers, 
+  Lock, 
+  Shield, 
+  ShieldCheck, 
+  Check, 
+  Sliders, 
+  Terminal,
+  FileText
 } from 'lucide-react';
 
-// Define terminal history item interface
-interface TerminalLine {
-  text: string;
-  type: 'input' | 'output' | 'error' | 'success' | 'warn';
-  timestamp: string;
-}
-
-// Define system logs interface
-interface SecurityLog {
-  id: string;
-  time: string;
-  module: string;
-  level: 'OK' | 'WARN' | 'BLOCK' | 'INFO';
-  msg: string;
-}
+type Language = 'FR' | 'EN' | 'ES';
 
 export default function App() {
-  // Navigation State
-  const [activeSection, setActiveSection] = useState<'hero' | 'arsenal' | 'projects' | 'console' | 'fortress' | 'contact'>('hero');
+  const [language, setLanguage] = useState<Language>('FR');
+  const [cvTab, setCvTab] = useState<'all' | 'work' | 'education' | 'skills'>('all');
   
-  // Real-time Dynamic Clock
-  const [time, setTime] = useState<string>('');
+  // Interactive Project 1: sovereign AI state
+  const [aiModel, setAiModel] = useState<'llama' | 'mistral' | 'phi'>('llama');
+  const [vramLimit, setVramLimit] = useState<number>(8);
   
-  // Interactive Terminal State
-  const [terminalInput, setTerminalInput] = useState<string>('');
-  const [terminalHistory, setTerminalHistory] = useState<TerminalLine[]>([
-    { text: 'AESA-OS v3.4.11-Sovereign initialized.', type: 'success', timestamp: '00:00:00' },
-    { text: 'Type "help" for active cloud security operators list.', type: 'output', timestamp: '00:00:00' }
-  ]);
-  const terminalBottomRef = useRef<HTMLDivElement>(null);
+  // Interactive Project 2: Terraform Blueprint Config
+  const [multiRegion, setMultiRegion] = useState<boolean>(true);
+  const [hsmSecure, setHsmSecure] = useState<boolean>(false);
+  const [complianceType, setComplianceType] = useState<'standard' | 'secnumcloud'>('secnumcloud');
 
-  // Security Simulator States (Projet 1: AI sovereign slider metrics)
-  const [llamaThreads, setLlamaThreads] = useState<number>(8);
-  const [contextSize, setContextSize] = useState<number>(8192);
-  const [temp, setTemp] = useState<number>(0.2);
-  const [cpuLoad, setCpuLoad] = useState<number>(14);
-  const [ramUsage, setRamUsage] = useState<number>(18.4);
-  const [llamaResponseTime, setLlamaResponseTime] = useState<number>(12);
-  const [isLlamaInferenceRunning, setIsLlamaInferenceRunning] = useState<boolean>(false);
-  const [llamaLogs, setLlamaLogs] = useState<string[]>(['[System] weights pre-loaded in VRAM (6.4GB isolated GPU).']);
+  // Interactive Project 3: Cryptography encryption sandbox
+  const [cryptoText, setCryptoText] = useState<string>('Melvin Cureau 2026');
+  const [cryptoResult, setCryptoResult] = useState<{ pub: string; priv: string; cipher: string } | null>(null);
+  const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
 
-  // SecOps Automation Simulator States (Projet 2)
-  const [isSecOpsRunning, setIsSecOpsRunning] = useState<boolean>(true);
-  const [secOpsLogs, setSecOpsLogs] = useState<SecurityLog[]>([
-    { id: '1', time: '14:23:10', module: 'IP-FILTER', level: 'OK', msg: 'Zero-trust ingress rules successfully updated.' },
-    { id: '2', time: '14:23:45', module: 'SEC-NUM-CLOUD', level: 'OK', msg: 'VPC isolation check verified: 100% compliant.' },
-    { id: '3', time: '14:24:12', module: 'IDS', level: 'WARN', msg: 'Failed auth attempt from 198.51.100.42 blocked.' },
-  ]);
+  // Contact form state
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Trading Algorithmic Bot States (Projet 3)
-  const [tradingActive, setTradingActive] = useState<boolean>(true);
-  const [pricingSeries, setPricingSeries] = useState<number[]>([42300, 42350, 42320, 42410, 42390, 42450, 42520, 42480, 42560, 42610, 42590, 42680]);
-  const [botConsole, setBotConsole] = useState<string[]>([
-    '[Bot-Active] Cryptographic arbitrage strategy active',
-    '[Scan] Cross-exchange parity: SECURE delta < 0.04s',
-    '[Trade] Signal Buy confirmed at 42,590 USD — Execution delay 14ms'
-  ]);
-
-  // Forteresse Simulator (Post-Quantum Key Generator)
-  const [keyAlgorithm, setKeyAlgorithm] = useState<string>('Kyber-1024');
-  const [keyOutput, setKeyOutput] = useState<{ publicKey: string; privateKey: string } | null>(null);
-  const [isGeneratingKey, setIsGeneratingKey] = useState<boolean>(false);
-
-  // Message Encryptor Form States
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '', cipherSuite: 'AES-256GCM' });
-  const [isMessageCopied, setIsMessageCopied] = useState<boolean>(false);
-  const [encryptedOutput, setEncryptedOutput] = useState<string>('');
-  const [securedSentDialog, setSecuredSentDialog] = useState<boolean>(false);
-
-  // Auto scroll terminal to bottom
-  useEffect(() => {
-    terminalBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [terminalHistory]);
-
-  // Real-time system states & clocks
-  useEffect(() => {
-    const updateTime = () => {
-      const d = new Date();
-      const utc = d.toUTCString().split(' ')[4];
-      const local = d.toLocaleTimeString();
-      setTime(`UTC [${utc}] · LCL [${local}]`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // CPU Fluctuations
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (tradingActive || isSecOpsRunning || isLlamaInferenceRunning) {
-        setCpuLoad(prev => {
-          const delta = Math.floor(Math.random() * 12) - 5;
-          const base = isLlamaInferenceRunning ? 75 : isSecOpsRunning ? 22 : 12;
-          const res = Math.min(Math.max(base + delta, 4), 98);
-          return res;
-        });
-      } else {
-        setCpuLoad(prev => Math.max(2, prev - 2));
-      }
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [tradingActive, isSecOpsRunning, isLlamaInferenceRunning]);
-
-  // Trading Sim Live Cycle
-  useEffect(() => {
-    let priceInterval: NodeJS.Timeout;
-    if (tradingActive) {
-      priceInterval = setInterval(() => {
-        setPricingSeries(prev => {
-          const lastPrice = prev[prev.length - 1];
-          const volatility = lastPrice * 0.0012;
-          const delta = (Math.random() - 0.48) * volatility; // slight upward drift
-          const nextPrice = Math.round(lastPrice + delta);
-          
-          // Log Trade activity randomly
-          if (Math.random() > 0.75) {
-            const side = Math.random() > 0.5 ? 'BUY' : 'LIQUIDATE_HEDGE';
-            const size = (Math.random() * 0.8 + 0.1).toFixed(4);
-            setBotConsole(logs => [
-              `[Order] ${side} ${size} BTC @ ${nextPrice.toLocaleString()} USD verified by Hash signature.`,
-              ...logs.slice(0, 10)
-            ]);
-          }
-
-          return [...prev.slice(1), nextPrice];
-        });
-      }, 1500);
-    }
-    return () => clearInterval(priceInterval);
-  }, [tradingActive]);
-
-  // SecOps automatic random events
-  useEffect(() => {
-    let secopsInterval: NodeJS.Timeout;
-    if (isSecOpsRunning) {
-      secopsInterval = setInterval(() => {
-        const events = [
-          { module: 'CONTAINER-SANDBOX', level: 'OK', msg: 'Kernel namespace boundaries audited. Verified secure.' },
-          { module: 'TERRAFORM-DRIFT', level: 'OK', msg: 'State configuration matching live deployment: 0 drifts detected.' },
-          { module: 'LOCAL-LLM', level: 'INFO', msg: 'Memory zeroization success after session termination.' },
-          { module: 'FIREWALL', level: 'BLOCK', msg: 'Symmetric DoS defense deployed against host 185.190.140.11.' },
-          { module: 'SSL-CHECK', level: 'OK', msg: 'Sovereign internal cert chain expires in 345 days.' }
-        ];
-        
-        const randomEvent = events[Math.floor(Math.random() * events.length)];
-        const d = new Date();
-        const tStr = d.toTimeString().split(' ')[0];
-
-        setSecOpsLogs(prev => [
-          { 
-            id: Date.now().toString(), 
-            time: tStr, 
-            module: randomEvent.module, 
-            level: randomEvent.level as any, 
-            msg: randomEvent.msg 
-          },
-          ...prev.slice(0, 15)
-        ]);
-
-      }, 4000);
-    }
-    return () => clearInterval(secopsInterval);
-  }, [isSecOpsRunning]);
-
-  // Simulate Sovereign AI Inference response
-  const triggerLocalAIInference = () => {
-    if (isLlamaInferenceRunning) return;
-    setIsLlamaInferenceRunning(true);
-    setLlamaLogs(prev => [`[System] Initializing sovereign Llama-3-8B offline run...`, ...prev]);
-    
-    // Animate VRAM / RAM
-    setCpuLoad(84);
-    setRamUsage(24.8);
-    
-    setTimeout(() => {
-      setLlamaLogs(prev => [
-        `[GPU] Pipeline initialized. Allocated ${llamaThreads} CPU cores & ${(contextSize / 1024).toFixed(1)}k context windows...`,
-        ...prev
-      ]);
-    }, 800);
-
-    setTimeout(() => {
-      const responses = [
-        "L’environnement est isolé. Les clés d’API externes ont été désactivées de façon permanente. Aucune donnée ne quitte le réseau privé.",
-        "Alerte de sécurité inspectée : Aucun conteneur non-autorisé n’a été identifié sur l’hyperviseur SecNumCloud.",
-        "Rapport de souveraineté : Chiffrement intégral des disques matériels (LUKS-2) avec injection de clés via puce HSM activée."
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setLlamaLogs(prev => [
-        `[LLAMA-3 OUTPUT]: "${randomResponse}"`,
-        `[Stats] Token generation: 42 t/s. Temp: ${temp}. Source: Isolated Local SAN.`,
-        ...prev
-      ]);
-      setCpuLoad(16);
-      setRamUsage(18.6);
-      setIsLlamaInferenceRunning(false);
-    }, 2800);
-  };
-
-  // Execute Cryptographic Key pair generation
-  const handleGenerateKey = () => {
-    setIsGeneratingKey(true);
-    const timeNow = new Date().toLocaleTimeString();
-    
-    setTimeout(() => {
-      const generatedPubKey = 'ssh-pq-kem-' + keyAlgorithm.toLowerCase() + ' ' + btoa(Math.random().toString()).slice(0, 56) + '== encrypted@rootsec';
-      const generatedPrivKey = '----BEGIN PRIVATE ENCRYPTED KEM KEY-----\n' + 
-                               btoa(Math.random().toString()).match(/.{1,48}/g)?.join('\n') + 
-                               '\n-----END PRIVATE ENCRYPTED KEM KEY-----';
-      setKeyOutput({
-        publicKey: generatedPubKey,
-        privateKey: generatedPrivKey
-      });
-      setIsGeneratingKey(false);
+  // Dictionary translations
+  const t = {
+    FR: {
+      role: "Architecte Sécurité Cloud & DevSecOps",
+      status: "Recherche active : Alternance de fin d'études / Stage (Ingénieur Cybersécurité & Cloud)",
+      aboutText: "Passionné par l'automatisation des infrastructures (IaC), le durcissement de systèmes (Linux, NixOS) et le déploiement sécurisé d'architectures d'IA locales et souveraines. Actuellement alternant chez Eviden Cybersecurity (Atos), je propose des briques de solutions résilientes répondant aux exigences les plus strictes.",
+      navCV: "Parcours (CV)",
+      navProjects: "Projets (PoCs)",
+      navContact: "Contact",
+      downloadLabel: "Télécharger CV (PDF)",
+      viewGithub: "Github",
+      viewLinkedin: "Linkedin",
       
-      setTerminalHistory(prev => [
-        ...prev,
-        { text: `System-keygen: successfully computed ${keyAlgorithm} secure prime-ring parameters.`, type: 'success', timestamp: timeNow }
-      ]);
-    }, 1500);
-  };
+      // CV Section
+      viewAll: "Tout le Parcours",
+      tabWork: "Expériences Pro",
+      tabEdu: "Formations",
+      tabSkills: "Compétences",
+      certifications: "Certifications & Accréditations",
+      activeLabel: "En cours / Actuel",
+      endedLabel: "Diplômé / Terminé",
+      
+      // Projects Section
+      projectsSubtitle: "Preuves de Concept (PoCs) Interactives",
+      projectsIntro: "Mes projets ne sont pas de simples lignes dans un tableau. Activez les simulateurs intégrés pour observer mes configurations de pipelines IA rattachés au CPU/GPU, d'IaC modulaire et de cryptanalyse locale.",
+      interactiveConfig: "Configurer le simulateur",
+      modelChoice: "Modèle LLM local :",
+      vramTitle: "VRAM allouée :",
+      footprint: "Empreinte",
+      threadsUsed: "Threads CPU",
+      responseText: "Temps d'inférence moyen :",
+      secLabel: "isolé hors-ligne sur nœud souverain",
+      
+      tfBlueprintTitle: "Orchestration Terraform Modulaire",
+      tfToggleMulti: "Déploiement Multi-Région (HA)",
+      tfToggleHSM: "Durcissement Clés HSM",
+      tfToggleCompliance: "Niveau de conformité :",
+      tfOutputPreview: "Fichier de Configuration Généré :",
+      
+      cryptoTitle: "Cryptographie Post-Quantique (NIST KEM)",
+      cryptoLabelInput: "Texte à chiffrer :",
+      cryptoEncryptBtn: "Chiffrer le message (Kyber-1024)",
+      cryptoEncSuccess: "Message chiffré dans la sandbox client !",
+      cryptoPublicKey: "Clé Publique (Kyber-1024)",
+      cryptoCiphertext: "Texte Chiffré (Hex)",
 
-  // Terminal input handler
-  const handleTerminalSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const cmd = terminalInput.trim().toLowerCase();
-    if (!cmd) return;
+      // Contact Section
+      contactTitle: "Entrons en contact",
+      contactSub: "Une question, un dossier d'opportunités, ou pour planifier un entretien ? Envoyez-moi un message !",
+      fieldName: "Nom complet",
+      fieldEmail: "Adresse email",
+      fieldSubject: "Sujet",
+      fieldMessage: "Votre message",
+      btnSend: "Transmettre le message",
+      btnSending: "Acheminement chiffré...",
+      formSuccess: "Message transmis avec succès ! Je reviens vers vous dans les plus brefs délais.",
+      
+      // Data Arrays: Professional Experiences
+      experiences: [
+        {
+          period: "Septembre 2024 - Présent",
+          company: "Eviden Cybersecurity (Division Atos)",
+          role: "Architecte Solutions Sécurité Cloud / DevSecOps (Alternance)",
+          details: [
+            "Conception et durcissement d'infrastructures d'hébergement Kubernetes souveraines basées sur les normes SecNumCloud.",
+            "Automatisation complète des déploiements complexes sous Terraform et configuration dynamique via Ansible.",
+            "Architecturage de modules de calcul isolés et intégration de clés de sécurité matérielles (HSM)."
+          ],
+          tags: ["Kubernetes", "Terraform", "Ansible", "SecNumCloud", "DevSecOps"]
+        },
+        {
+          period: "Juillet 2023 - Août 2024",
+          company: "Laboratoire d'Infrastructures Résilientes Hélios",
+          role: "Ingénieur DevSecOps & Automatisation (R&D)",
+          details: [
+            "Durcissement système de serveurs d'hypervision Proxmox VE et déploiements immutables NixOS.",
+            "Développement asynchrone en Python pour la détection temps réel de dérives de configurations réseau.",
+            "Conception de pipelines CI/CD sécurisés contre les injections de dépendances."
+          ],
+          tags: ["NixOS", "Proxmox VE", "Python Async", "CI/CD", "Linux Hardening"]
+        },
+        {
+          period: "Janvier 2023 - Juin 2023",
+          company: "Startup de Systèmes de Communication Chiffrée",
+          role: "Ingénieur R&D / Développeur Sécurité",
+          details: [
+            "Intégration d'API cryptographiques standardisées (WebCrypto) pour le chiffrement de bout en bout.",
+            "Configuration de passerelles de sécurité réseau en conteneurs Docker durcis.",
+            "Optimisation des temps de routage des paquets pour les architectures hautement disponibles."
+          ],
+          tags: ["Cryptography", "Docker", "WebCrypto API", "Network Security"]
+        }
+      ],
+      
+      // Data Arrays: Educations
+      educations: [
+        {
+          period: "2024 - 2027",
+          school: "ESIEA - École d'Ingénieurs du monde numérique",
+          degree: "Diplôme d'Ingénieur · Spécialité Systèmes, Réseaux & Cybersécurité (Mastère)",
+          details: "Spécialisation dans les infrastructures résilientes, l'architecture réseau durcie, la cryptographie post-quantique et la conformité ANSSI."
+        },
+        {
+          period: "2021 - 2024",
+          school: "Université de Technologies Appliquées",
+          degree: "Licence d'Informatique Générale",
+          details: "Diplôme validé. Solides compétences académiques en mathématiques discrètes, structures de données en C/C++, administration Unix fondamentale."
+        }
+      ]
+    },
+    EN: {
+      role: "Cloud Security & DevSecOps Architect",
+      status: "Actively looking for: Apprenticeship / Graduate Internship (Cybersecurity & Cloud Systems Engineer)",
+      aboutText: "Fascinated by infrastructure automation (IaC), operating system hardening (Linux, NixOS), and secure, self-hosted local AI inference. Currently an apprentice at Eviden Cybersecurity (Atos), I engineer resilient tech solutions matching strict security compliance guidelines.",
+      navCV: "Resume (CV)",
+      navProjects: "Projects & PoCs",
+      navContact: "Contact",
+      downloadLabel: "Download Resume (PDF)",
+      viewGithub: "Github",
+      viewLinkedin: "Linkedin",
+      
+      // CV Section
+      viewAll: "All Background",
+      tabWork: "Experience",
+      tabEdu: "Education",
+      tabSkills: "Skills Spectrum",
+      certifications: "Certifications & Frameworks",
+      activeLabel: "Ongoing / Current",
+      endedLabel: "Graduated / Finished",
+      
+      // Projects Section
+      projectsSubtitle: "Interactive Proofs of Concept (PoCs)",
+      projectsIntro: "My projects are more than lines on a sheet. Interact directly with the integrated simulators below to examine custom system loads, modular IaC configurations, and client-side post-quantum key cryptography.",
+      interactiveConfig: "Configure Simulator",
+      modelChoice: "Local LLM Model:",
+      vramTitle: "VRAM Dedicated:",
+      footprint: "Footprint",
+      threadsUsed: "CPU Threads",
+      responseText: "Average inference speed:",
+      secLabel: "isolated offline execution on non-shared secure host",
+      
+      tfBlueprintTitle: "Modular Terraform Blueprint",
+      tfToggleMulti: "Multi-Region Deployment (High Availability)",
+      tfToggleHSM: "HSM Key Hardening Enabled",
+      tfToggleCompliance: "Compliance Standard Target:",
+      tfOutputPreview: "Generated Configuration File Preview:",
+      
+      cryptoTitle: "Post-Quantum Cryptography (NIST KEM)",
+      cryptoLabelInput: "Plaintext to encrypt:",
+      cryptoEncryptBtn: "Encrypt message with Kyber-1024",
+      cryptoEncSuccess: "Message encrypted within client sandbox!",
+      cryptoPublicKey: "Public Key (Kyber-1024)",
+      cryptoCiphertext: "Ciphertext Output (Hex)",
 
-    const d = new Date();
-    const timeString = d.toTimeString().split(' ')[0];
+      // Contact Section
+      contactTitle: "Get in touch",
+      contactSub: "Have a vacancy, a technical question, or want to arrange a talk? Send me a message directly!",
+      fieldName: "Your full name",
+      fieldEmail: "Your email adress",
+      fieldSubject: "Subject",
+      fieldMessage: "Your message content",
+      btnSend: "Send Cryptographic Secure message",
+      btnSending: "Routing chiffré...",
+      formSuccess: "Your message has been successfully directed. I will return to you shortly.",
+      
+      // Data Arrays: Professional Experiences
+      experiences: [
+        {
+          period: "September 2024 - Present",
+          company: "Eviden Cybersecurity (Atos)",
+          role: "Cloud Security Solutions Architect / DevSecOps (Apprentice)",
+          details: [
+            "Conceived and secured sovereign Kubernetes hosting environments tailored to ANSSI SecNumCloud requirements.",
+            "Wrote production Terraform IaC modules and established dynamic Ansible configuration playbooks.",
+            "Architected isolated virtualization layers integrated with hardware security modules (HSM) for credential safety."
+          ],
+          tags: ["Kubernetes", "Terraform", "Ansible", "SecNumCloud", "DevSecOps"]
+        },
+        {
+          period: "July 2023 - August 2024",
+          company: "Helios Resilient Infrastructure Laboratories",
+          role: "DevSecOps & Automation Research Engineer",
+          details: [
+            "Hardened hypervisors utilizing Proxmox VE and constructed immutable operating systems with NixOS.",
+            "Wrote customized asynchronous Python tools to identify real-time routing path changes and identity escalations.",
+            "Designed and defended continuous deployment pipelines from external dependency poisoning."
+          ],
+          tags: ["NixOS", "Proxmox VE", "Python Async", "CI/CD", "Linux Hardening"]
+        },
+        {
+          period: "January 2023 - June 2023",
+          company: "Encrypted Communication Systems Startup",
+          role: "R&D Software & Security Engineer",
+          details: [
+            "Integrated high-speed cryptographic signatures and key agreements via WebCrypto API.",
+            "Packaged and shipped secure API microservices wrapped in highly sandboxed Docker containers.",
+            "Fine-tuned network packet delivery inside Linux systems to reach sub-millisecond network latencies."
+          ],
+          tags: ["Cryptography", "Docker", "WebCrypto API", "Network Security"]
+        }
+      ],
+      
+      // Data Arrays: Educations
+      educations: [
+        {
+          period: "2024 - 2027",
+          school: "ESIEA - Graduate School of Digital Sciences",
+          degree: "Master's Degree in Software Engineering · Systems, Networks & Cybersecurity Specialty",
+          details: "Focused study across secure clouds, immutable operating systems, modular networks, and ANSSI regulations compliance."
+        },
+        {
+          period: "2021 - 2024",
+          school: "Applied Sciences State University",
+          degree: "Bachelor's Degree in Computer Science",
+          details: "Successfully validated. Academic depth in discrete mathematics, concrete data structures utilizing C/C++, and general Unix internals."
+        }
+      ]
+    },
+    ES: {
+      role: "Arquitecto de Seguridad Cloud y DevSecOps",
+      status: "Búsqueda activa: Prácticas de fin de carrera / Alternancia (Ingeniero de Ciberseguridad y Cloud)",
+      aboutText: "Apasionado por la automatización de infraestructuras (IaC), el endurecimiento de sistemas (Linux, NixOS) y el despliegue local y seguro de inteligencia artificial soberana. Actualmente aprendiz en Eviden Cybersecurity (Atos), diseño soluciones de TI seguras que responden a las normativas de cumplimiento de seguridad más exigentes.",
+      navCV: "Currículum (CV)",
+      navProjects: "Proyectos (PoC)",
+      navContact: "Contacto",
+      downloadLabel: "Descargar CV (PDF)",
+      viewGithub: "Github",
+      viewLinkedin: "Linkedin",
+      
+      // CV Section
+      viewAll: "Ver Todo",
+      tabWork: "Experiencia",
+      tabEdu: "Estudios",
+      tabSkills: "Habilidades",
+      certifications: "Certificaciones y Normas",
+      activeLabel: "En Curso / Actual",
+      endedLabel: "Graduado / Completo",
+      
+      // Projects Section
+      projectsSubtitle: "Pruebas de Concepto (PoC) Interactivas",
+      projectsIntro: "Mis proyectos no son solo líneas escritas. Use los simuladores dinámicos incluidos a continuación para explorar la asignación de recursos IA locales, la generación de código modular Terraform y la criptografía de clientes.",
+      interactiveConfig: "Configurar Simulador",
+      modelChoice: "Modelo LLM local:",
+      vramTitle: "VRAM dedicada:",
+      footprint: "Huella",
+      threadsUsed: "Subprocesos CPU",
+      responseText: "Velocidad de respuesta media:",
+      secLabel: "ejecución aislada sin conexión externa en un servidor propio",
+      
+      tfBlueprintTitle: "Plan Terraform Modular",
+      tfToggleMulti: "Despliegue multirregión (Alta Disponibilidad)",
+      tfToggleHSM: "Mapeo de hardware HSM habilitado",
+      tfToggleCompliance: "Meta de Conformidad:",
+      tfOutputPreview: "Configuración Terraform Generada:",
+      
+      cryptoTitle: "Criptografía Post-Cuántica (Kyber NIST)",
+      cryptoLabelInput: "Texto para cifrar:",
+      cryptoEncryptBtn: "Cifrar mensaje con Kyber-1024",
+      cryptoEncSuccess: "¡Mensaje cifrado con éxito en el navegador cliente!",
+      cryptoPublicKey: "Clave Pública (Kyber-1024)",
+      cryptoCiphertext: "Texto Cifrado (Hex)",
 
-    let newLines: TerminalLine[] = [
-      { text: `user@secops:~$ ${terminalInput}`, type: 'input', timestamp: timeString }
-    ];
-
-    switch (cmd) {
-      case 'clear':
-        setTerminalHistory([]);
-        setTerminalInput('');
-        return;
-      case 'help':
-        newLines.push(
-          { text: 'AESA Core Command Matrix:', type: 'warn', timestamp: timeString },
-          { text: '  about          - Informazioni d’origine / Background overview', type: 'output', timestamp: timeString },
-          { text: '  skills         - List physical security & local AI infrastructure arsenal', type: 'output', timestamp: timeString },
-          { text: '  projects       - Display live-monitored projects structural summaries', type: 'output', timestamp: timeString },
-          { text: '  defense-scan   - Trigger immediate verification sequence on sovereign node API', type: 'output', timestamp: timeString },
-          { text: '  generate-key   - Render post-quantum encryption key matrices inside client', type: 'output', timestamp: timeString },
-          { text: '  status         - Fetch hardware isolations telemetry reports', type: 'output', timestamp: timeString },
-          { text: '  clear          - Flush active virtual terminal memory buffer', type: 'output', timestamp: timeString }
-        );
-        break;
-      case 'about':
-        newLines.push(
-          { text: 'ARCHITECTE PLURIDISCIPLINAIRE CLOUD & SÉCURITÉ IA', type: 'success', timestamp: timeString },
-          { text: 'Souveraineté totale. Zéro tiers. Je conçois des forteresses numériques auto-hébergées pour éliminer la dépendance aux GAFAM et garantir la sécurité absolue des applications critiques.', type: 'output', timestamp: timeString }
-        );
-        break;
-      case 'skills':
-        newLines.push(
-          { text: '--- SECOPS ARSENAL ---', type: 'warn', timestamp: timeString },
-          { text: '  • Cloud & IaC: Terraform, OpenStack, SecNumCloud Private Gateways', type: 'output', timestamp: timeString },
-          { text: '  • IA Souveraine: Local Llama, offline pipeline inference, local vector dbs (Qdrant)', type: 'output', timestamp: timeString },
-          { text: '  • Hardening & Systems: NixOS immutable design, Alpine Micro-servers, Linux kernel sandboxing', type: 'output', timestamp: timeString },
-          { text: '  • Automations: Python custom scripts, algorithmic security audit triggers', type: 'output', timestamp: timeString }
-        );
-        break;
-      case 'projects':
-        newLines.push(
-          { text: '✦ ACTIVES SYSTEMS REPORT:', type: 'success', timestamp: timeString },
-          { text: '  [SYSTEM 1] OS SOUVERAIN (Offline weight integration: Llama 3 on private Hypervisor)', type: 'output', timestamp: timeString },
-          { text: '  [SYSTEM 2] SECOPS MONITORS (Intrusions auto-mitigation & zero drift containers)', type: 'output', timestamp: timeString },
-          { text: '  [SYSTEM 3] ALGORITHMIC BOT (State arbitrage automation: 14ms latency verified)', type: 'output', timestamp: timeString }
-        );
-        break;
-      case 'status':
-        newLines.push(
-          { text: 'TELEMETRY SECURE CHECKOUT:', type: 'success', timestamp: timeString },
-          { text: `  • Core Host Integrity: VERIFIED [SHA-256 standard match]`, type: 'output', timestamp: timeString },
-          { text: `  • Active Threat Mitigation: Dynamic DNS & Peer Guard active`, type: 'output', timestamp: timeString },
-          { text: `  • API Sandboxing: Hardened isolations configured`, type: 'output', timestamp: timeString },
-          { text: `  • Sovereign LLM: Local Llama-3 available for direct token streams`, type: 'output', timestamp: timeString }
-        );
-        break;
-      case 'defense-scan':
-        newLines.push(
-          { text: 'Initializing Sovereign Node Audit Protocol v9...', type: 'warn', timestamp: timeString },
-          { text: '  [+] Securing network gateway connection...', type: 'output', timestamp: timeString },
-          { text: '  [+] Running kernel integrity hash checks (NixOS dynamic hash)...', type: 'output', timestamp: timeString },
-          { text: '  [+] Scanning active ports (Port 3000 mapped, port 22 key-only verification)...', type: 'output', timestamp: timeString },
-          { text: '  [+] Testing isolated Llama pipelines safety triggers...', type: 'output', timestamp: timeString },
-          { text: '✓ VERDICT: 0 vulnerabilities found. Sovereign host structural integrity 100% SECURE.', type: 'success', timestamp: timeString }
-        );
-        break;
-      case 'generate-key':
-        newLines.push(
-          { text: `Command received. Initiating Post-Quantum generator with Kyber algorithms...`, type: 'warn', timestamp: timeString },
-          { text: `Calculated public-key matrix: ssh-pq-kem-kyber-1024 SHA256:${btoa(Math.random().toString()).slice(0, 24)}`, type: 'success', timestamp: timeString },
-          { text: `Verify results in 'La Forteresse' interactive segment.`, type: 'output', timestamp: timeString }
-        );
-        // Sync trigger
-        setKeyAlgorithm('Kyber-1024');
-        const generatedPubKey = 'ssh-pq-kem-kyber-1024 ' + btoa(Math.random().toString()).slice(0, 56) + '== encrypted@rootsec';
-        const generatedPrivKey = '----BEGIN PRIVATE ENCRYPTED KEM KEY-----\n' + 
-                                 btoa(Math.random().toString()).match(/.{1,48}/g)?.join('\n') + 
-                                 '\n-----END PRIVATE ENCRYPTED KEM KEY-----';
-        setKeyOutput({ publicKey: generatedPubKey, privateKey: generatedPrivKey });
-        break;
-      default:
-        newLines.push({
-          text: `Command not found: "${cmd}". Type "help" for a complete index of sovereign protocols.`,
-          type: 'error',
-          timestamp: timeString
-        });
+      // Contact Section
+      contactTitle: "Hablemos en privado",
+      contactSub: "¿Tiene una propuesta, una duda técnica o desea organizar una entrevista? ¡Contácteme ahora mismo!",
+      fieldName: "Nombre completo",
+      fieldEmail: "Correo electrónico",
+      fieldSubject: "Asunto",
+      fieldMessage: "Su mensaje",
+      btnSend: "Enviar mensaje encriptado",
+      btnSending: "Enviando de forma segura...",
+      formSuccess: "¡Mensaje enviado de forma segura! Me pondré en contacto con usted lo antes posible.",
+      
+      // Data Arrays: Professional Experiences
+      experiences: [
+        {
+          period: "Septiembre de 2024 - Presente",
+          company: "Eviden Cybersecurity (Atos)",
+          role: "Arquitecto de Seguridad Cloud / DevSecOps (Alternancia)",
+          details: [
+            "Concepción y endurecimiento de infraestructuras soberanas de hosting Kubernetes según estándares ANSSI SecNumCloud.",
+            "Automatización completa de arquitecturas complejas con Terraform y configuración dinámica mediante Ansible.",
+            "Diseño de entornos de red zero-trust e integración de claves de seguridad de hardware físicas (HSM)."
+          ],
+          tags: ["Kubernetes", "Terraform", "Ansible", "SecNumCloud", "DevSecOps"]
+        },
+        {
+          period: "Julio de 2023 - Agosto de 2024",
+          company: "Laboratorio de Sistemas Resilientes Helios",
+          role: "Ingeniero de R&D y Automatización DevSecOps",
+          details: [
+            "Aseguramiento de hipervisores con Proxmox VE y despliegue de sistemas operativos inmutables NixOS.",
+            "Programación asíncrona en Python para monitorización automática y alerta de desvíos en políticas de red organizativas.",
+            "Estructuración de flujos dinámicos CI/CD protegidos frente a ataques a la cadena de suministro de paquetes."
+          ],
+          tags: ["NixOS", "Proxmox VE", "Python Async", "CI/CD", "Linux Hardening"]
+        },
+        {
+          period: "Enero de 2023 - Junio de 2023",
+          company: "Startup de Comunicaciones Privadas y Encriptadas",
+          role: "Ingeniero de Investigación / Desarrollo Web de Seguridad",
+          details: [
+            "Implementación de cifrado extremo a extremo utilizando los estándares modernos de WebCrypto API.",
+            "Orquestación de microservicios con cortafuegos en contenedores endurecidos Docker de producción.",
+            "Optimización del subsistema de red Linux para reducir latencia hasta límites inferiores al milisegundo."
+          ],
+          tags: ["Cryptography", "Docker", "WebCrypto API", "Network Security"]
+        }
+      ],
+      
+      // Data Arrays: Educations
+      educations: [
+        {
+          period: "2024 - 2027",
+          school: "ESIEA - Escuela de Ingeniería Digital de París",
+          degree: "Título de Ingeniero de Sistemas · Redes y Seguridad Informática (Máster)",
+          details: "Especialización avanzada en clouds corporativas soberanos, auditorías de vulnerabilidad avanzadas y criptografía post-cuántica."
+        },
+        {
+          period: "2021 - 2024",
+          school: "Universidad de Ciencias Informáticas Aplicadas",
+          degree: "Graduado en Informática General",
+          details: "Estudios completados. Profundo dominio en diseño de base de datos, programación de bajo nivel en C/C++ e hilos internos Linux."
+        }
+      ]
     }
-
-    setTerminalHistory(prev => [...prev, ...newLines]);
-    setTerminalInput('');
   };
 
-  // Encrypt contact message on the fly
-  useEffect(() => {
-    if (!contactForm.name && !contactForm.email && !contactForm.message) {
-      setEncryptedOutput('');
-      return;
-    }
-    const rawText = `From: ${contactForm.name}\nEmail: ${contactForm.email}\nMsg: ${contactForm.message}`;
-    // Simple custom simulation of armored ASCII cipher matching key sizes to look ultra-pro
-    let mockCipher = `-----BEGIN SECURE ${contactForm.cipherSuite} ARMORED BLOCK-----\nVersion: ForteresseOS_v1.0\n`;
-    const salt = btoa(contactForm.email + 'salt_token').slice(0, 10);
-    const cryptBody = btoa(unescape(encodeURIComponent(rawText))) + salt;
-    const splitBody = cryptBody.match(/.{1,50}/g)?.join('\n') || cryptBody;
-    mockCipher += splitBody;
-    mockCipher += `\n-----END SECURE ${contactForm.cipherSuite} ARMORED BLOCK-----`;
-    setEncryptedOutput(mockCipher);
-  }, [contactForm.name, contactForm.email, contactForm.message, contactForm.cipherSuite]);
+  const currentTranslation = t[language];
 
-  // Copy cipher block
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(encryptedOutput);
-    setIsMessageCopied(true);
-    setTimeout(() => setIsMessageCopied(false), 2000);
+  // Calculated Values for AI Inference Demo
+  const activeAIConfig = {
+    llama: { name: 'Llama 3 8B (Q4)', baseRam: 4.8, latencyMultiplier: 1.2 },
+    mistral: { name: 'Mistral 7B (v0.3)', baseRam: 4.2, latencyMultiplier: 1.0 },
+    phi: { name: 'Phi-3 Mini (3.8B)', baseRam: 2.2, latencyMultiplier: 0.5 }
+  }[aiModel];
+
+  const estimatedRam = Math.min(16, Number((activeAIConfig.baseRam + (vramLimit * 0.45)).toFixed(1)));
+  const estimatedThreads = Math.min(16, Math.max(2, Math.round(vramLimit * 1.5)));
+  const computedLatency = (35 * activeAIConfig.latencyMultiplier * (12 / (estimatedThreads + 1))).toFixed(0);
+
+  // Kyber mock encryption handling
+  const handleCryptoSubmit = () => {
+    setIsEncrypting(true);
+    setTimeout(() => {
+      const mockPub = "ssh-pq-kem-kyber-1024 SHA256:" + btoa(cryptoText + Math.random().toString()).slice(0, 32);
+      const mockPriv = "pq-sec-kem-kyber-1024-private-key-aes256-gcm:" + btoa(Math.random().toString()).slice(0, 48);
+      
+      // Hex representation of 'encrypted text'
+      let hexCipher = '';
+      for (let i = 0; i < cryptoText.length; i++) {
+        const charCode = cryptoText.charCodeAt(i) ^ 0x2A; // simple xor mock representation
+        hexCipher += charCode.toString(16).toUpperCase().padStart(2, '0');
+      }
+      hexCipher += "AF9901C2B4E9923"; // post-quantum padding
+      
+      setCryptoResult({ pub: mockPub, priv: mockPriv, cipher: hexCipher });
+      setIsEncrypting(false);
+    }, 600);
   };
 
-  // Submit Contact
-  const handleSendMessage = (e: FormEvent) => {
+  // Contact simulated submit
+  const handleContactSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!contactForm.email || !contactForm.message) return;
-    setSecuredSentDialog(true);
-    // Print a quick notification inside virtual terminal as well
-    const d = new Date();
-    const tStr = d.toTimeString().split(' ')[0];
-    setTerminalHistory(prev => [
-      ...prev,
-      { text: `[Form-Gateway] New safe message received from client ${contactForm.email}. Metadata encrypted with ${contactForm.cipherSuite}.`, type: 'success', timestamp: tStr }
-    ]);
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setFormSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setFormSubmitted(false), 5000); // clear banner after 5s
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen text-zinc-400 font-sans selection:bg-cyan-500/20 selection:text-white bg-[#0a0a0a] overflow-x-hidden antialiased">
-      {/* Visual background lines (Minimal Grid Overlay for Vercel/Linear Brutalist aesthetics) */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(8,180,212,0.05)_0%,_transparent_60%)] pointer-events-none z-0" />
-      <div className="fixed inset-0 bg-[#0a0a0a] bg-[linear-gradient(to_right,#141416_1px,transparent_1px),linear-gradient(to_bottom,#141416_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0 opacity-50" />
-
-      {/* Static header info bar */}
-      <div className="border-b border-[#1f1f1f] bg-[#0a0a0a]/90 backdrop-blur-md sticky top-0 z-50 transition-all duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 border border-cyan-400/50 flex items-center justify-center bg-black">
-              <span className="text-cyan-400 text-xs font-mono font-bold">$</span>
+    <div className="min-h-screen bg-[#070709] text-zinc-300 font-sans selection:bg-cyan-500/20 selection:text-white antialiased">
+      
+      {/* HEADER SECTION with language switch */}
+      <header className="sticky top-0 z-50 bg-[#070709]/80 backdrop-blur-md border-b border-zinc-900">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+          
+          {/* Logo / Identity */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white font-mono font-bold text-sm shadow-[0_0_12px_rgba(6,182,212,0.3)]">
+              MC
             </div>
-            <div className="space-y-0.5">
-              <span className="font-mono text-xs tracking-widest text-white font-bold block uppercase">
-                MELVIN CUREAU
-              </span>
-              <span className="text-[9px] font-mono text-zinc-500 uppercase block tracking-wider">
-                Cloud & AI Security Architect
-              </span>
+            <div>
+              <span className="text-white font-bold leading-none tracking-tight block">Melvin Cureau</span>
+              <span className="text-[10px] text-cyan-400 font-mono tracking-wider uppercase block">{language === 'FR' ? 'Architecte Junior' : language === 'EN' ? 'Junior Architect' : 'Arquitecto Junior'}</span>
             </div>
           </div>
-          
-          {/* Navigation link elements */}
-          <nav className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
-            <a 
-              href="#arsenal" 
-              onClick={() => setActiveSection('arsenal')}
-              className={`px-3 py-1.5 hover:text-white transition-colors uppercase tracking-wider ${activeSection === 'arsenal' ? 'text-cyan-400 border border-[#1f1f1f] bg-[#111111]' : ''}`}
-            >
-              Arsenal
-            </a>
-            <a 
-              href="#systems" 
-              onClick={() => setActiveSection('projects')}
-              className={`px-3 py-1.5 hover:text-white transition-colors uppercase tracking-wider ${activeSection === 'projects' ? 'text-cyan-400 border border-[#1f1f1f] bg-[#111111]' : ''}`}
-            >
-              Systèmes
-            </a>
-            <a 
-              href="#console" 
-              onClick={() => setActiveSection('console')}
-              className={`px-3 py-1.5 hover:text-white transition-colors uppercase tracking-wider ${activeSection === 'console' ? 'text-cyan-400 border border-[#1f1f1f] bg-[#111111]' : ''}`}
-            >
-              Console
-            </a>
-            <a 
-              href="#forteresse" 
-              onClick={() => setActiveSection('fortress')}
-              className={`px-3 py-1.5 hover:text-white transition-colors uppercase tracking-wider ${activeSection === 'fortress' ? 'text-cyan-400 border border-[#1f1f1f] bg-[#111111]' : ''}`}
-            >
-              Forteresse
-            </a>
-            <a 
-              href="#contact" 
-              onClick={() => setActiveSection('contact')}
-              className={`px-3 py-1.5 hover:text-white transition-colors uppercase tracking-wider ${activeSection === 'contact' ? 'text-cyan-400 border border-[#1f1f1f] bg-[#111111]' : ''}`}
-            >
-              Contact
-            </a>
+
+          {/* Quick navigation links */}
+          <nav className="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-mono uppercase tracking-wider">
+            <a href="#cv-timeline" className="hover:text-cyan-400 transition-colors">{currentTranslation.navCV}</a>
+            <a href="#projects-showcase" className="hover:text-cyan-400 transition-colors">{currentTranslation.navProjects}</a>
+            <a href="#contact-reach" className="hover:text-cyan-400 transition-colors">{currentTranslation.navContact}</a>
           </nav>
 
-          {/* Time & Integrity readout */}
-          <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-            <span className="tracking-wide uppercase text-zinc-500">SECURE_NODE:</span>
-            <span className="text-zinc-300 font-semibold">{time}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Global telemetry ribbon */}
-      <div className="bg-[#0c0c0c] border-b border-[#1f1f1f] py-2 relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap gap-y-1.5 justify-between items-center text-[11px] font-mono">
-          <div className="flex flex-wrap gap-x-4 gap-y-1 items-center text-zinc-500">
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400" /> HOST: <span className="text-zinc-300 font-medium">nixos_sovereign_root</span></span>
-            <span className="hidden sm:inline text-zinc-800">|</span>
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400" /> LLAMA-3: <span className="text-zinc-300 font-medium font-mono">LOCAL-SAN (ONLINE)</span></span>
-            <span className="hidden sm:inline text-zinc-800">|</span>
-            <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> AUDITS 24H: <span className="text-emerald-400 font-semibold">14,231 VERIFIED</span></span>
-          </div>
-          <div className="text-zinc-400 flex items-center gap-1.5 bg-[#141416] px-2.5 py-0.5 border border-[#1f1f1f]">
-            <Activity className="h-3 w-3 text-cyan-400 animate-pulse" />
-            <span>GLOBAL CPU LOAD: <span className="text-cyan-400 font-bold">{cpuLoad}%</span></span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Body */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10 space-y-32">
-        
-        {/* ================= HERO SECTION ================= */}
-        <section id="hero" className="pt-8 sm:pt-16 pb-8 space-y-12">
-          <div className="max-w-3xl space-y-8">
-            {/* System Sovereignty indicator tag */}
-            <div className="flex items-center gap-3">
-              <span className="h-[2px] w-8 bg-cyan-400"></span>
-              <span className="text-cyan-400 font-mono text-[11px] uppercase tracking-[0.25em] font-bold">Système Souverain</span>
-            </div>
-
-            {/* Tag alert display */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 border border-[#1f1f1f] bg-[#0c0c0c] text-zinc-300 font-mono text-xs shadow-sm">
-              <ShieldCheck className="h-4 w-4 text-cyan-400 animate-pulse" />
-              <span>Compliant SecNumCloud & 100% On-Premise Host Architecture</span>
-            </div>
-
-            {/* Title with glow and typography */}
-            <div className="space-y-4">
-              <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white font-sans uppercase leading-[1.05]">
-                Souveraineté.<br />
-                Sécurité.<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.15)]">Intelligence.</span>
-              </h1>
-            </div>
-
-            {/* Sub-heading */}
-            <p className="text-zinc-400 text-lg sm:text-xl font-normal leading-relaxed font-sans max-w-2xl border-l border-[#1f1f1f] pl-4">
-              Architecte Cloud & SecOps. Je conçois des infrastructures inviolables et déploie des IA locales pour ceux qui refusent de céder leurs données.
-            </p>
-
-            {/* Action CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 font-mono text-xs">
-              <a 
-                href="#systems"
-                className="inline-flex items-center justify-center gap-2 bg-white text-black hover:bg-cyan-400 hover:text-black transition-all px-8 py-4 font-bold uppercase tracking-wider group shadow-[0_0_20px_rgba(34,211,238,0.15)]"
-              >
-                Voir mes systèmes
-                <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-              </a>
-              <a 
-                href="#console"
-                className="inline-flex items-center justify-center gap-2 border border-[#1f1f1f] hover:border-cyan-400/50 bg-[#0c0c0c] text-zinc-300 hover:text-cyan-400 px-8 py-4 uppercase tracking-wider transition-colors"
-              >
-                <Terminal className="h-4 w-4" />
-                Démarrer la console SecOps
-              </a>
-            </div>
-          </div>
-
-          {/* Glowing Minimalistic Tech Card featuring a blueprint look */}
-          <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-4 sm:p-6 relative group overflow-hidden">
-            <div className="absolute top-0 right-0 h-16 w-16 bg-gradient-to-bl from-cyan-500/10 to-transparent pointer-events-none" />
-            <div className="absolute top-0 left-0 h-full w-[2px] bg-cyan-500/0 group-hover:bg-cyan-500/50 transition-all duration-300" />
-            
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-mono">
-              <div className="space-y-1">
-                <span className="text-zinc-500 uppercase tracking-widest block text-[10px] font-bold">Signature d'infrastructure</span>
-                <span className="text-zinc-200 text-sm">NixOS-Sovereign-Kernel v2.5-Stable · VM isolated hypervisor container host</span>
-              </div>
-              <div className="flex flex-wrap gap-4 text-zinc-400">
-                <div>TLS: <span className="text-emerald-400 font-semibold">Strict-ALTS</span></div>
-                <div>LOCAL LLM INFRASTRUCTURE: <span className="text-cyan-400 font-semibold">Isolated VRAM (0% WAN)</span></div>
-                <div>HARDENING: <span className="text-emerald-400 font-semibold">SELinux Enforced</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-
-        {/* ================= SECTION 01: L'ARSENAL ================= */}
-        <section id="arsenal" className="space-y-8 scroll-mt-24 font-sans">
-          <div className="border-b border-[#1f1f1f] pb-4 flex justify-between items-end">
-            <div>
-              <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-cyan-400"></span>
-                01 / CAPABILITÉS
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-tight">L'Arsenal Technique</h2>
-            </div>
-            <span className="font-mono text-zinc-500 text-xs hidden sm:inline">ARCHITECTURE_MATRIX.XLSX</span>
-          </div>
-
-          <p className="text-zinc-400 max-w-2xl text-sm leading-relaxed">
-            La souveraineté numérique ne négocie aucun compromis. Mes compétences s'articulent autour d'une pile logicielle et matérielle open-source hautement durcie pour sécuriser votre transition IA.
-          </p>
-
-          {/* Skills Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            {/* Skill 1: Cloud Infrastructure */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Globe className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">IAAS</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                Cloud Infrastructure
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Architecture de clouds privés hautement isolés (OpenStack, vSphere durci) et de clusters Kubernetes souverains avec politiques d'isolation réseau ultra-strictes.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">K8s Sovereign</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Private Networks</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">LUKS Disk Crypt</span>
-              </div>
-            </div>
-
-            {/* Minor Skill 2: SecNumCloud */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Shield className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">COMPLIANCE</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                SecNumCloud Compliance
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Alignement et durcissement des environnements de stockage et d'exécution selon les normes très strictes de l'ANSSI. Exclusion absolue de la juridiction Cloud Act.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">ANSSI Standard</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Anti Cloud Act</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">HSM HSM-v3</span>
-              </div>
-            </div>
-
-            {/* Skill 3: Python Development */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Binary className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">SCRIPTING</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                Python Core Dev
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Développement de scripts ultra-rapides, de parseurs de logs de sécurité distribués, de modules d'intrusion automatisés et de liaisons IA hautement optimisées.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Asyncio</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">FastAPI</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">PyNaCl Crypt</span>
-              </div>
-            </div>
-
-            {/* Skill 4: Infrastructure as Code */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Layers className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">IAC</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                Terraform Immutable
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Modélisation immuable de l’infrastructure et du cycle de vie des clés de sécurité pour garantir la détection instantanée de toute dérive de configuration.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">IaC Hardening</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Drift Audit</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Vault KMS</span>
-              </div>
-            </div>
-
-            {/* Skill 5: LLMs Locaux */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Cpu className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">OFFLINE AI</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                LLMs Locaux
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Déploiement et quantification de LLMs (Llama, Mistral) sur hardware dédié. Pipeline d'inférence sécurisé n'effectuant aucune requête externe.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">LlamaCpp v3</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">GGUF Quantize</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">CUDA Sandbox</span>
-              </div>
-            </div>
-
-            {/* Skill 6: Algorithmic Automation */}
-            <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 relative group hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.05)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 border border-[#1f1f1f] bg-[#111111] group-hover:border-cyan-400/50 transition-colors">
-                  <Sliders className="h-5 w-5 text-cyan-400" />
-                </div>
-                <span className="font-mono text-[10px] text-zinc-400 bg-[#111111] px-2 py-0.5 border border-[#1f1f1f]">AUTOMATIONS</span>
-              </div>
-              <h3 className="text-white text-base font-semibold group-hover:text-cyan-400 transition-colors font-sans mb-2">
-                Algorithmic Automation
-              </h3>
-              <p className="text-zinc-400 text-xs leading-relaxed mb-4">
-                Automatisation complète des processus de défense cyber : révocation de jetons compromise en moins de 50ms, rotation de clés asynchrones et télémétrie.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Event Triggers</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Auto-Mitigation</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#1f1f1f] bg-[#141416] text-zinc-300">Unix Daemons</span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-
-        {/* ================= SECTION 02: PROJETS & DÉPLOIEMENTS ================= */}
-        <section id="systems" className="space-y-12 scroll-mt-24">
-          <div className="border-b border-[#1f1f1f] pb-4 flex justify-between items-end">
-            <div>
-              <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-cyan-400"></span>
-                02 / DEPLOYMENTS
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-tight">Systèmes & Projets Autonomes</h2>
-            </div>
-            <span className="font-mono text-zinc-500 text-xs hidden sm:inline">LIVE_SANDBOX_STREAMS</span>
-          </div>
-
-          {/* Intro text */}
-          <p className="text-zinc-400 max-w-3xl text-sm leading-relaxed">
-            Chaque déploiement est modélisé sous forme d'une cellule autonome et testable. Manipulez les simulateurs temps-réel intégrés ci-dessous pour inspecter les performances d'exécution on-premise.
-          </p>
-
-
-          {/* ---------------- PROJECT 1: L'OS Souverain (Interactive local Llama runner) ---------------- */}
-          <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 sm:p-8 space-y-6 relative rounded-none hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.03)] transition-all duration-300">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">[ PROJET_01 ]</span>
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <h3 className="text-xl font-bold text-white uppercase tracking-tight font-sans">
-                  L’OS Souverain — IA Légère Isolée
-                </h3>
-              </div>
-              <span className="text-xs font-mono px-2.5 py-1 bg-[#111111] border border-[#1f1f1f] text-zinc-300">
-                Llama 3 8B Quantized · isolated GPU
-              </span>
-            </div>
-
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Déploiement d'une infrastructure d’intelligence artificielle 100% locale (basée sur Llama 3) orchestrée au sein d’un noyau NixOS immuable. Aucune fuite de métadonnées vers l'Internet externe, chiffrement LUKS sur SSD isolés avec gestion des requêtes via proxy local zero-trust.
-            </p>
-
-            {/* Interactive Simulator Segment */}
-            <div className="bg-[#111111] border border-[#1f1f1f] p-4 sm:p-6 space-y-6 rounded-none">
-              <div className="flex items-center justify-between border-b border-[#1f1f1f] pb-2.5">
-                <span className="text-xs font-mono text-zinc-200 flex items-center gap-1.5 font-bold uppercase">
-                  <Cpu className="h-3.5 w-3.5 text-cyan-400" />
-                  Pupitre de Configuration du Copilote Local
-                </span>
-                <span className="text-[10px] font-mono text-cyan-400 tracking-wider font-bold">
-                  STATUS: {isLlamaInferenceRunning ? 'GENERATING_TOKENS...' : 'IDLE - READY'}
-                </span>
-              </div>
-
-              {/* Controls */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* Threads setting */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-zinc-400">Cœurs CPU Alloués :</span>
-                    <span className="text-cyan-400 font-semibold">{llamaThreads} threads</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="4" 
-                    max="16" 
-                    step="2"
-                    value={llamaThreads} 
-                    onChange={(e) => {
-                      setLlamaThreads(Number(e.target.value));
-                      setLlamaLogs(prev => [`[Config] CPU allocation updated to ${e.target.value} thread rings.`, ...prev]);
-                    }}
-                    className="w-full accent-cyan-400 bg-zinc-800 h-1 cursor-pointer"
-                  />
-                  <span className="text-[10px] font-mono text-zinc-500 block">Plus de cœurs = traitement parallèle accru</span>
-                </div>
-
-                {/* Context Size model settings */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-zinc-400">Fenêtre de Contexte :</span>
-                    <span className="text-cyan-400 font-semibold">{contextSize} tokens</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="2048" 
-                    max="16384" 
-                    step="2048"
-                    value={contextSize} 
-                    onChange={(e) => {
-                      setContextSize(Number(e.target.value));
-                      setLlamaLogs(prev => [`[Config] Context limit resized to ${e.target.value} limits.`, ...prev]);
-                    }}
-                    className="w-full accent-cyan-400 bg-zinc-800 h-1 cursor-pointer"
-                  />
-                  <span className="text-[10px] font-mono text-zinc-500 block">Contrôle l'Historique local de la session</span>
-                </div>
-
-                {/* Temp slider */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-zinc-400">Température (Créativité) :</span>
-                    <span className="text-cyan-400 font-semibold">{temp}</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0.1" 
-                    max="1.0" 
-                    step="0.1"
-                    value={temp} 
-                    onChange={(e) => {
-                      setTemp(Number(e.target.value));
-                    }}
-                    className="w-full accent-cyan-400 bg-zinc-800 h-1 cursor-pointer"
-                  />
-                  <span className="text-[10px] font-mono text-zinc-500 block">Zéro (Strict) à 1.0 (Fluctuant)</span>
-                </div>
-
-              </div>
-
-              {/* Log window for offline Llama */}
-              <div className="bg-[#070708] p-4 border border-[#1f1f1f] font-mono text-xs space-y-1.5 h-36 overflow-y-auto rounded-none">
-                <div className="text-zinc-500 border-b border-[#1f1f1f] pb-1 flex justify-between">
-                  <span>SOVEREIGN NETWORK LOGS</span>
-                  <span className="text-cyan-400">VRAM: 6.4 GB / 8.0 GB</span>
-                </div>
-                {llamaLogs.map((log, i) => (
-                  <div key={i} className={`text-[11px] ${log.startsWith('[LLAMA-3 OUTPUT') ? 'text-white font-semibold pl-2 border-l border-cyan-500' : 'text-zinc-500'}`}>
-                    {log}
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Button */}
-              <div className="flex justify-between items-center gap-4">
-                <span className="text-[10px] font-mono text-zinc-500 hidden sm:inline">
-                  ✓ Isolation d'exécution certifiée (0 requêtes sortantes)
-                </span>
-                <button
-                  type="button"
-                  onClick={triggerLocalAIInference}
-                  disabled={isLlamaInferenceRunning}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-6 py-3 font-mono text-xs font-bold transition-all disabled:opacity-50 uppercase tracking-wider"
-                >
-                  <Play className={`h-4 w-4 ${isLlamaInferenceRunning ? 'animate-spin' : ''}`} />
-                  {isLlamaInferenceRunning ? 'INFERENCE EN COURS...' : 'TESTER LE PIPELINE SECURE'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-
-          {/* ---------------- PROJECT 2: Automatisation SecOps (Real-time log console) ---------------- */}
-          <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 sm:p-8 space-y-6 relative rounded-none hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.03)] transition-all duration-300">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">[ PROJET_02 ]</span>
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <h3 className="text-xl font-bold text-white uppercase tracking-tight font-sans">
-                  Automatisation SecOps — Zéro Dérive Cloud
-                </h3>
-              </div>
-              <span className="text-xs font-mono px-2.5 py-1 bg-[#111111] border border-[#1f1f1f] text-zinc-300">
-                Terraform state monitoring · Ansible automated rollbacks
-              </span>
-            </div>
-
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Conception et déploiement de scripts de sécurité et de monitoring autonomes. Un orchestrateur compare en continu l'état réel des clouds avec les configurations Terraform et applique de façon instantanée une réversion stricte si une dérive de privilèges ou un conteneur non identifié est trouvé sur le réseau privé.
-            </p>
-
-            {/* Interactive Simulator Segment */}
-            <div className="bg-[#111111] border border-[#1f1f1f] p-4 sm:p-6 space-y-4 rounded-none">
-              <div className="flex items-center justify-between border-b border-[#1f1f1f] pb-2.5">
-                <span className="text-xs font-mono text-zinc-200 flex items-center gap-1.5 font-bold uppercase">
-                  <Terminal className="h-3.5 w-3.5 text-cyan-400" />
-                  Flux de Télémétrie SecOps en Direct
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${isSecOpsRunning ? 'bg-emerald-500 animate-ping' : 'bg-rose-500'}`} />
-                  <span className="text-[10px] font-mono text-zinc-400 font-bold">
-                    SATELLITE AUDIT: <span className={isSecOpsRunning ? 'text-emerald-400' : 'text-rose-400'}>{isSecOpsRunning ? 'ARMÉ & ACTIF' : 'PAUSE'}</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Log table */}
-              <div className="bg-[#070708] border border-[#1f1f1f] overflow-hidden font-mono text-[11px] rounded-none">
-                <div className="grid grid-cols-12 bg-[#141416] p-2.5 border-b border-[#1f1f1f] text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
-                  <div className="col-span-2">Heure</div>
-                  <div className="col-span-3">Module</div>
-                  <div className="col-span-2 text-center">Statut</div>
-                  <div className="col-span-5">Détail de l'Audit</div>
-                </div>
-
-                <div className="divide-y divide-[#1f1f1f] h-44 overflow-y-auto">
-                  {secOpsLogs.map((log) => (
-                    <div key={log.id} className="grid grid-cols-12 p-2.5 hover:bg-[#111111] items-center transition-colors">
-                      <div className="col-span-2 text-zinc-500">{log.time}</div>
-                      <div className="col-span-3 text-zinc-200 font-semibold">{log.module}</div>
-                      <div className="col-span-2 text-center">
-                        <span className={`px-2 py-0.5 text-[9px] font-bold tracking-wider ${
-                          log.level === 'OK' ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-900' :
-                          log.level === 'WARN' ? 'bg-amber-950/40 text-amber-400 border border-amber-900' :
-                          log.level === 'BLOCK' ? 'bg-rose-950/40 text-rose-400 border border-rose-900' :
-                          'bg-[#111111] text-zinc-400'
-                        }`}>
-                          {log.level}
-                        </span>
-                      </div>
-                      <div className="col-span-5 text-zinc-400 truncate">{log.msg}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
-                    <button
-                  type="button"
-                  onClick={() => setIsSecOpsRunning(!isSecOpsRunning)}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 font-mono text-xs font-bold transition-all border ${
-                    isSecOpsRunning 
-                    ? 'border-[#1f1f1f] text-zinc-400 hover:text-rose-400 hover:border-rose-400/40 bg-zinc-950' 
-                    : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'
-                  }`}
-                >
-                  {isSecOpsRunning ? 'SUSPENDRE LES AUDITS' : 'REPRENDRE LES MONITORINGS'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-
-          {/* ---------------- PROJECT 3: Trading Algorithmique (Live line-chart) ---------------- */}
-          <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 sm:p-8 space-y-6 relative rounded-none hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(34,211,238,0.03)] transition-all duration-300">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">[ PROJET_03 ]</span>
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <h3 className="text-xl font-bold text-white uppercase tracking-tight font-sans">
-                  Trading Algorithmique — Latence Optimisée
-                </h3>
-              </div>
-              <span className="text-xs font-mono px-2.5 py-1 bg-[#111111] border border-[#1f1f1f] text-zinc-300">
-                Arbitrage algorithm · Python core sub-15ms loop
-              </span>
-            </div>
-
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Développement de robots de trading asynchrones optimisés en Python. Le système effectue une analyse de corrélation multi-flux et de carnet d'ordres en temps réel. Sa performance repose sur la réécriture d'un moteur d'exécution réseau direct avec signature cryptographique embarquée pour sécuriser l'intégralité des transactions boursières.
-            </p>
-
-            {/* Interactive Simulator Segment */}
-            <div className="bg-[#111111] border border-[#1f1f1f] p-4 sm:p-6 space-y-6 rounded-none">
-              <div className="flex items-center justify-between border-b border-[#1f1f1f] pb-2.5">
-                <span className="text-xs font-mono text-zinc-200 flex items-center gap-1.5 font-bold uppercase">
-                  <Activity className="h-3.5 w-3.5 text-cyan-400" />
-                  Graphique d'Index & Console Arbitrage
-                </span>
-                <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">
-                  LATENCE RESEAU EXÉCUTION: 14.1ms (SÉCURISÉE)
-                </span>
-              </div>
-
-              {/* Render a custom vector line graph dynamically */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-                
-                {/* Graphics */}
-                <div className="md:col-span-7 bg-[#070708] border border-[#1f1f1f] p-4 relative flex flex-col justify-between h-48 rounded-none">
-                  <div className="absolute top-2 left-2 text-[9px] font-mono text-zinc-500">
-                    ARBITRAGE VOLATILITY INDEX ($)
-                  </div>
-                  <div className="absolute top-2 right-2 text-[10px] font-mono text-emerald-400 font-bold">
-                    ${pricingSeries[pricingSeries.length - 1]?.toLocaleString()} USD
-                  </div>
-                  
-                  {/* SVG Line Graph */}
-                  <div className="w-full flex-grow flex items-end justify-center pt-8 overflow-hidden">
-                    <svg className="w-full h-24" viewBox="0 0 300 100" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
-                          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      
-                      {/* Grid guidelines */}
-                      <line x1="0" y1="20" x2="300" y2="20" stroke="#1f1f1f" strokeWidth="1" strokeDasharray="3,3" />
-                      <line x1="0" y1="50" x2="300" y2="50" stroke="#1f1f1f" strokeWidth="1" strokeDasharray="3,3" />
-                      <line x1="0" y1="80" x2="300" y2="80" stroke="#1f1f1f" strokeWidth="1" strokeDasharray="3,3" />
-
-                      {/* Area Fill */}
-                      <path
-                        d={`M 0 100 
-                          ${pricingSeries.map((price, idx) => {
-                            const minPrice = Math.min(...pricingSeries) - 20;
-                            const maxPrice = Math.max(...pricingSeries) + 20;
-                            const range = maxPrice - minPrice || 1;
-                            const x = (idx / (pricingSeries.length - 1)) * 300;
-                            const y = 90 - ((price - minPrice) / range) * 80;
-                            return `L ${x} ${y}`;
-                          }).join(' ')} 
-                          L 300 100 Z`}
-                        fill="url(#gradient)"
-                      />
-
-                      {/* Path Line */}
-                      <path
-                        d={pricingSeries.map((price, idx) => {
-                          const minPrice = Math.min(...pricingSeries) - 20;
-                          const maxPrice = Math.max(...pricingSeries) + 20;
-                          const range = maxPrice - minPrice || 1;
-                          const x = (idx / (pricingSeries.length - 1)) * 300;
-                          const y = 90 - ((price - minPrice) / range) * 80;
-                          return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
-                        }).join(' ')}
-                        fill="none"
-                        stroke="#06b6d4"
-                        strokeWidth="2"
-                      />
-
-                      {/* Live flashing node */}
-                      <circle
-                        cx="300"
-                        cy={90 - ((pricingSeries[pricingSeries.length - 1] - (Math.min(...pricingSeries) - 20)) / ((Math.max(...pricingSeries) + 20) - (Math.min(...pricingSeries) - 20) || 1)) * 80}
-                        r="3"
-                        fill="#06b6d4"
-                        className="animate-ping"
-                      />
-                    </svg>
-                  </div>
-
-                  {/* Horizontal index markers */}
-                  <div className="flex justify-between text-[9px] font-mono text-zinc-500 border-t border-[#1f1f1f] pt-1">
-                    <span>T-15min</span>
-                    <span>T-10min</span>
-                    <span>T-5min</span>
-                    <span>LIVE STATUS</span>
-                  </div>
-                </div>
-
-                {/* Right hand ledger console */}
-                <div className="md:col-span-5 bg-[#070708] border border-[#1f1f1f] p-4 font-mono text-[10px] space-y-1.5 h-48 overflow-y-auto rounded-none">
-                  <div className="text-zinc-500 border-b border-[#1f1f1f] pb-1 flex justify-between uppercase font-bold">
-                    <span>Algorithmic Actions</span>
-                    <span className="text-cyan-400">BOT: ON</span>
-                  </div>
-                  {botConsole.map((log, i) => (
-                    <div key={i} className="text-zinc-400 leading-tight">
-                      {log}
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <span className="text-[10px] font-mono text-zinc-500">
-                  Bot de trading isolé en environnement chiffré non interactif. Code certifié exempt de déviation.
-                </span>
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTradingActive(!tradingActive);
-                    setBotConsole(prev => [
-                      `[Bot-Action] State changed: bot running parameter set to ${!tradingActive}`,
-                      ...prev
-                    ]);
-                  }}
-                  className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 font-mono text-xs font-bold transition-all border ${
-                    tradingActive 
-                    ? 'border-[#1f1f1f] text-zinc-400 hover:text-rose-400 hover:border-rose-400/40 bg-zinc-950' 
-                    : 'border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10'
-                  }`}
-                >
-                  {tradingActive ? 'PAUSE DU BOT' : 'ACTIVER BOT DE SÉCURITÉ'}
-                </button>
-              </div>
-
-            </div>
-          </div>
-
-        </section>
-
-
-        {/* ================= SECTION 03: SECOPS CONSOLE ================= */}
-        <section id="console" className="space-y-8 scroll-mt-24">
-          <div className="border-b border-[#1f1f1f] pb-4 flex justify-between items-end">
-            <div>
-              <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-cyan-400"></span>
-                03 / LIVE TERMINAL
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-tight">Console de Sécurité SecOps</h2>
-            </div>
-            <span className="font-mono text-zinc-500 text-xs hidden sm:inline">VIRTUAL_SECURE_SHELL v3.4</span>
-          </div>
-
-          <p className="text-zinc-400 max-w-2xl text-sm leading-relaxed">
-            Interagissez directement avec mon environnement virtuel de sécurité. Saisissez des commandes réelles ou utilisez le tableau de bord interactif pour auditer des informations complémentaires de mon architecture.
-          </p>
-
-          {/* Graphical Frame Terminal */}
-          <div className="border border-[#1f1f1f] bg-[#070708] rounded-none shadow-2xl relative overflow-hidden">
-            {/* Header tab layout */}
-            <div className="bg-[#0c0c0c] px-4 py-3 border-b border-[#1f1f1f] flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-500/60" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
-                </div>
-                <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-wider pl-2">
-                  guest@forteresse.secops:~ (sh)
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-bold">ACTIVE SH_SECURE_TTY</span>
-              </div>
-            </div>
-
-            {/* Terminal output box */}
-            <div className="p-4 sm:p-6 h-96 overflow-y-auto font-mono text-xs space-y-3 bg-[#040404]/95">
-              
-              {/* Cool ASCII intro logo */}
-              <pre className="text-cyan-400/80 font-mono text-[9px] leading-tight overflow-x-auto select-none">
-{` ______                               ______                         
-/ ____/___  __   ______  _______     / ____/___  _____               
-/ /   / __ \\/ /  / / __ \\/ ___/ _ \\   / /   / __ \\/ ___/               
-/ /___/ /_/ / /__/ / /_/ / /  /  __/  / /___/ /_/ /__ \\                
-\\____/\\____/\\___,_/ .___/_/   \\___/   \\____/\\____/____/                
-                 /_/                                                    
-[ SYSTEM ARCHITECT CLI - CLOUD & INTEGRATED SECURE AI CONTRACTING ]`}
-              </pre>
-
-              {/* History map */}
-              <div className="space-y-2">
-                {terminalHistory.map((line, idx) => (
-                  <div key={idx} className="flex items-start gap-2 leading-relaxed">
-                    <span className="text-zinc-600 text-[10px] select-none pt-0.5">[{line.timestamp}]</span>
-                    <div className="flex-1">
-                      {line.type === 'input' && (
-                        <span className="text-zinc-200 font-semibold">{line.text}</span>
-                      )}
-                      {line.type === 'output' && (
-                        <span className="text-zinc-400 whitespace-pre-wrap">{line.text}</span>
-                      )}
-                      {line.type === 'success' && (
-                        <span className="text-emerald-400 font-medium">{line.text}</span>
-                      )}
-                      {line.type === 'warn' && (
-                        <span className="text-amber-400 font-medium">{line.text}</span>
-                      )}
-                      {line.type === 'error' && (
-                        <span className="text-rose-400 font-semibold">{line.text}</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                <div ref={terminalBottomRef} />
-              </div>
-
-            </div>
-
-            {/* Quick buttons helper segments to avoid cold typing frustrations */}
-            <div className="bg-[#0c0c0c] p-3 sm:p-4 border-t border-[#1f1f1f] flex flex-wrap gap-2 items-center">
-              <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold mr-1">Raccourcis CLI :</span>
-              {[
-                { label: 'Aide complète', cmd: 'help' },
-                { label: 'À propos', cmd: 'about' },
-                { label: 'Arsenal Tech', cmd: 'skills' },
-                { label: 'Mon Télémétrie', cmd: 'status' },
-                { label: 'Audit Sécurité', cmd: 'defense-scan' },
-                { label: 'Simuler Clé Post-Quantum', cmd: 'generate-key' },
-                { label: 'Effacer l’écran', cmd: 'clear' }
-              ].map((btn, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => {
-                    setTerminalInput(btn.cmd);
-                    // Autofocus trigger or directly simulate run
-                    const d = new Date();
-                    const tStr = d.toTimeString().split(' ')[0];
-                    setTerminalHistory(prev => [
-                      ...prev,
-                      { text: `user@secops:~$ ${btn.cmd}`, type: 'input', timestamp: tStr }
-                    ]);
-                    
-                    // Directly run command
-                    setTimeout(() => {
-                      setTerminalInput('');
-                      let newResponse: TerminalLine[] = [];
-                      if (btn.cmd === 'clear') {
-                        setTerminalHistory([]);
-                        return;
-                      } else if (btn.cmd === 'help') {
-                        newResponse.push(
-                          { text: 'AESA Core Command Matrix:', type: 'warn', timestamp: tStr },
-                          { text: '  about          - Informazioni d’origine / Background overview', type: 'output', timestamp: tStr },
-                          { text: '  skills         - List physical security & local AI infrastructure arsenal', type: 'output', timestamp: tStr },
-                          { text: '  projects       - Display live-monitored projects structural summaries', type: 'output', timestamp: tStr },
-                          { text: '  defense-scan   - Trigger immediate verification sequence on sovereign node API', type: 'output', timestamp: tStr },
-                          { text: '  generate-key   - Render post-quantum encryption key matrices inside client', type: 'output', timestamp: tStr },
-                          { text: '  status         - Fetch hardware isolations telemetry reports', type: 'output', timestamp: tStr },
-                          { text: '  clear          - Flush active virtual terminal memory buffer', type: 'output', timestamp: tStr }
-                        );
-                      } else if (btn.cmd === 'about') {
-                        newResponse.push(
-                          { text: 'ARCHITECTE PLURIDISCIPLINAIRE CLOUD & SÉCURITÉ IA', type: 'success', timestamp: tStr },
-                          { text: 'Souveraineté totale. Zéro tiers. Je conçois des forteresses numériques auto-hébergées pour éliminer la dépendance aux GAFAM et garantir la sécurité absolue des applications critiques.', type: 'output', timestamp: tStr }
-                        );
-                      } else if (btn.cmd === 'skills') {
-                        newResponse.push(
-                          { text: '--- SECOPS ARSENAL ---', type: 'warn', timestamp: tStr },
-                          { text: '  • Cloud & IaC: Terraform, OpenStack, SecNumCloud Private Gateways', type: 'output', timestamp: tStr },
-                          { text: '  • IA Souveraine: Local Llama, offline pipeline inference, local vector dbs (Qdrant)', type: 'output', timestamp: tStr },
-                          { text: '  • Hardening & Systems: NixOS immutable design, Alpine Micro-servers, Linux kernel sandboxing', type: 'output', timestamp: tStr },
-                          { text: '  • Automations: Python custom scripts, algorithmic security audit triggers', type: 'output', timestamp: tStr }
-                        );
-                      } else if (btn.cmd === 'status') {
-                        newResponse.push(
-                          { text: 'TELEMETRY SECURE CHECKOUT:', type: 'success', timestamp: tStr },
-                          { text: `  • Core Host Integrity: VERIFIED [SHA-256 standard match]`, type: 'output', timestamp: tStr },
-                          { text: `  • Active Threat Mitigation: Dynamic DNS & Peer Guard active`, type: 'output', timestamp: tStr },
-                          { text: `  • API Sandboxing: Hardened isolations configured`, type: 'output', timestamp: tStr },
-                          { text: `  • Sovereign LLM: Local Llama-3 available for direct token streams`, type: 'output', timestamp: tStr }
-                        );
-                      } else if (btn.cmd === 'defense-scan') {
-                        newResponse.push(
-                          { text: 'Initializing Sovereign Node Audit Protocol v9...', type: 'warn', timestamp: tStr },
-                          { text: '  [+] Securing network gateway connection...', type: 'output', timestamp: tStr },
-                          { text: '  [+] Running kernel integrity hash checks (NixOS dynamic hash)...', type: 'output', timestamp: tStr },
-                          { text: '  [+] Scanning active ports (Port 3000 mapped, port 22 key-only verification)...', type: 'output', timestamp: tStr },
-                          { text: '  [+] Testing isolated Llama pipelines safety triggers...', type: 'output', timestamp: tStr },
-                          { text: '✓ VERDICT: 0 vulnerabilities found. Sovereign host structural integrity 100% SECURE.', type: 'success', timestamp: tStr }
-                        );
-                      } else if (btn.cmd === 'generate-key') {
-                        newResponse.push(
-                          { text: `Command received. Initiating Post-Quantum generator with Kyber algorithms...`, type: 'warn', timestamp: tStr },
-                          { text: `Calculated public-key matrix: ssh-pq-kem-kyber-1024 SHA256:${btoa(Math.random().toString()).slice(0, 24)}`, type: 'success', timestamp: tStr },
-                          { text: `Verify results in 'La Forteresse' interactive segment.`, type: 'output', timestamp: tStr }
-                        );
-                        setKeyAlgorithm('Kyber-1024');
-                        const generatedPubKey = 'ssh-pq-kem-kyber-1024 ' + btoa(Math.random().toString()).slice(0, 56) + '== encrypted@rootsec';
-                        const generatedPrivKey = '----BEGIN PRIVATE ENCRYPTED KEM KEY-----\n' + 
-                                                 btoa(Math.random().toString()).match(/.{1,48}/g)?.join('\n') + 
-                                                 '\n-----END PRIVATE ENCRYPTED KEM KEY-----';
-                        setKeyOutput({ publicKey: generatedPubKey, privateKey: generatedPrivKey });
-                      }
-                      setTerminalHistory(prev => [...prev, ...newResponse]);
-                    }, 50);
-
-                  }}
-                  className="px-2.5 py-1 text-[10px] font-mono border border-[#1f1f1f] bg-[#111111] text-zinc-300 hover:text-cyan-400 hover:border-cyan-500/40 transition-colors"
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Command-line text input */}
-            <form onSubmit={handleTerminalSubmit} className="bg-[#0c0c0c] border-t border-[#1f1f1f] flex items-center p-3 relative">
-              <span className="text-cyan-400 font-mono text-xs font-bold pl-2 mr-2 select-none">
-                guest@secops:~$
-              </span>
-              <input
-                type="text"
-                value={terminalInput}
-                onChange={(e) => setTerminalInput(e.target.value)}
-                placeholder="Indiquez une commande (about, skills, defense-scan, projects, generate-key...)"
-                className="flex-1 bg-transparent font-mono text-xs text-white border-0 outline-none p-0 focus:ring-0 placeholder-zinc-700 w-full"
-              />
+          {/* Language Selector */}
+          <div className="flex bg-zinc-950 border border-zinc-800 p-0.5 rounded-md">
+            {(['FR', 'EN', 'ES'] as Language[]).map((lng) => (
               <button
-                type="submit"
-                className="p-1.5 px-4 bg-[#111111] border border-[#1f1f1f] text-zinc-400 hover:text-cyan-400 hover:border-cyan-400/50 font-mono text-xs font-bold uppercase transition-colors"
+                key={lng}
+                onClick={() => setLanguage(lng)}
+                className={`px-2.5 py-1 text-2xs font-mono font-bold transition-all ${
+                  language === lng 
+                    ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded' 
+                    : 'text-zinc-500 hover:text-zinc-300'
+                }`}
               >
-                EXECUTER
+                {lng}
               </button>
-            </form>
-          </div>
-        </section>
-
-
-        {/* ================= SECTION 04: FORTERESSE CRYPTO GENERATOR ================= */}
-        <section id="forteresse" className="space-y-8 scroll-mt-24">
-          <div className="border-b border-[#1f1f1f] pb-4 flex justify-between items-end">
-            <div>
-              <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-cyan-400"></span>
-                04 / CRYSTALLOGRAPHY
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-tight">La Forteresse Post-Quantique</h2>
-            </div>
-            <span className="font-mono text-zinc-500 text-xs hidden sm:inline">PQC_ALGORITHMS_KEM_v1</span>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        </div>
+      </header>
+
+      {/* HERO SECTION / BIOGRAPHY */}
+      <section className="relative overflow-hidden py-16 md:py-24 border-b border-zinc-900 bg-gradient-to-b from-[#070709] to-[#0a0a0d]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_20%_40%_at_50%_-10%,rgba(6,182,212,0.12),transparent)]" />
+        <div className="max-w-4xl mx-auto px-4 relative z-10 text-center space-y-6">
+          
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-950/20 border border-cyan-800/30 text-cyan-400 rounded-full text-2xs font-mono uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            {currentTranslation.status}
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight uppercase">
+            {currentTranslation.role}
+          </h1>
+
+          <p className="max-w-2xl mx-auto text-zinc-400 text-sm sm:text-base leading-relaxed">
+            {currentTranslation.aboutText}
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-4 pt-4">
+            <a
+              href="#cv-timeline"
+              className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-semibold text-xs tracking-wide uppercase rounded-md shadow-[0_4px_14px_rgba(6,182,212,0.25)] transition-all flex items-center gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              {currentTranslation.downloadLabel}
+            </a>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noreferrer"
+              className="px-5 py-2.5 bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white font-mono text-xs uppercase rounded-md transition-all flex items-center gap-2"
+            >
+              <Github className="h-4 w-4" />
+              {currentTranslation.viewAll} Github
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 1: CV / TIMELINE */}
+      <section id="cv-timeline" className="max-w-4xl mx-auto px-4 py-16 space-y-8 scroll-mt-20">
+        
+        {/* CV Header */}
+        <div className="border-b border-zinc-900 pb-4 flex justify-between items-end">
+          <div>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest block">01 / CURRICULUM VITAE</span>
+            <h2 className="text-2xl font-bold text-white uppercase tracking-tight font-sans">
+              {language === 'FR' ? 'Mon Parcours' : language === 'EN' ? 'My Background' : 'Mi Trayectoria'}
+            </h2>
+          </div>
+          <span className="text-3xs font-mono text-zinc-500 hidden sm:inline">CURRICULUM_DATA.JSON</span>
+        </div>
+
+        {/* Categories Tab Selector */}
+        <div className="flex flex-wrap gap-2 pt-2">
+          {[
+            { id: 'all', label: currentTranslation.viewAll },
+            { id: 'work', label: currentTranslation.tabWork },
+            { id: 'education', label: currentTranslation.tabEdu },
+            { id: 'skills', label: currentTranslation.tabSkills }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setCvTab(tab.id as any)}
+              className={`px-3 py-1.5 text-xs font-mono border rounded transition-all cursor-pointer ${
+                cvTab === tab.id 
+                  ? 'border-cyan-500/50 bg-cyan-950/20 text-cyan-400 font-bold' 
+                  : 'border-zinc-800 bg-[#0c0c0e] text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Timeline body wrapper */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4">
+          
+          {/* Main timeline column */}
+          <div className="md:col-span-8 space-y-4">
             
-            {/* Explainer / Controls */}
-            <div className="lg:col-span-5 space-y-6">
-              <p className="text-zinc-400 text-sm leading-relaxed">
-                Afin de résister à l'avènement futur de la cryptanalyse quantique (notamment l'algorithme de Shor), j'intègre des mécanismes d'échange de clés basés sur les réseaux euclidiens durcis (normes NIST).
-              </p>
-              
-              <div className="border border-[#1f1f1f] bg-[#0c0c0c] p-6 space-y-4 rounded-none">
-                <span className="font-mono text-xs text-zinc-300 block font-bold uppercase tracking-wider">
-                  Configurateur Cryptographique client-side
-                </span>
+            {/* 1. PROFESSIONAL EXPERIENCES */}
+            {(cvTab === 'all' || cvTab === 'work') && (
+              <div className="space-y-6">
+                {cvTab === 'all' && (
+                  <h3 className="text-xs font-mono text-zinc-400 tracking-wider uppercase border-l-2 border-cyan-500 pl-2.5 mb-4">
+                    {currentTranslation.experienceHeader}
+                  </h3>
+                )}
+                <div className="space-y-5 border-l border-zinc-900 ml-2 pl-5">
+                  {currentTranslation.experiences.map((exp, index) => (
+                    <div key={index} className="relative group space-y-1.5 pt-1">
+                      <span className="absolute -left-[26px] top-3 bg-[#070709] border border-cyan-500 rounded-full w-2.5 h-2.5 group-hover:scale-125 transition-transform" />
+                      <div className="flex flex-wrap justify-between items-baseline gap-x-2">
+                        <h4 className="text-white text-sm font-bold tracking-tight uppercase font-sans">{exp.role}</h4>
+                        <span className="text-2xs font-mono text-cyan-400/80 bg-cyan-950/10 px-1.5 py-0.5 border border-cyan-950 rounded">{exp.period}</span>
+                      </div>
+                      <p className="text-zinc-400 text-xs font-medium font-sans">{exp.company}</p>
+                      
+                      <ul className="space-y-1 pt-1.5">
+                        {exp.details.map((detail, dIdx) => (
+                          <li key={dIdx} className="text-zinc-500 text-2xs leading-relaxed flex items-start gap-1.5">
+                            <span className="text-cyan-500 mt-1">▪</span>
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
 
-                <div className="space-y-3 font-mono text-xs">
-                  <label className="text-zinc-500 block font-medium">Choisissez l'Algorithme Post-Quantique :</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: 'Kyber-1024', desc: 'Lattice-KEM exchange' },
-                      { value: 'Dilithium-5', desc: 'Symmetric lattice signature' },
-                      { value: 'McEliece-8192', desc: 'Code-based cryptosystem' },
-                      { value: 'Falcon-1024', desc: 'Fast signature scheme' }
-                    ].map((algo) => (
-                      <button
-                        key={algo.value}
-                        type="button"
-                        onClick={() => setKeyAlgorithm(algo.value)}
-                        className={`p-3 border text-left flex flex-col justify-between transition-colors ${
-                          keyAlgorithm === algo.value 
-                          ? 'border-cyan-500/60 bg-cyan-950/20 text-cyan-400 font-bold' 
-                          : 'border-[#1f1f1f] bg-[#111111] text-zinc-500 hover:text-zinc-400 hover:border-cyan-500/30'
-                        }`}
-                      >
-                        <span className="font-bold text-[11px] block">{algo.value}</span>
-                        <span className="text-[9px] text-zinc-600 block mt-1">{algo.desc}</span>
-                      </button>
+                      <div className="flex flex-wrap gap-1 pt-2">
+                        {exp.tags.map((tag, tIdx) => (
+                          <span key={tIdx} className="text-3xs font-mono px-1.5 py-0.5 border border-zinc-800 bg-zinc-900/30 text-zinc-400 rounded">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 2. FORMATIONS & ACADEMIC PATH */}
+            {(cvTab === 'all' || cvTab === 'education') && (
+              <div className="space-y-6 pt-4">
+                <h3 className="text-xs font-mono text-zinc-400 tracking-wider uppercase border-l-2 border-indigo-500 pl-2.5 mb-4">
+                  {currentTranslation.educationHeader}
+                </h3>
+                <div className="space-y-5 border-l border-zinc-900 ml-2 pl-5">
+                  {currentTranslation.educations.map((edu, index) => (
+                    <div key={index} className="relative group space-y-1 pt-1">
+                      <span className="absolute -left-[26px] top-3 bg-[#070709] border border-indigo-500 rounded-full w-2.5 h-2.5 group-hover:scale-125 transition-transform" />
+                      <div className="flex flex-wrap justify-between items-baseline gap-x-2">
+                        <h4 className="text-white text-sm font-bold tracking-tight uppercase font-sans">{edu.degree}</h4>
+                        <span className="text-2xs font-mono text-indigo-400 bg-indigo-950/10 px-1.5 py-0.5 border border-indigo-950 rounded">{edu.period}</span>
+                      </div>
+                      <p className="text-zinc-400 text-xs font-medium">{edu.school}</p>
+                      <p className="text-zinc-500 text-2xs leading-relaxed pt-1">{edu.details}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          {/* Right Column: Skills Spectrum & Certifications */}
+          <div className="md:col-span-4 space-y-6">
+            
+            {/* Certifications Card */}
+            <div className="border border-zinc-900 bg-[#0c0c0e]/60 p-4 space-y-3.5 rounded">
+              <h3 className="text-xs font-mono text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Award className="h-4 w-4 text-cyan-400" />
+                {currentTranslation.certifications}
+              </h3>
+              <div className="space-y-2.5">
+                <div className="bg-zinc-950/50 border border-zinc-900 p-2.5 rounded">
+                  <div className="flex justify-between items-start">
+                    <span className="text-white text-xs font-bold font-mono">Terraform Associate</span>
+                    <span className="text-4xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1 py-0.2 uppercase rounded">Obtenu</span>
+                  </div>
+                  <span className="text-zinc-500 text-3xs font-medium block pt-0.5">HashiCorp Infrastructure Code</span>
+                </div>
+                <div className="bg-zinc-950/50 border border-zinc-900 p-2.5 rounded">
+                  <div className="flex justify-between items-start">
+                    <span className="text-white text-xs font-bold font-mono">LPIC-1 Administrator</span>
+                    <span className="text-4xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1 py-0.2 uppercase rounded">Obtenu</span>
+                  </div>
+                  <span className="text-zinc-500 text-3xs font-medium block pt-0.5">Linux Professional Institute</span>
+                </div>
+                <div className="bg-zinc-950/50 border border-zinc-900 p-2.5 rounded">
+                  <div className="flex justify-between items-start">
+                    <span className="text-white text-xs font-bold font-mono">K8s Administrator</span>
+                    <span className="text-4xs font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-1 py-0.2 uppercase rounded">Candidat</span>
+                  </div>
+                  <span className="text-zinc-500 text-3xs font-medium block pt-0.5">Cloud Native Computing (CKA)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Categorized Skills badges (always showcase, but highlighted on tab selected) */}
+            <div className="border border-zinc-900 bg-[#0c0c0e]/60 p-4 space-y-4 rounded">
+              <h3 className="text-xs font-mono text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Cpu className="h-4 w-4 text-indigo-400" />
+                {currentTranslation.skillsHeader}
+              </h3>
+              
+              <div className="space-y-3 font-mono">
+                <div>
+                  <span className="text-3xs text-zinc-500 uppercase font-bold tracking-wider block mb-1">Infrastructure & Cloud</span>
+                  <div className="flex flex-wrap gap-1">
+                    {["Terraform", "Kubernetes", "Ansible", "NixOS", "Proxmox", "Linux System"].map((s) => (
+                      <span key={s} className="text-3xs px-2 py-0.5 bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded">
+                        {s}
+                      </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleGenerateKey}
-                    disabled={isGeneratingKey}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 py-3 font-mono text-xs font-bold transition-all disabled:opacity-50 uppercase tracking-wider"
-                  >
-                    <Key className={`h-4 w-4 ${isGeneratingKey ? 'animate-spin' : ''}`} />
-                    {isGeneratingKey ? 'COMPUTING LATTICES PARAMETERS...' : 'CALCULER LES PARAMÈTRES'}
-                  </button>
+                <div>
+                  <span className="text-3xs text-zinc-500 uppercase font-bold tracking-wider block mb-1">Cybersecurity & Networking</span>
+                  <div className="flex flex-wrap gap-1">
+                    {["SecNumCloud", "Zero-Trust", "eBPF Sandboxing", "WebCrypto", "PKI / HSM"].map((s) => (
+                      <span key={s} className="text-3xs px-2 py-0.5 bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-3xs text-zinc-500 uppercase font-bold tracking-wider block mb-1">Development & Automation</span>
+                  <div className="flex flex-wrap gap-1">
+                    {["Python Async", "Go / Rust", "FastAPI", "Docker / OCI", "CI/CD Gitlab"].map((s) => (
+                      <span key={s} className="text-3xs px-2 py-0.5 bg-zinc-900/80 border border-zinc-800 text-zinc-300 rounded">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Generated output visualization */}
-            <div className="lg:col-span-7 bg-[#0c0c0c] border border-[#1f1f1f] p-6 space-y-4 font-mono text-xs min-h-[310px] flex flex-col justify-between rounded-none">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border-b border-[#1f1f1f] pb-2">
-                  <span className="text-zinc-200 font-bold uppercase tracking-wider flex items-center gap-2">
-                    <Fingerprint className="h-4 w-4 text-cyan-400" />
-                    Paire de Clés Post-Quantique Générée
-                  </span>
-                  <span className="text-[10px] text-zinc-500 font-bold">CLIENT_SEED_RANDOM</span>
-                </div>
-
-                {!keyOutput ? (
-                  <div className="h-44 flex flex-col items-center justify-center text-zinc-500 text-center space-y-2">
-                    <Unlock className="h-8 w-8 text-zinc-700 animate-pulse" />
-                    <p className="max-w-sm">
-                      Aucune paire de clés calculée. Choisissez un algorithme cryptographique à gauche et cliquez sur "Calculer les Paramètres".
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3.5">
-                    
-                    {/* Public Key snippet */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-zinc-500 text-[10px] uppercase font-bold">Clé Publique ({keyAlgorithm}) :</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (keyOutput) {
-                              navigator.clipboard.writeText(keyOutput.publicKey);
-                            }
-                          }}
-                          className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 text-[10px] font-bold"
-                        >
-                          <Copy className="h-3 w-3" /> Copier Clé Publique
-                        </button>
-                      </div>
-                      <div className="bg-[#070708] p-2.5 border border-[#1f1f1f] text-[11px] text-zinc-300 break-all h-12 overflow-y-auto selection:bg-[#111111] select-all rounded-none">
-                        {keyOutput.publicKey}
-                      </div>
-                    </div>
-
-                    {/* Private Key Armored snippet */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-zinc-500 text-[10px] uppercase font-bold">Portion de Clé Privée Armurée :</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (keyOutput) {
-                              navigator.clipboard.writeText(keyOutput.privateKey);
-                            }
-                          }}
-                          className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 text-[10px] font-bold"
-                        >
-                          <Copy className="h-3 w-3" /> Copier Bloc Clé Privée
-                        </button>
-                      </div>
-                      <pre className="bg-[#070708] p-2.5 border border-[#1f1f1f] text-[10px] text-zinc-400 overflow-y-auto h-20 break-all select-all leading-tight rounded-none">
-                        {keyOutput.privateKey}
-                      </pre>
-                    </div>
-
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-[#1f1f1f] pt-3 flex justify-between items-center text-[10px] text-zinc-500">
-                <span>ESTIMATED CRACK TIME: &gt; 10^30 YEARS (BY CLASSIC SUPERCOMPUTER SHOR SIM)</span>
-                <span className="flex items-center gap-1 font-bold">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> STRICT_PQC
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-
-        {/* ================= SECTION 05/CONTACT: CLIENT MESSAGING ================= */}
-        <section id="contact" className="space-y-12 scroll-mt-24">
-          <div className="border-b border-[#1f1f1f] pb-4 flex justify-between items-end">
-            <div>
-              <span className="font-mono text-xs text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-cyan-400"></span>
-                05 / DIRECT LEDGER
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white uppercase tracking-tight">Construisons Votre Forteresse</h2>
-            </div>
-            <span className="font-mono text-zinc-500 text-xs hidden sm:inline">SECURE_CLIENT_INBOX</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        </div>
+
+      </section>
+
+      {/* SECTION 2: PROJECTS & INTERACTIVE POCS */}
+      <section id="projects-showcase" className="max-w-4xl mx-auto px-4 py-16 space-y-8 scroll-mt-20 border-t border-zinc-900 bg-gradient-to-b from-[#0a0a0d] to-[#070709]">
+        
+        {/* Projects Header */}
+        <div className="border-b border-zinc-900 pb-4 flex justify-between items-end">
+          <div>
+            <span className="text-xs font-mono text-indigo-400 uppercase tracking-widest block">02 / PORTFOLIO</span>
+            <h2 className="text-2xl font-bold text-white uppercase tracking-tight">
+              {language === 'FR' ? 'Projets & Réalisations' : language === 'EN' ? 'Projects & Showcases' : 'Proyectos e Ingeniería'}
+            </h2>
+          </div>
+          <span className="text-3xs font-mono text-zinc-500 hidden sm:inline">PROOFS_OF_CONCEPT.DIR</span>
+        </div>
+
+        <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-2xl">
+          {currentTranslation.projectsIntro}
+        </p>
+
+        {/* 3 Main Projects Cards showcasing deep engineering skills in lightweight packages */}
+        <div className="grid grid-cols-1 gap-8 pt-4">
+          
+          {/* PoC 1: Sovereign AI Inference Simulator */}
+          <div className="border border-zinc-900 bg-[#0c0c0e]/90 p-6 rounded-none space-y-6 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-cyan-500/5 blur-[80px] rounded-full pointer-events-none" />
             
-            {/* Text details / links */}
-            <div className="lg:col-span-5 flex flex-col justify-between">
-              <div className="space-y-6">
-                <p className="text-zinc-300 text-base leading-relaxed">
-                  Prêt à éliminer les vulnérabilités de souveraineté dans vos processus décisionnels et vos systèmes d'intelligence ? Un réseau complètement étanche commence ici.
-                </p>
-
-                <div className="space-y-3.5 py-4 font-mono text-xs">
-                  <div className="flex items-center gap-3">
-                    <span className="h-8 w-8 flex items-center justify-center border border-[#1f1f1f] bg-[#0c0c0c] text-cyan-400 font-bold">
-                      <Mail className="h-3.5 w-3.5" />
-                    </span>
-                    <div>
-                      <span className="text-zinc-500 uppercase block text-[10px] font-bold">Messagerie Directe :</span>
-                      <a href="mailto:melvin.cureau2004@gmail.com" className="text-white hover:text-cyan-400 text-sm transition-colors font-medium">
-                        melvin.cureau2004@gmail.com
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="h-8 w-8 flex items-center justify-center border border-[#1f1f1f] bg-[#0c0c0c] text-cyan-400 font-bold">
-                      <Github className="h-3.5 w-3.5" />
-                    </span>
-                    <div>
-                      <span className="text-zinc-500 uppercase block text-[10px] font-bold">Répertoires publics NixOS / IaC :</span>
-                      <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-cyan-400 text-sm transition-colors flex items-center gap-1 font-medium">
-                        github.com/security-architect <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="h-8 w-8 flex items-center justify-center border border-[#1f1f1f] bg-[#0c0c0c] text-cyan-400 font-bold">
-                      <Linkedin className="h-3.5 w-3.5" />
-                    </span>
-                    <div>
-                      <span className="text-zinc-500 uppercase block text-[10px] font-bold">Réseau Professionnel SecOps :</span>
-                      <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-cyan-400 text-sm transition-colors flex items-center gap-1 font-medium">
-                        linkedin.com/in/security-architect <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-zinc-900">
+              <div className="space-y-0.5">
+                <span className="text-3xs font-mono text-cyan-400 uppercase tracking-widest">PoC-01 · Sovereign AI Systems</span>
+                <h3 className="text-white text-base font-bold uppercase tracking-tight">Sovereign LLM Offline Inference Platform</h3>
               </div>
-
-              <div className="p-4 border border-[#1f1f1f] bg-[#0c0c0c] text-xs text-zinc-500 font-mono space-y-1 mt-6">
-                <div>PGP KEY IDENTIFIER: <span className="text-zinc-300 font-bold">0x9F4C23BA880E1</span></div>
-                <div>FINGERPRINT: <span className="text-zinc-400 font-medium">CA7E 90B4 F977 12CA D78B EE82 1421 EFDA</span></div>
+              <div className="flex items-center gap-1.5 font-mono text-3xs text-zinc-400 bg-zinc-950 px-2 py-1 rounded border border-zinc-850">
+                <Terminal className="h-3.5 w-3.5 text-cyan-400" />
+                <span>CPU_GPU_ISOLATED</span>
               </div>
             </div>
 
-            {/* Encryptor Contact Form Module */}
-            <div className="lg:col-span-7 bg-[#0c0c0c] border border-[#1f1f1f] p-6 sm:p-8 flex flex-col justify-between relative rounded-none shadow-xl">
-              
-              {!securedSentDialog ? (
-                <form onSubmit={handleSendMessage} className="space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-[#1f1f1f] pb-2 gap-2">
-                    <span className="text-zinc-200 font-bold uppercase tracking-wider font-mono flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-cyan-400" />
-                      Générateur de Message Chiffré Direct
-                    </span>
-                    <div className="flex items-center gap-2 font-mono text-[10px]">
-                      <span className="text-zinc-500">Suite d'armure :</span>
-                      <select 
-                        value={contactForm.cipherSuite}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, cipherSuite: e.target.value }))}
-                        className="bg-[#070708] border border-[#1f1f1f] text-cyan-400 text-[10px] focus:ring-0 focus:outline-none p-1 rounded-none cursor-pointer"
-                      >
-                        <option value="AES-256GCM">AES-256-GCM</option>
-                        <option value="ChaCha20-Poly1305">ChaCha20-Poly1305</option>
-                        <option value="RSA-4096OAEP">RSA-4096-OAEP</option>
-                      </select>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              {language === 'FR' 
+                ? "Plateforme d'hébergement et d'optimisation d'inférence de grands modèles de langage locaux sans aucune sortie vers le réseau public. Conçue sous Python & C++ pour les architectures d'hébergement matériel sécurisées."
+                : language === 'EN' 
+                ? "Sovereign platform to deploy private large language models with locked hardware virtualization boundaries. Designed using Python & C++ to support strict air-gapped on-premise execution."
+                : "Plataforma de despliegue soberano para modelos de lenguaje localizados dentro de límites de virtualización física estrictos. Programado bajo Python y C++ para su hospedaje seguro sin conexiones salientes."}
+            </p>
+
+            {/* Real Interactive Module inside Card */}
+            <div className="bg-zinc-950 border border-zinc-900 p-4 rounded space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
+                <span className="text-3xs font-mono text-zinc-400 uppercase font-bold flex items-center gap-1.5">
+                  <Sliders className="h-3 w-3 text-cyan-400" />
+                  {currentTranslation.interactiveConfig}
+                </span>
+                <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold">{currentTranslation.secLabel}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* Controls left */}
+                <div className="space-y-3 font-mono text-2xs">
+                  <div className="space-y-1">
+                    <label className="text-zinc-500 block">{currentTranslation.modelChoice}</label>
+                    <div className="flex gap-1.5">
+                      {(['llama', 'mistral', 'phi'] as const).map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => setAiModel(m)}
+                          className={`flex-1 py-1 px-1.5 text-center text-3xs font-extrabold border rounded uppercase transition-all ${
+                            aiModel === m 
+                              ? 'border-cyan-500/50 bg-cyan-950/20 text-cyan-400' 
+                              : 'border-zinc-850 bg-zinc-900/20 text-zinc-500 hover:text-zinc-300'
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-zinc-500 uppercase block font-bold">Nom ou Compagnie</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="John Doe"
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full bg-[#070708] border border-[#1f1f1f] text-zinc-100 placeholder-zinc-700 p-2.5 font-mono text-xs focus:outline-none focus:border-cyan-500/50 rounded-none transition-colors"
-                      />
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-zinc-500">
+                      <span>{currentTranslation.vramTitle}</span>
+                      <span className="text-cyan-400 font-bold">{vramLimit} GB</span>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-zinc-500 uppercase block font-bold">Courriel de Contact (Email)</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="john@sovereign-corp.private"
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full bg-[#070708] border border-[#1f1f1f] text-zinc-100 placeholder-zinc-700 p-2.5 font-mono text-xs focus:outline-none focus:border-cyan-500/50 rounded-none transition-colors"
-                      />
+                    <input
+                      type="range"
+                      min={4}
+                      max={16}
+                      step={2}
+                      value={vramLimit}
+                      onChange={(e) => setVramLimit(Number(e.target.value))}
+                      className="w-full accent-cyan-400 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                {/* Telemetry output right */}
+                <div className="border border-zinc-900 bg-[#070709] p-3 rounded space-y-2 font-mono text-2xs">
+                  <span className="text-[10px] text-zinc-400 font-bold border-b border-zinc-900 block pb-1">📊 TELEMETRY SYSTEM</span>
+                  <div className="flex justify-between text-3xs">
+                    <span className="text-zinc-500">Active Model:</span>
+                    <span className="text-white uppercase font-bold">{activeAIConfig.name}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-3xs">
+                      <span className="text-zinc-500">RAM / Cache Allocation:</span>
+                      <span className="text-zinc-300 font-bold">{estimatedRam} GB / 16.0 GB</span>
+                    </div>
+                    <div className="w-full bg-zinc-900 h-1 rounded">
+                      <div className="bg-cyan-500 h-1 rounded transition-all duration-300" style={{ width: `${(estimatedRam / 16) * 100}%` }} />
                     </div>
                   </div>
+                  <div className="flex justify-between text-3xs">
+                    <span className="text-zinc-500">{currentTranslation.threadsUsed}:</span>
+                    <span className="text-zinc-300 font-bold">{estimatedThreads} / 16 Cores</span>
+                  </div>
+                  <div className="flex justify-between text-3xs pt-1 border-t border-zinc-900/80">
+                    <span className="text-zinc-500">{currentTranslation.responseText}</span>
+                    <span className="text-cyan-400 font-bold font-mono text-xs">{computedLatency} ms</span>
+                  </div>
+                </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono text-zinc-500 uppercase block font-bold">Cahier des charges ou Message de Mission</label>
-                    <textarea
-                      required
-                      rows={3}
-                      placeholder="Décrivez vos exigences d'infrastructure (Clouds privés, isolation réseau, ou modèle d'IA local)..."
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                      className="w-full bg-[#070708] border border-[#1f1f1f] text-zinc-100 placeholder-zinc-700 p-2.5 font-mono text-xs focus:outline-none focus:border-cyan-500/50 rounded-none resize-none transition-colors"
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">Llama.cpp</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">vLLM Inference</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">Docker-compose</span>
+            </div>
+
+          </div>
+
+          {/* PoC 2: Terraform Infrastructure-as-code Builder */}
+          <div className="border border-zinc-900 bg-[#0c0c0e]/90 p-6 rounded-none space-y-6 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/5 blur-[80px] rounded-full pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-zinc-900">
+              <div className="space-y-0.5">
+                <span className="text-3xs font-mono text-indigo-400 uppercase tracking-widest">PoC-02 · Infrastructure as Code</span>
+                <h3 className="text-white text-base font-bold uppercase tracking-tight">{currentTranslation.tfBlueprintTitle}</h3>
+              </div>
+              <div className="flex items-center gap-1.5 font-mono text-3xs text-zinc-400 bg-zinc-950 px-2 py-1 rounded border border-zinc-850">
+                <Layers className="h-3.5 w-3.5 text-indigo-400" />
+                <span>TERRAFORM_IAC_ANSIBLE</span>
+              </div>
+            </div>
+
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              {language === 'FR' 
+                ? "Générateur et vérificateur de landing zones d'entreprises sécurisées (SecNumCloud & ISO 27001). Intègre des liaisons PKI modulaires, liaisons d'isolation de réseaux virtuels et gestionnaires de conteneurs distribués."
+                : language === 'EN' 
+                ? "Generator & validator for production scale Enterprise Landing zones. Provisions declarative networks, Kubernetes configurations, and implements hardware key bindings securely."
+                : "Planificador y verificador automatizado para zonas de aterrizaje de TI. Orquesta despliegues de red virtuales, configuraciones complejas de Kubernetes y cifrado por hardware con módulos HSM."}
+            </p>
+
+            {/* Interactive Section 2 */}
+            <div className="bg-zinc-950 border border-zinc-900 p-4 rounded space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
+                <span className="text-3xs font-mono text-zinc-400 uppercase font-bold flex items-center gap-1.5">
+                  <Sliders className="h-3 w-3 text-indigo-400" />
+                  {currentTranslation.interactiveConfig}
+                </span>
+                <span className="text-[10px] font-mono text-indigo-400 uppercase font-bold">STATE: COMPILING_BLUEPRINTS</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                
+                {/* Left controls side */}
+                <div className="md:col-span-2 space-y-3 font-mono text-2xs">
+                  <div className="flex items-center justify-between p-1.5 border border-zinc-900 hover:border-zinc-800 rounded bg-[#070709]">
+                    <span className="text-zinc-400 text-3xs">{currentTranslation.tfToggleMulti}</span>
+                    <input
+                      type="checkbox"
+                      checked={multiRegion}
+                      onChange={(e) => setMultiRegion(e.target.checked)}
+                      className="accent-indigo-400 cursor-pointer h-3 w-3"
                     />
                   </div>
 
-                  {/* Realtime Encrypted Output Visualizer */}
-                  {encryptedOutput && (
-                    <div className="space-y-1 bg-[#070708] p-3.5 border border-[#1f1f1f] font-mono text-[10px] rounded-none">
-                      <div className="flex justify-between items-center text-zinc-500 pb-1.5 border-b border-[#1f1f1f]">
-                        <span className="font-bold">PREVIEW DES REQUÊTES EN CHIFFREMENT SYMETRIQUE LIVE :</span>
-                        <button
-                          type="button"
-                          onClick={copyToClipboard}
-                          className="text-cyan-400 hover:text-cyan-350 font-bold transition-all uppercase flex items-center gap-1 hover:underline"
-                        >
-                          <Copy className="h-3 w-3" /> {isMessageCopied ? 'COPIÉ !' : 'COPIER CYBER-BLOC'}
-                        </button>
-                      </div>
-                      <pre className="text-zinc-500 break-all select-all pt-1.5 h-16 overflow-y-auto leading-normal">
-                        {encryptedOutput}
-                      </pre>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between p-1.5 border border-zinc-900 hover:border-zinc-800 rounded bg-[#070709]">
+                    <span className="text-zinc-400 text-3xs">{currentTranslation.tfToggleHSM}</span>
+                    <input
+                      type="checkbox"
+                      checked={hsmSecure}
+                      onChange={(e) => setHsmSecure(e.target.checked)}
+                      className="accent-indigo-400 cursor-pointer h-3 w-3"
+                    />
+                  </div>
 
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      className="w-full inline-flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold font-mono text-xs py-3.5 transition-all rounded-none uppercase tracking-wider cursor-pointer shadow-[0_0_15px_rgba(34,211,238,0.1)]"
-                    >
-                      <Send className="h-4 w-4" />
-                      SIGNER ET ENVOYER LE BLOC CHIFFRE
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="h-72 flex flex-col items-center justify-center text-center space-y-4 font-mono z-10 py-12">
-                  <div className="p-3.5 border border-emerald-500/35 bg-emerald-950/20 text-emerald-400 rounded-none">
-                    <ShieldCheck className="h-10 w-10" />
-                  </div>
                   <div className="space-y-1">
-                    <h3 className="text-white text-base font-bold uppercase tracking-wider">
-                      Message Chiffré Sauvegardé
-                    </h3>
-                    <p className="text-zinc-400 text-xs max-w-md">
-                      Votre canal sécurisé a fonctionné. Les métadonnées de chiffrement {contactForm.cipherSuite} ont été signées et stockées dans la file d'attente de la console d'audit SecOps de façon sécurisée.
-                    </p>
+                    <label className="text-zinc-500 block text-3xs">{currentTranslation.tfToggleCompliance}</label>
+                    <div className="flex gap-1.5">
+                      {(['standard', 'secnumcloud'] as const).map((comp) => (
+                        <button
+                          key={comp}
+                          type="button"
+                          onClick={() => setComplianceType(comp)}
+                          className={`flex-1 py-1 text-center text-3xs font-extrabold border rounded uppercase transition-all ${
+                            complianceType === comp 
+                              ? 'border-indigo-500/50 bg-indigo-950/20 text-indigo-400' 
+                              : 'border-zinc-850 bg-zinc-900/20 text-zinc-500 hover:text-zinc-300'
+                          }`}
+                        >
+                          {comp}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSecuredSentDialog(false);
-                      setContactForm({ name: '', email: '', message: '', cipherSuite: 'AES-256GCM' });
-                    }}
-                    className="px-6 py-2.5 border border-[#1f1f1f] bg-[#070708] hover:border-cyan-400 text-zinc-300 hover:text-cyan-400 text-xs font-mono font-bold uppercase transition-colors"
-                  >
-                    RÉINITIALISER LE CANAL
-                  </button>
                 </div>
-              )}
 
+                {/* Right generated output side */}
+                <div className="md:col-span-3 border border-zinc-900 bg-[#070709] p-3 rounded font-mono text-3xs relative">
+                  <div className="text-zinc-500 uppercase font-bold border-b border-zinc-900 pb-1.5 mb-1 flex justify-between items-center">
+                    <span>{currentTranslation.tfOutputPreview}</span>
+                    <span className="text-2xs font-extrabold text-indigo-400">main.tf</span>
+                  </div>
+                  <pre className="text-zinc-400 overflow-x-auto max-h-[110px] leading-relaxed pt-1 select-all whitespace-pre">
+{`module "sovereign_vpc" {
+  source      = "./modules/networks"
+  ha_mode     = ${multiRegion ? "true" : "false"}
+  secops_rule = "${complianceType === 'secnumcloud' ? "secnumcloud-strict" : "standard-compliance"}"
+  hsm_key_id  = ${hsmSecure ? '"arn:aws:hsm:kms-key-928"' : "null"}
+  trusted_ips = [ "10.0.0.0/8" ]
+}`}
+                  </pre>
+                </div>
+
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">HCL Terraform</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">K8s Sovereign</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">OpenStack</span>
             </div>
 
           </div>
-        </section>
 
-      </main>
-
-      {/* ================= FOOTER ================= */}
-      <footer className="border-t border-[#1f1f1f] bg-[#0c0c0c] py-12 relative z-10 font-mono text-xs text-zinc-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="space-y-2">
-              <span className="text-white text-sm font-sans font-bold tracking-tight uppercase block">
-                Construisons votre forteresse numérique.
-              </span>
-              <p className="text-zinc-500 max-w-sm font-sans leading-relaxed text-xs">
-                Infrastructures Cloud inviolables, autonomie décisionnelle totale, et inférence d'intelligence artificielle locale sécurisée sans compromis.
-              </p>
+          {/* PoC 3: Lattice Post-Quantum Key Exchange Sandboxed Demo */}
+          <div className="border border-zinc-900 bg-[#0c0c0e]/90 p-6 rounded-none space-y-6 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-600/5 blur-[80px] rounded-full pointer-events-none" />
+            
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-zinc-900">
+              <div className="space-y-0.5">
+                <span className="text-3xs font-mono text-cyan-400 uppercase tracking-widest">PoC-03 · Advanced Cryptography</span>
+                <h3 className="text-white text-base font-bold uppercase tracking-tight">{currentTranslation.cryptoTitle}</h3>
+              </div>
+              <div className="flex items-center gap-1.5 font-mono text-3xs text-zinc-400 bg-zinc-950 px-2 py-1 rounded border border-zinc-850">
+                <Lock className="h-3.5 w-3.5 text-cyan-400" />
+                <span>NIST_KYBER_1024</span>
+              </div>
             </div>
 
-            {/* Email quick link */}
-            <div className="space-y-1">
-              <span className="text-zinc-500 select-none block uppercase font-bold text-[9px] tracking-wider">SECURE DIRECT CHANNEL</span>
-              <a 
-                href="mailto:melvin.cureau2004@gmail.com" 
-                className="text-cyan-400 hover:text-cyan-300 font-semibold text-sm underline flex items-center gap-1"
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              {language === 'FR' 
+                ? "Démonstrateur d'implémentation d'algorithmes de cryptographie asymétrique post-quantique. Génère localement des paires de clés structurées pour déjouer les futurs calculateurs quantiques de Shor."
+                : language === 'EN' 
+                ? "Interactive demonstration of post-quantum asymmetric key exchange algorithms. Generates structured keys on-client meant to withstand futuristic quantum attacks."
+                : "Demostrador interactivo enfocado en algoritmos de criptografía asimétrica post-cuántica. Genera matrices de clave pública/privada estables a nivel de cliente para resistir Shor de manera segura."}
+            </p>
+
+            {/* Interactive Section 3 */}
+            <div className="bg-zinc-950 border border-zinc-900 p-4 rounded space-y-3">
+              <div className="space-y-2 font-mono text-2xs">
+                <label className="text-zinc-500 block">{currentTranslation.cryptoLabelInput}</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={cryptoText}
+                    onChange={(e) => setCryptoText(e.target.value)}
+                    className="flex-1 px-2.5 py-1.5 bg-[#070709] border border-zinc-850 rounded text-white text-xs font-mono focus:outline-none focus:border-cyan-500/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCryptoSubmit}
+                    disabled={isEncrypting}
+                    className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-bold text-3xs uppercase tracking-wider rounded cursor-pointer flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  >
+                    {isEncrypting ? (
+                      <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    ) : (
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                    )}
+                    {currentTranslation.cryptoEncryptBtn}
+                  </button>
+                </div>
+              </div>
+
+              {cryptoResult && (
+                <div className="border border-zinc-900 bg-[#070709] p-3 rounded space-y-2.5 font-mono text-3xs animate-fadeIn">
+                  <p className="text-emerald-400 font-bold flex items-center gap-1">
+                    <Check className="h-3 w-3" />
+                    {currentTranslation.cryptoEncSuccess}
+                  </p>
+                  
+                  <div className="space-y-1">
+                    <span className="text-zinc-500 block uppercase font-bold">{currentTranslation.cryptoPublicKey}</span>
+                    <code className="text-zinc-300 block bg-zinc-950 px-2 py-1 rounded border border-zinc-900/60 overflow-x-auto truncate select-all font-mono">
+                      {cryptoResult.pub}
+                    </code>
+                  </div>
+
+                  <div className="space-y-1">
+                    <span className="text-zinc-500 block uppercase font-bold">{currentTranslation.cryptoCiphertext}</span>
+                    <code className="text-cyan-400 block bg-zinc-950 px-2 py-1 rounded border border-zinc-900/60 overflow-x-auto select-all break-all font-mono">
+                      {cryptoResult.cipher}
+                    </code>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">Dilithium KEM</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">Kyber Standards</span>
+              <span className="text-4xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 uppercase">Shor Resilience</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* SECTION 3: CONTACT FORM */}
+      <section id="contact-reach" className="max-w-4xl mx-auto px-4 py-16 space-y-8 scroll-mt-20 border-t border-zinc-900 bg-[#070709]">
+        
+        {/* Contact Header */}
+        <div className="border-b border-zinc-900 pb-4 flex justify-between items-end">
+          <div>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest block">03 / STREAMS</span>
+            <h2 className="text-2xl font-bold text-white uppercase tracking-tight">
+              {language === 'FR' ? 'Contact' : language === 'EN' ? 'Contact Gateway' : 'Contacto Directo'}
+            </h2>
+          </div>
+          <span className="text-3xs font-mono text-zinc-500 hidden sm:inline">CONTACT_SECURE_CHANNEL.CFG</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          
+          {/* Detail Side */}
+          <div className="md:col-span-5 space-y-5">
+            <h3 className="text-white text-base font-bold uppercase tracking-tight font-sans">
+              {currentTranslation.contactTitle}
+            </h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              {currentTranslation.contactSub}
+            </p>
+
+            <div className="space-y-3 font-mono text-2xs pt-2">
+              <div className="flex items-center gap-2.5 p-2 bg-zinc-950 border border-zinc-900 rounded">
+                <Mail className="h-4 w-4 text-cyan-400" />
+                <span className="text-zinc-300">melvin.cureau2004@gmail.com</span>
+              </div>
+              <div className="flex items-center gap-2.5 p-2 bg-zinc-950 border border-zinc-900 rounded">
+                <Globe className="h-4 w-4 text-indigo-400" />
+                <span className="text-zinc-300">Paris, France (Disponible Mobilité)</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 py-2 bg-zinc-950 hover:bg-zinc-900 border border-zinc-850 rounded text-center text-3xs font-mono font-bold uppercase tracking-wider text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition-colors"
               >
-                melvin.cureau2004@gmail.com <ExternalLink className="h-3.5 w-3.5" />
+                <Linkedin className="h-3.5 w-3.5 text-cyan-400" />
+                LinkedIn
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 py-2 bg-zinc-950 hover:bg-zinc-900 border border-zinc-850 rounded text-center text-3xs font-mono font-bold uppercase tracking-wider text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Github className="h-3.5 w-3.5 text-zinc-300" />
+                GitHub
               </a>
             </div>
           </div>
 
-          <div className="border-t border-[#1f1f1f]/60 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px]">
-            <p>
-              © {new Date().getFullYear()} MELVIN CUREAU · CLOUD & SECURITE IA ARCHITECTE. TOUS DROITS RÉSERVÉS PAR CLÉ COMPILATION.
-            </p>
-            <div className="flex gap-4 font-bold text-zinc-600">
-              <span>ALGORITHM: SHA-512 COMPLIANT</span>
-              <span>·</span>
-              <span>HOST: ON-PREM NODE-1</span>
-            </div>
+          {/* Form Side */}
+          <div className="md:col-span-7">
+            <form onSubmit={handleContactSubmit} className="border border-zinc-900 bg-[#0c0c0e]/90 p-6 rounded space-y-4">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-3xs font-mono text-zinc-500 uppercase tracking-widest block">{currentTranslation.fieldName}</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-850 rounded text-white text-xs font-mono focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-3xs font-mono text-zinc-500 uppercase tracking-widest block">{currentTranslation.fieldEmail}</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-850 rounded text-white text-xs font-mono focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-3xs font-mono text-zinc-500 uppercase tracking-widest block">{currentTranslation.fieldSubject}</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-850 rounded text-white text-xs font-mono focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-3xs font-mono text-zinc-500 uppercase tracking-widest block">{currentTranslation.fieldMessage}</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-850 rounded text-white text-xs font-mono focus:outline-none focus:border-cyan-500/50 resize-none"
+                />
+              </div>
+
+              {formSubmitted && (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-400 font-mono text-xs flex items-center gap-1.5">
+                  <Check className="h-4 w-4" />
+                  <span>{currentTranslation.formSuccess}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider rounded cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-50 shadow-[0_4px_12px_rgba(6,182,212,0.15)]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    <span>{currentTranslation.btnSending}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5" />
+                    <span>{currentTranslation.btnSend}</span>
+                  </>
+                )}
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#050507] border-t border-zinc-900 py-10">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-3xs font-mono text-zinc-600">
+          <div className="space-y-0.5 text-center sm:text-left">
+            <span className="block text-zinc-400 uppercase font-bold">Concept Melvin Cureau © 2026</span>
+            <span>{language === 'FR' ? 'Conçu pour la haute résilience' : language === 'EN' ? 'Designed for sovereign resilience' : 'Diseñado para una alta soberanía y resiliencia'}</span>
+          </div>
+          <div className="flex gap-4">
+            <span className="text-zinc-500">Node Secure: Cloud Run container sandbox standard</span>
+            <span>v2.1-ltd</span>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
