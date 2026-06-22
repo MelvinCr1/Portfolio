@@ -1,6 +1,6 @@
 {
   "name": "Melvin Cureau - Cloud & DevSecOps Portfolio",
-  "description": "Portfolio épuré et CV interactif de Melvin Cureau (Architecte Cloud & DevSecOps). Projets, parcours et formulaire de contact en 3 langues : Français, Anglais et Espagnol.",
+  "description": "Portfolio Melvin Cureau.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
