@@ -18,23 +18,21 @@ export default function TimelineSection({
   const [isCvExpanded, setIsCvExpanded] = useState(false);
 
   return (
-    <section id="cv-section" className="relative py-20 px-6 max-w-4xl mx-auto scroll-mt-12">
+    <section id="cv-section" className="relative py-20 px-6 max-w-5xl mx-auto scroll-mt-12">
       
-      {/* Title Block */}
-      <div className="text-center space-y-3 mb-16">
-        <h2 className={`text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
-          theme === 'dark' ? 'text-white' : 'text-slate-900'
+      {/* Title Block with Editorial Architecture style (Section Number + Title) */}
+      <div className="flex items-baseline gap-4 mb-16 border-b pb-4 transition-colors duration-300 border-neutral-200/50 dark:border-neutral-800/40">
+        <span className="font-mono text-xs text-[#cb9b51] font-bold">01 /</span>
+        <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight uppercase transition-colors ${
+          theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'
         }`}>{currentTranslation.titleCV}</h2>
-        {currentTranslation.subtitleCV && (
-          <p className="text-sm text-slate-500 max-w-md mx-auto">{currentTranslation.subtitleCV}</p>
-        )}
       </div>
 
-      {/* Tab selector buttons */}
-      <div className={`flex p-1 rounded-2xl max-w-md mx-auto mb-12 shadow-2xl relative overflow-hidden border transition-colors ${
+      {/* Tab selector buttons - styled as minimalist block-segmented tabs */}
+      <div className={`flex p-1 rounded-lg max-w-md mx-auto mb-16 relative overflow-hidden border transition-all ${
         theme === 'dark' 
-          ? 'bg-slate-950 border-white/5' 
-          : 'bg-slate-100 border-slate-200'
+          ? 'bg-[#121214] border-neutral-800/70' 
+          : 'bg-neutral-100/80 border-neutral-200'
       }`}>
         {[
           { id: 'all', label: currentTranslation.viewAll },
@@ -46,25 +44,25 @@ export default function TimelineSection({
             <button
               key={tab.id}
               onClick={() => setCvTab(tab.id as any)}
-              className="relative flex-1 py-2.5 text-xs font-semibold rounded-xl cursor-pointer transition-all uppercase duration-300 text-center select-none"
+              className="relative flex-1 py-2 text-xs font-mono uppercase tracking-wider cursor-pointer transition-all duration-300 text-center select-none"
             >
               {isActive && (
                 <motion.span
                   layoutId="activeCVSwitch"
-                  className={`absolute inset-0 rounded-xl shadow-lg border ${
+                  className={`absolute inset-0 rounded-md shadow-sm border ${
                     theme === 'dark' 
-                      ? 'bg-slate-900 border-white/10' 
-                      : 'bg-white border-slate-200'
+                      ? 'bg-[#1c1d22] border-neutral-800' 
+                      : 'bg-white border-neutral-200/80'
                   }`}
-                  transition={{ type: "spring", stiffness: 140, damping: 20 }}
+                  transition={{ type: "spring", stiffness: 150, damping: 22 }}
                 />
               )}
-              <span className={`relative z-10 transition-colors ${
+              <span className={`relative z-10 transition-colors duration-250 ${
                 isActive 
-                  ? 'text-teal-400 font-extrabold' 
+                  ? 'text-[#cb9b51] font-bold' 
                   : theme === 'dark' 
-                    ? 'text-slate-400 hover:text-slate-300' 
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'text-neutral-500 hover:text-neutral-300' 
+                    : 'text-neutral-500 hover:text-neutral-800'
               }`}>
                 {tab.label}
               </span>
@@ -73,85 +71,75 @@ export default function TimelineSection({
         })}
       </div>
 
-      {/* Main interactive dynamic grid wrapper */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Main modern asymmetric grid wrapper: 2/3 Experiences, 1/3 Skills & Certifications */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         
-        <div className="md:col-span-2 space-y-8 relative">
+        <div className="md:col-span-2 space-y-12 relative">
           <AnimatePresence mode="popLayout">
             
-            {/* Experiences lists */}
+            {/* Experiences block */}
             {(cvTab === 'all' || cvTab === 'work') && (
               <motion.div
                 key="work-block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                className="space-y-8"
               >
-                <h3 className={`text-xs font-mono uppercase tracking-widest flex items-center gap-2 transition-colors ${
-                  theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                <h3 className={`text-xs font-mono uppercase tracking-[0.2em] flex items-center gap-2 transition-colors border-b pb-2 ${
+                  theme === 'dark' ? 'text-neutral-300 border-neutral-800/40' : 'text-neutral-600 border-neutral-200/50'
                 }`}>
-                  <Briefcase className="h-4 w-4 text-teal-400" />
-                  {currentTranslation.tabWork}
+                  <Briefcase className="h-3.5 w-3.5 text-[#cb9b51] shrink-0" />
+                  <span>{currentTranslation.tabWork}</span>
                 </h3>
 
-                <div className={`space-y-6 border-l ml-3 pl-6 transition-colors ${
-                  theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
-                }`}>
+                <div className="divide-y divide-neutral-200/40 dark:divide-neutral-800/40">
                   {currentTranslation.experiences.map((exp, index) => (
                     <motion.div 
                       key={index}
-                      whileHover={{ y: -3 }}
-                      className={`${!isCvExpanded && index >= 2 ? 'hidden' : 'block'} relative group p-5 rounded-xl border transition-all duration-200 ${
-                        theme === 'dark' 
-                          ? 'bg-slate-900/20 border-slate-900/60 hover:border-slate-800 hover:bg-slate-900/40 shadow-none' 
-                          : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/50 shadow-sm'
-                      }`}
+                      className={`${!isCvExpanded && index >= 2 ? 'hidden' : 'block'} py-8 first:pt-0 last:pb-0 group transition-all duration-300`}
                     >
-                      {/* Timeline point indicator */}
-                      <div className={`absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-teal-400 rounded-full group-hover:scale-130 transition-all ${
-                        theme === 'dark' ? 'bg-[#090a0f]' : 'bg-slate-50'
-                      }`} />
-                      
-                      <div className="flex flex-wrap justify-between items-start gap-2">
-                        <div>
-                          <span className="text-[10px] font-mono text-teal-400 uppercase tracking-wider block mb-1">{exp.period}</span>
-                          <h4 className={`text-base font-bold tracking-tight transition-colors ${
-                            theme === 'dark' ? 'text-white' : 'text-slate-900'
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono text-[#cb9b51] uppercase tracking-widest block font-semibold">{exp.period}</span>
+                          <h4 className={`text-base font-medium tracking-tight transition-colors ${
+                            theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'
                           }`}>{exp.role}</h4>
                         </div>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
-                          theme === 'dark'
-                            ? 'bg-slate-950 border-white/5 text-slate-300'
-                            : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}>
-                          {exp.company}
-                        </span>
+                        
+                        <div className="flex flex-col sm:items-end gap-1 shrink-0">
+                          <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded border self-start sm:self-auto transition-colors ${
+                            theme === 'dark'
+                              ? 'bg-neutral-900/60 border-neutral-850 text-neutral-300'
+                              : 'bg-neutral-50 border-neutral-200 text-neutral-700'
+                          }`}>
+                            {exp.company}
+                          </span>
+                          <p className="text-[10px] font-mono text-neutral-500 flex items-center gap-1.5 justify-start sm:justify-end">
+                            <Globe className="h-3 w-3 text-neutral-600" />
+                            {exp.location}
+                          </p>
+                        </div>
                       </div>
 
-                      <p className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 mt-1">
-                        <Globe className="h-3 w-3 text-slate-600" />
-                        {exp.location}
-                      </p>
-
-                      <ul className="space-y-2 mt-4">
+                      <ul className="space-y-2.5 mt-5">
                         {exp.details.map((detail, dIdx) => (
-                          <li key={dIdx} className={`text-xs leading-relaxed flex items-start gap-2 transition-colors ${
-                            theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
+                          <li key={dIdx} className={`text-xs leading-relaxed flex items-start gap-2.5 transition-colors ${
+                            theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600 font-light'
                           }`}>
-                            <span className="text-teal-400 mt-1.5 shrink-0 block w-1.5 h-1.5 rounded-full bg-teal-400" />
+                            <span className="text-[#cb9b51] mt-1.5 shrink-0 block w-1.5 h-1.5 rounded-full bg-[#cb9b51]/80" />
                             <span>{detail}</span>
                           </li>
                         ))}
                       </ul>
 
-                      <div className="flex flex-wrap gap-1.5 pt-4">
+                      <div className="flex flex-wrap gap-1.5 pt-4.5">
                         {exp.tags.map((tag, tIdx) => (
-                          <span key={tIdx} className={`text-[10px] font-mono px-2 py-0.5 border rounded-md transition-colors ${
+                          <span key={tIdx} className={`text-[10px] font-mono px-2 py-0.5 border rounded transition-colors ${
                             theme === 'dark'
-                              ? 'border-white/5 bg-slate-950 text-slate-400'
-                              : 'border-slate-200 bg-slate-50 text-slate-800 font-medium'
+                              ? 'border-neutral-850 bg-neutral-950/40 text-neutral-400'
+                              : 'border-neutral-200 bg-neutral-50 text-neutral-500'
                           }`}>
                             {tag}
                           </span>
@@ -163,60 +151,49 @@ export default function TimelineSection({
               </motion.div>
             )}
 
-            {/* Education section */}
+            {/* Education block */}
             {(cvTab === 'all' || cvTab === 'education') && (
               <motion.div
                 key="edu-block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6 pt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                className="space-y-8 pt-4"
               >
-                <h3 className={`text-xs font-mono uppercase tracking-widest flex items-center gap-2 transition-colors ${
-                  theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                <h3 className={`text-xs font-mono uppercase tracking-[0.2em] flex items-center gap-2 transition-colors border-b pb-2 ${
+                  theme === 'dark' ? 'text-neutral-300 border-neutral-800/40' : 'text-neutral-600 border-neutral-200/50'
                 }`}>
-                  <GraduationCap className="h-4 w-4 text-indigo-400" />
-                  {currentTranslation.tabEdu}
+                  <GraduationCap className="h-4 w-4 text-[#cb9b51] shrink-0" />
+                  <span>{currentTranslation.tabEdu}</span>
                 </h3>
 
-                <div className={`space-y-5 border-l ml-3 pl-6 transition-colors ${
-                  theme === 'dark' ? 'border-slate-800' : 'border-slate-200'
-                }`}>
+                <div className="divide-y divide-neutral-200/40 dark:divide-neutral-800/40">
                   {currentTranslation.educations.map((edu, index) => (
                     <motion.div 
                       key={index}
-                      whileHover={{ y: -3 }}
-                      className={`${!isCvExpanded && index >= 1 && cvTab === 'all' ? 'hidden' : 'block'} relative group p-5 rounded-xl border transition-all duration-200 ${
-                        theme === 'dark'
-                          ? 'bg-slate-900/20 border-slate-900/60 hover:border-slate-800 hover:bg-slate-900/40 shadow-none'
-                          : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/50 shadow-sm'
-                      }`}
+                      className={`${!isCvExpanded && index >= 1 && cvTab === 'all' ? 'hidden' : 'block'} py-8 first:pt-0 last:pb-0 transition-all duration-300`}
                     >
-                      {/* Bullet point */}
-                      <div className={`absolute -left-[31px] top-7 w-[9px] h-[9px] border-2 border-indigo-500 rounded-full group-hover:scale-130 transition-all ${
-                        theme === 'dark' ? 'bg-[#090a0f]' : 'bg-slate-50'
-                      }`} />
-                      
-                      <div className="flex flex-wrap justify-between items-start gap-2">
-                        <div>
-                          <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider block mb-1">{edu.period}</span>
-                          <h4 className={`text-base font-bold tracking-tight transition-colors ${
-                            theme === 'dark' ? 'text-white' : 'text-slate-900'
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono text-[#cb9b51] uppercase tracking-widest block font-semibold">{edu.period}</span>
+                          <h4 className={`text-base font-medium tracking-tight transition-colors ${
+                            theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'
                           }`}>{edu.degree}</h4>
+                          <p className="text-xs text-[#cb9b51]/80 font-mono font-medium">{edu.specialty}</p>
                         </div>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all ${
+                        
+                        <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded border self-start sm:self-auto shrink-0 transition-colors ${
                           theme === 'dark'
-                            ? 'bg-slate-950 border-white/5 text-slate-300'
-                            : 'bg-slate-100 border-slate-200 text-slate-700'
+                            ? 'bg-neutral-900/60 border-neutral-850 text-neutral-300'
+                            : 'bg-neutral-50 border-neutral-200 text-neutral-700'
                         }`}>
                           {edu.school}
                         </span>
                       </div>
 
-                      <p className="text-xs text-indigo-300 font-mono mt-1 font-semibold">{edu.specialty}</p>
-                      <p className={`text-xs mt-3 leading-relaxed font-light transition-colors ${
-                        theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
+                      <p className={`text-xs mt-3.5 leading-relaxed font-light transition-colors ${
+                        theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600'
                       }`}>{edu.details}</p>
                     </motion.div>
                   ))}
@@ -226,145 +203,100 @@ export default function TimelineSection({
 
           </AnimatePresence>
 
-          {/* Expander Button for "Voir Plus" */}
-          <div className="flex justify-center pt-6">
+          {/* Expander Button for "Voir Plus" - minimalist design */}
+          <div className="flex justify-start pt-6 border-t border-neutral-200/30 dark:border-neutral-800/30">
             <button
               onClick={() => setIsCvExpanded(!isCvExpanded)}
-              className={`group flex items-center gap-2 px-5 py-2.5 border text-xs font-mono font-bold transition-all rounded-xl cursor-pointer active:scale-95 select-none ${
+              className={`group flex items-center gap-2.5 px-4 py-2 border text-xs font-mono font-bold tracking-widest uppercase rounded-lg cursor-pointer active:scale-98 select-none transition-all ${
                 theme === 'dark'
-                  ? 'bg-slate-950 hover:bg-slate-900 border-white/10 hover:border-teal-500/30 text-slate-300 hover:text-teal-400 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)]'
-                  : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-teal-500 text-slate-700 hover:text-teal-600 shadow-sm'
+                  ? 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:text-white hover:border-neutral-700'
+                  : 'bg-white border-neutral-200 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50'
               }`}
             >
               <span>{isCvExpanded ? currentTranslation.btnShowLess : currentTranslation.btnShowMore}</span>
-              <span className={`text-[10px] transition-transform duration-300 inline-block ${isCvExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'}`}>
+              <span className={`text-[8px] transition-transform duration-300 inline-block ${isCvExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'}`}>
                 ▼
               </span>
             </button>
           </div>
         </div>
 
-        {/* Right sidebar: Skills spectrum */}
-        <div className="space-y-6.5">
+        {/* Right sidebar: Skills & Certifications organized cleanly */}
+        <div className="space-y-10">
           
           {/* Certifications panel */}
-          <div className={`border p-6 rounded-2xl shadow-xl transition-all duration-300 space-y-4 ${
-            theme === 'dark'
-              ? 'border-white/[0.04] bg-slate-900/30 hover:shadow-[0_20px_50px_rgba(20,184,166,0.05)]'
-              : 'border-slate-200 bg-white shadow-sm'
-          }`}>
-            <h3 className={`text-xs font-mono uppercase tracking-wider flex items-center gap-2 ${
-              theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
+          <div className="space-y-4">
+            <h3 className={`text-xs font-mono uppercase tracking-[0.2em] flex items-center gap-2 border-b pb-2 ${
+              theme === 'dark' ? 'text-neutral-300 border-neutral-800/40' : 'text-neutral-600 border-neutral-200/50'
             }`}>
-              <Award className="h-4.5 w-4.5 text-teal-400" />
-              {currentTranslation.certifications}
+              <Award className="h-4.5 w-4.5 text-[#cb9b51] shrink-0" />
+              <span>{currentTranslation.certifications}</span>
             </h3>
 
             <div className="space-y-3">
-              <div className={`border px-4 py-3 rounded-xl transition-colors ${
-                theme === 'dark' ? 'bg-slate-950 border-white/5 hover:border-blue-500/30' : 'bg-slate-50 border-slate-200 hover:border-blue-500'
+              <div className={`border p-4 rounded-lg transition-all ${
+                theme === 'dark' ? 'bg-[#0f1012] border-neutral-850 hover:border-neutral-700' : 'bg-[#FAF9F5] border-neutral-200 hover:border-neutral-300'
               }`}>
-                <div className="flex justify-between items-start">
-                  <span className={`text-xs font-bold font-mono ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>Microsoft Azure (AZ-900)</span>
-                  <span className="text-[9px] font-mono bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 uppercase rounded-md shrink-0 ml-1">
+                <div className="flex justify-between items-start gap-1">
+                  <span className={`text-xs font-bold font-mono tracking-tight ${theme === 'dark' ? 'text-neutral-200' : 'text-neutral-800'}`}>Microsoft Azure (AZ-900)</span>
+                  <span className="text-[8px] font-mono bg-[#cb9b51]/10 text-[#cb9b51] border border-[#cb9b51]/15 px-1.5 py-0.5 uppercase rounded shrink-0">
                     {language === 'FR' ? 'En cours' : language === 'EN' ? 'In progress' : 'En curso'}
                   </span>
                 </div>
-                <span className="text-slate-500 text-[10px] block mt-1">
+                <span className="text-neutral-500 text-[10px] block mt-1.5 leading-relaxed">
                   {language === 'FR' ? "Azure Fundamentals en cours d'acquisition" : language === 'EN' ? 'Azure Fundamentals certification in progress' : 'Certificación Azure Fundamentals en curso'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Categorized Skills badges */}
-          <div className={`border p-6 rounded-2xl shadow-xl space-y-6 ${
-            theme === 'dark'
-              ? 'border-white/[0.04] bg-slate-900/30'
-              : 'border-slate-200 bg-white shadow-sm'
-          }`}>
-            <h3 className={`text-xs font-mono uppercase tracking-wider flex items-center gap-2 ${
-              theme === 'dark' ? 'text-slate-300' : 'text-slate-800'
+          {/* Categorized Skills spectrum */}
+          <div className="space-y-6">
+            <h3 className={`text-xs font-mono uppercase tracking-[0.2em] flex items-center gap-2 border-b pb-2 ${
+              theme === 'dark' ? 'text-neutral-300 border-neutral-800/40' : 'text-neutral-600 border-neutral-200/50'
             }`}>
-              <Cpu className="h-4.5 w-4.5 text-indigo-400" />
+              <Cpu className="h-4.5 w-4.5 text-[#cb9b51] shrink-0" />
               <span>{language === 'FR' ? 'Compétences' : language === 'EN' ? 'Skills' : 'Competencias'}</span>
             </h3>
             
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">DevOps & Automation</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Ansible", "Terraform", "Docker", "Gitlab / Github", "AWS CloudFormation"].map((s) => (
-                    <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-500 hover:text-teal-600'
-                    }`}>
-                      {s}
-                    </span>
-                  ))}
+            <div className="space-y-5">
+              {[
+                {
+                  title: "DevOps & Automation",
+                  items: ["Ansible", "Terraform", "Docker", "Gitlab / Github", "AWS CloudFormation"]
+                },
+                {
+                  title: "Cloud & Virtualisation",
+                  items: ["Cloud Architecture", "VMware", "Clouds privés", "Virtualisation", "Microsoft Azure", "AWS"]
+                },
+                {
+                  title: "Admin Système & Réseau",
+                  items: ["Linux", "Windows Server", "Firewall Fortigate", "Networking Basics"]
+                },
+                {
+                  title: "Observabilité & Scripting",
+                  items: ["Monitoring & Observability", "PowerShell", "Python", "SQL", "Algorithmes"]
+                },
+                {
+                  title: language === 'FR' ? 'Savoir-être & Méthodes' : language === 'EN' ? 'Soft-Skills & Methods' : 'Habilidades y Métodos',
+                  items: ["Résolution de problèmes", "Gestion de projet", "Documentation technique"]
+                }
+              ].map((category, cIdx) => (
+                <div key={cIdx} className="space-y-2">
+                  <span className="text-[9px] text-[#cb9b51] uppercase font-mono block font-bold tracking-widest">{category.title}</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {category.items.map((s) => (
+                      <span key={s} className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-all duration-200 ${
+                        theme === 'dark'
+                          ? 'bg-neutral-950/40 border-neutral-850 text-neutral-400 hover:border-[#cb9b51]/30 hover:text-neutral-200'
+                          : 'bg-neutral-50/50 border-neutral-200/80 text-neutral-500 hover:border-[#cb9b51]/40 hover:text-neutral-850'
+                      }`}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Cloud & Virtualisation</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Cloud Architecture", "VMware", "Clouds privés", "Virtualisation", "Microsoft Azure", "AWS"].map((s) => (
-                    <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-indigo-500/20'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-500 hover:text-indigo-600'
-                    }`}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Admin Système & Réseau</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Linux", "Windows Server", "Firewall Fortigate", "Networking Basics"].map((s) => (
-                    <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600'
-                    }`}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">Observabilité & Scripting</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Monitoring & Observability", "PowerShell", "Python", "SQL", "Algorithmes"].map((s) => (
-                    <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-teal-500/20'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600'
-                    }`}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 uppercase font-mono block mb-2 font-bold tracking-wider">{language === 'FR' ? 'Savoir-être & Méthodes' : language === 'EN' ? 'Soft-Skills & Methods' : 'Habilidades y Métodos'}</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Résolution de problèmes", "Gestion de projet", "Documentation technique"].map((s) => (
-                    <span key={s} className={`text-[10px] font-mono px-2.5 py-1 rounded-lg border transition-colors ${
-                      theme === 'dark'
-                        ? 'bg-slate-950 border-white/5 text-slate-300 hover:border-indigo-500/20'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-500 hover:text-indigo-600'
-                    }`}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 

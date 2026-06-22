@@ -52,23 +52,19 @@ export default function App() {
   const currentTranslation = translations[language];
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-teal-500/30 selection:text-white relative ${
+    <div className={`min-h-screen transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-neutral-500/20 selection:text-[#cb9b51] relative ${
       theme === 'dark' 
-        ? 'bg-[#090a0f] text-slate-300' 
-        : 'bg-[#fafbfe] text-slate-700'
+        ? 'bg-[#090a0c] text-neutral-400' 
+        : 'bg-[#FAF9F5] text-neutral-800'
     }`}>
       
-      {/* Designer background: Clean, fine architectural grid lines and organic feel */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10">
-        {/* Crisp designer hairline grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808004_1px,transparent_1px),linear-gradient(to_bottom,#80808004_1px,transparent_1px)] bg-[size:48px_48px]" />
-        
-        {/* Subtle, natural, ultra-faint warm ambient shadow center (gives depth but no tech-neon look) */}
-        <div className={`absolute top-[-300px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full blur-[140px] opacity-40 transition-all duration-500 ${
-          theme === 'dark' 
-            ? 'bg-indigo-950/15' 
-            : 'bg-amber-100/25'
-        }`} />
+      {/* Minimal clean background layout, completely free of generic AI-style glowing gradient blobs and gridded meshes */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* Delicate artistic touch: very fine custom decorative vertical margins */}
+        <div className="max-w-5xl mx-auto h-full px-6 relative">
+          <div className={`absolute top-0 bottom-0 left-0 w-[1px] transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900/40' : 'bg-neutral-200/40'}`} />
+          <div className={`absolute top-0 bottom-0 right-0 w-[1px] transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900/40' : 'bg-neutral-200/40'}`} />
+        </div>
       </div>
 
       {/* HEADER Component */}
@@ -107,17 +103,17 @@ export default function App() {
       <AnimatePresence>
         {showBackToTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 10 }}
-            whileHover={{ scale: 1.08, y: -2 }}
+            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+            whileHover={{ y: -3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             id="back-to-top-floating"
-            className={`fixed bottom-6 right-6 p-3 rounded-full shadow-2xl border transition-all cursor-pointer z-50 focus:outline-none ${
+            className={`fixed bottom-8 right-8 p-3.5 rounded-lg border transition-all cursor-pointer z-50 focus:outline-none ${
               theme === 'dark'
-                ? 'bg-slate-900/90 backdrop-blur-md border-white/10 text-teal-400 hover:text-teal-300 hover:border-teal-500/30'
-                : 'bg-white/90 backdrop-blur-md border-slate-200 text-teal-500 hover:text-teal-600 hover:border-teal-400'
+                ? 'bg-neutral-900 border-neutral-800 text-[#cb9b51] hover:text-[#e5bf7e] hover:border-neutral-700'
+                : 'bg-white border-neutral-200 text-[#cb9b51] hover:text-[#af8b61] hover:border-neutral-300 shadow-sm'
             }`}
             aria-label="Retour en haut"
           >

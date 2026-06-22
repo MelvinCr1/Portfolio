@@ -16,13 +16,11 @@ export default function ProjectsSection({
 }: ProjectsSectionProps) {
   const [githubRepos, setGithubRepos] = useState<GithubRepo[]>([]);
   const [reposLoading, setReposLoading] = useState<boolean>(true);
-  const [reposError, setReposError] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchRepos() {
       try {
         setReposLoading(true);
-        setReposError(false);
         // Attempt to fetch pinned repos from a vercel-based scraping service
         const pinnedRes = await fetch('https://github-pinned-api.vercel.app/api/user/MelvinCr1');
         if (pinnedRes.ok) {
@@ -187,119 +185,89 @@ export default function ProjectsSection({
   return (
     <section id="projects-section" className={`relative py-20 border-t scroll-mt-12 transition-all duration-300 ${
       theme === 'dark' 
-        ? 'border-white/[0.04] bg-slate-950/20' 
-        : 'border-slate-200 bg-slate-50/50'
+        ? 'border-neutral-900/50 bg-[#090a0c]/10' 
+        : 'border-neutral-200/50 bg-neutral-100/10'
     }`}>
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         
-        {/* Header */}
-        <div className="text-center space-y-3 mb-10">
-          <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight uppercase leading-none transition-colors ${
-            theme === 'dark' ? 'text-white' : 'text-slate-900'
+        {/* Editorial Header (Section Number + Title) */}
+        <div className="flex items-baseline gap-4 mb-14 border-b pb-4 transition-colors duration-300 border-neutral-200/50 dark:border-neutral-800/40">
+          <span className="font-mono text-xs text-[#cb9b51] font-bold">02 /</span>
+          <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight uppercase transition-colors ${
+            theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'
           }`}>{currentTranslation.projectsTitle}</h2>
         </div>
 
-        {/* Dynamic Grid of GitHub Pinned Projects */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 auto-rows-fr">
+        {/* Dynamic Grid of GitHub Pinned Projects - Clean Technical panels */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           {reposLoading ? (
-            Array.from({ length: 3 }).map((_, idx) => (
-              <div key={idx} className={`border p-6 rounded-2xl space-y-4 animate-pulse ${
-                theme === 'dark' ? 'border-white/[0.03] bg-slate-900/10' : 'border-slate-200 bg-white'
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div key={idx} className={`border p-6 rounded-lg space-y-4 animate-pulse ${
+                theme === 'dark' ? 'border-neutral-900/40 bg-neutral-900/5' : 'border-neutral-200 bg-neutral-50/50'
               }`}>
                 <div className="flex justify-between items-center">
-                  <div className={`h-4 rounded w-1/2 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
-                  <div className={`h-3 rounded w-1/6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
+                  <div className={`h-4 rounded w-1/2 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
+                  <div className={`h-3 rounded w-1/6 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
                 </div>
                 <div className="space-y-2">
-                  <div className={`h-3 rounded w-full ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
-                  <div className={`h-3 rounded w-5/6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
-                </div>
-                <div className="flex gap-4 pt-2">
-                  <div className={`h-3 rounded w-1/4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
-                  <div className={`h-3 rounded w-1/4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} />
+                  <div className={`h-3 rounded w-full ${theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
+                  <div className={`h-3 rounded w-5/6 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
                 </div>
               </div>
             ))
           ) : (
             githubRepos.map((repo, idx) => {
-              const langColors: Record<string, string> = theme === 'dark' ? {
-                'HTML': 'bg-orange-500/15 text-orange-400 border-orange-500/20',
-                'CSS': 'bg-blue-500/15 text-blue-400 border-blue-500/20',
-                'JavaScript': 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
-                'TypeScript': 'bg-blue-500/15 text-blue-400 border-blue-500/20',
-                'PowerShell': 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20',
-                'Python': 'bg-sky-500/15 text-sky-400 border-sky-500/20',
-                'Shell': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-                'Go': 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
-                'C#': 'bg-purple-500/15 text-purple-400 border-purple-500/20',
-                'Vue': 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-                'YAML': 'bg-pink-500/15 text-pink-400 border-pink-500/20'
-              } : {
-                'HTML': 'bg-orange-50 border-orange-200 text-orange-800 font-semibold',
-                'CSS': 'bg-blue-50 border-blue-200 text-blue-800 font-semibold',
-                'JavaScript': 'bg-yellow-50 border-yellow-200 text-amber-900 font-semibold',
-                'TypeScript': 'bg-blue-50 border-blue-250 text-blue-800 font-semibold',
-                'PowerShell': 'bg-indigo-50 border-indigo-200 text-indigo-800 font-semibold',
-                'Python': 'bg-sky-50 border-sky-200 text-sky-800 font-semibold',
-                'Shell': 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold',
-                'Go': 'bg-cyan-50 border-cyan-200 text-cyan-800 font-semibold',
-                'C#': 'bg-purple-50 border-purple-200 text-purple-850 font-semibold',
-                'Vue': 'bg-emerald-50 border-emerald-250 text-emerald-800 font-semibold',
-                'YAML': 'bg-pink-55 border-pink-200 text-pink-850 font-semibold'
-              };
-              const badgeStyle = langColors[repo.language] || (theme === 'dark' ? 'bg-slate-500/15 text-slate-400 border-slate-500/30' : 'bg-slate-100 text-slate-700 border-slate-200 font-semibold');
-
               return (
                 <motion.div
                   key={`${repo.repo || 'repo'}-${idx}`}
                   initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1, duration: 0.5 }}
-                  whileHover={{ y: -4 }}
-                  className={`group relative overflow-hidden border p-6 rounded-xl flex flex-col justify-between transition-all duration-200 ${
+                  transition={{ delay: idx * 0.08, duration: 0.5 }}
+                  className={`group relative border p-6.5 rounded-lg flex flex-col justify-between transition-all duration-300 ${
                     theme === 'dark'
-                      ? 'border-slate-900/60 bg-slate-900/20 hover:border-slate-800 hover:bg-slate-900/40 shadow-none'
-                      : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
+                      ? 'border-neutral-850 bg-neutral-950/40 hover:border-neutral-700'
+                      : 'border-neutral-200 bg-white hover:border-neutral-350 shadow-sm'
                   }`}
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/[0.01] group-hover:bg-teal-500/[0.03] blur-2xl rounded-full transition-colors pointer-events-none" />
-
-                  <div className="space-y-3.5">
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className={`text-xs sm:text-sm font-bold font-mono tracking-tight group-hover:text-teal-400 transition-colors ${
-                          theme === 'dark' ? 'text-white' : 'text-slate-900'
-                        }`}>
-                          {repo.repo}
-                        </h3>
-                      </div>
-                      <span className={`text-[9px] font-mono border px-2 py-0.5 rounded-full uppercase ${badgeStyle}`}>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start gap-4">
+                      <h3 className={`text-base font-medium font-mono tracking-tight transition-colors ${
+                        theme === 'dark' ? 'text-neutral-100 group-hover:text-[#cb9b51]' : 'text-neutral-900 group-hover:text-[#cb9b51]'
+                      }`}>
+                        {repo.repo}
+                      </h3>
+                      
+                      <span className={`text-[9px] font-mono border px-2 py-0.5 rounded uppercase font-semibold tracking-wider ${
+                        theme === 'dark'
+                          ? 'border-neutral-800 bg-[#cb9b51]/10 text-[#cb9b51]'
+                          : 'border-neutral-200 bg-neutral-50 text-[#af8b61]'
+                      }`}>
                         {repo.language}
                       </span>
                     </div>
 
-                    <p className={`text-xs leading-relaxed font-light min-h-[48px] transition-colors ${
-                      theme === 'dark' ? 'text-slate-400' : 'text-slate-800'
+                    <p className={`text-xs leading-relaxed font-light min-h-[44px] transition-colors ${
+                      theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600'
                     }`}>
                       {repo.description}
                     </p>
                   </div>
 
-                  <div className={`flex justify-between items-center pt-4 border-t mt-4 transition-colors ${
-                    theme === 'dark' ? 'border-white/[0.03]' : 'border-slate-100'
+                  <div className={`flex justify-between items-center pt-4 border-t mt-6 transition-colors ${
+                    theme === 'dark' ? 'border-neutral-900/60' : 'border-neutral-105'
                   }`}>
-                    <div className="flex gap-4 font-mono text-[10px] text-slate-500">
+                    <div className="flex gap-4 font-mono text-[10px] text-neutral-500">
                       {repo.stars !== undefined && (
                         <span className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-amber-500" />
-                          <span>{repo.stars} {language === 'FR' ? 'étoile' : language === 'EN' ? 'star' : 'estrellas'}</span>
+                          <Star className="h-3 w-3 text-[#cb9b51]" />
+                          <span>{repo.stars}</span>
                         </span>
                       )}
                       {repo.forks !== undefined && (
-                        <span className="flex items-center gap-1">
-                          <GitFork className="h-3 w-3 text-slate-500" />
-                          <span>{repo.forks} {language === 'FR' ? 'clones' : language === 'EN' ? 'clones' : 'clones'}</span>
+                        <span className="flex items-center gap-1 animate-none">
+                          <GitFork className="h-3 w-3 text-neutral-500" />
+                          <span>{repo.forks}</span>
                         </span>
                       )}
                     </div>
@@ -308,10 +276,10 @@ export default function ProjectsSection({
                       href={repo.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-teal-400 hover:text-teal-300 font-mono font-bold uppercase tracking-wide transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs text-[#cb9b51] hover:text-[#e5bf7e] font-mono font-bold uppercase tracking-wider transition-colors"
                     >
                       <span>{language === 'FR' ? 'Accéder' : language === 'EN' ? 'Visit' : 'Visitar'}</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
+                      <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
                   </div>
                 </motion.div>

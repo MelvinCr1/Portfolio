@@ -73,8 +73,8 @@ export default function Header({
   return (
     <header className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 border-b ${
       theme === 'dark'
-        ? 'bg-[#090a0f]/85 border-white/[0.04]'
-        : 'bg-[#fafbfe]/85 border-slate-200/80'
+        ? 'bg-[#090a0c]/85 border-neutral-900/60'
+        : 'bg-[#FAF9F5]/85 border-neutral-200/50'
     }`}>
       <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
         
@@ -82,19 +82,19 @@ export default function Header({
 
         {/* Nav menu links */}
         <nav className={`hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-wider transition-colors ${
-          theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+          theme === 'dark' ? 'text-neutral-500' : 'text-neutral-600'
         }`}>
           <a href="#cv-section" className={`transition-colors py-1 relative group ${
-            theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
+            theme === 'dark' ? 'hover:text-neutral-200' : 'hover:text-neutral-950'
           }`}>
             {currentTranslation.navCV}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#cb9b51] group-hover:w-full transition-all duration-350" />
           </a>
           <a href="#projects-section" className={`transition-colors py-1 relative group ${
-            theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
+            theme === 'dark' ? 'hover:text-neutral-200' : 'hover:text-neutral-950'
           }`}>
             {currentTranslation.navProjects}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#cb9b51] group-hover:w-full transition-all duration-350" />
           </a>
         </nav>
 
@@ -105,10 +105,10 @@ export default function Header({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className={`p-2 rounded-xl border transition-all duration-300 cursor-pointer shadow-sm flex items-center justify-center ${
+            className={`p-2 rounded-lg border transition-all duration-300 cursor-pointer flex items-center justify-center ${
               theme === 'dark' 
-                ? 'bg-slate-950/60 border-white/10 text-teal-400 hover:text-teal-300 hover:bg-slate-900' 
-                : 'bg-white border-slate-200 text-teal-600 hover:text-teal-500 hover:bg-slate-50'
+                ? 'bg-neutral-950/60 border-neutral-900 text-[#cb9b51] hover:text-[#e5bf7e] hover:bg-neutral-900/40' 
+                : 'bg-white border-neutral-200 text-[#cb9b51] hover:text-[#af8b61] hover:bg-neutral-100/30'
             }`}
             title={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
             id="theme-toggler"
@@ -127,10 +127,10 @@ export default function Header({
           >
             <button
               onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className={`flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shadow-sm select-none ${
+              className={`flex items-center gap-2 border px-3 py-2 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer select-none ${
                 theme === 'dark'
-                  ? 'bg-slate-950 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
-                  : 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 hover:bg-slate-50'
+                  ? 'bg-neutral-950 border-neutral-900 text-neutral-300 hover:text-white hover:border-neutral-800'
+                  : 'bg-white border-neutral-200 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50'
               }`}
             >
               <span className="text-sm leading-none">{flags[language].flag}</span>
@@ -146,14 +146,14 @@ export default function Header({
                     onClick={() => setLangMenuOpen(false)} 
                   />
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className={`absolute right-0 mt-2 w-36 border rounded-xl shadow-2xl p-1 z-50 overflow-hidden ${
+                    className={`absolute right-0 mt-2 w-36 border rounded-lg shadow-lg p-1 z-50 overflow-hidden ${
                       theme === 'dark'
-                        ? 'bg-slate-900 border-white/10'
-                        : 'bg-white border-slate-200 shadow-md'
+                        ? 'bg-neutral-900 border-neutral-800'
+                        : 'bg-white border-neutral-200'
                     }`}
                   >
                     {(['FR', 'EN', 'ES'] as Language[]).map((lng) => (
@@ -163,12 +163,12 @@ export default function Header({
                           setLanguage(lng);
                           setLangMenuOpen(false);
                         }}
-                        className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-mono text-left rounded-lg transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-mono text-left rounded-md transition-all cursor-pointer ${
                           language === lng 
-                            ? 'bg-teal-500/10 text-teal-400 font-extrabold' 
+                            ? 'bg-neutral-500/10 text-[#cb9b51] font-bold' 
                             : theme === 'dark'
-                              ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                              ? 'text-neutral-400 hover:text-white hover:bg-neutral-950/40'
+                              : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
                         }`}
                       >
                         <span className="text-sm leading-none">{flags[lng].flag}</span>
