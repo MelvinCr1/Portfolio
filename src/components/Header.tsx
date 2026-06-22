@@ -78,20 +78,7 @@ export default function Header({
     }`}>
       <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
         
-        {/* Brand initials / logo */}
-        <motion.div 
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center cursor-pointer group"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        >
-          <span className={`font-mono text-xs font-black tracking-widest uppercase transition-colors duration-200 group-hover:text-teal-400 ${
-            theme === 'dark' ? 'text-white' : 'text-slate-950'
-          }`}>
-            MC
-          </span>
-        </motion.div>
+
 
         {/* Nav menu links */}
         <nav className={`hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-wider transition-colors ${
