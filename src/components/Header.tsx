@@ -109,12 +109,6 @@ export default function Header({
             {currentTranslation.navProjects}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
           </a>
-          <a href="#contact-section" className={`transition-colors py-1 relative group ${
-            theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-900'
-          }`}>
-            {currentTranslation.navContact}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal-400 group-hover:w-full transition-all duration-300" />
-          </a>
         </nav>
 
         <div className="flex items-center gap-3">

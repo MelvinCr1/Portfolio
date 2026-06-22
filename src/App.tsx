@@ -9,7 +9,6 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import TimelineSection from './components/TimelineSection';
 import ProjectsSection from './components/ProjectsSection';
-import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -96,13 +95,6 @@ export default function App() {
 
       {/* PROJECTS SECTION Component */}
       <ProjectsSection 
-        theme={theme}
-        language={language}
-        currentTranslation={currentTranslation}
-      />
-
-      {/* CONTACT SECTION Component */}
-      <ContactSection 
         theme={theme}
         language={language}
         currentTranslation={currentTranslation}
