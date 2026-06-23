@@ -192,7 +192,9 @@ export default function ProjectsSection({
         
         {/* Editorial Header (Section Number + Title) */}
         <div className="flex items-baseline gap-4 mb-14 border-b pb-4 transition-colors duration-300 border-neutral-200/50 dark:border-neutral-800/40">
-          <span className="font-mono text-xs text-[#cb9b51] font-bold">02 /</span>
+          <span className={`font-mono text-xs font-bold ${
+            theme === 'dark' ? 'text-[#00bd95]' : 'text-[#008f70]'
+          }`}>02 /</span>
           <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight uppercase transition-colors ${
             theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'
           }`}>{currentTranslation.projectsTitle}</h2>
@@ -227,21 +229,21 @@ export default function ProjectsSection({
                   className={`group relative border p-6.5 rounded-lg flex flex-col justify-between transition-all duration-300 ${
                     theme === 'dark'
                       ? 'border-neutral-850 bg-neutral-950/40 hover:border-neutral-700'
-                      : 'border-neutral-200 bg-white hover:border-neutral-350 shadow-sm'
+                      : 'border-neutral-200 bg-white hover:border-neutral-350 shadow-xs'
                   }`}
                 >
                   <div className="space-y-4">
                     <div className="flex justify-between items-start gap-4">
                       <h3 className={`text-base font-medium font-mono tracking-tight transition-colors ${
-                        theme === 'dark' ? 'text-neutral-100 group-hover:text-[#cb9b51]' : 'text-neutral-900 group-hover:text-[#cb9b51]'
+                        theme === 'dark' ? 'text-neutral-100 group-hover:text-[#00bd95]' : 'text-neutral-900 group-hover:text-[#008f70]'
                       }`}>
                         {repo.repo}
                       </h3>
                       
                       <span className={`text-[9px] font-mono border px-2 py-0.5 rounded uppercase font-semibold tracking-wider ${
                         theme === 'dark'
-                          ? 'border-neutral-800 bg-[#cb9b51]/10 text-[#cb9b51]'
-                          : 'border-neutral-200 bg-neutral-50 text-[#af8b61]'
+                          ? 'border-neutral-800 bg-[#00bd95]/10 text-[#00bd95]'
+                          : 'border-neutral-200 bg-[#008f70]/5 text-[#008f70]'
                       }`}>
                         {repo.language}
                       </span>
@@ -260,7 +262,9 @@ export default function ProjectsSection({
                     <div className="flex gap-4 font-mono text-[10px] text-neutral-500">
                       {repo.stars !== undefined && (
                         <span className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-[#cb9b51]" />
+                          <Star className={`h-3 w-3 ${
+                            theme === 'dark' ? 'text-[#00bd95]' : 'text-[#008f70]'
+                          }`} />
                           <span>{repo.stars}</span>
                         </span>
                       )}
@@ -276,7 +280,11 @@ export default function ProjectsSection({
                       href={repo.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-[#cb9b51] hover:text-[#e5bf7e] font-mono font-bold uppercase tracking-wider transition-colors"
+                      className={`inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider transition-colors ${
+                        theme === 'dark'
+                          ? 'text-[#00bd95] hover:text-[#2ae3c0]'
+                          : 'text-[#008f70] hover:text-[#00aa85]'
+                      }`}
                     >
                       <span>{language === 'FR' ? 'Accéder' : language === 'EN' ? 'Visit' : 'Visitar'}</span>
                       <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

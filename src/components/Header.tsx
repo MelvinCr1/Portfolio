@@ -88,13 +88,13 @@ export default function Header({
             theme === 'dark' ? 'hover:text-neutral-200' : 'hover:text-neutral-950'
           }`}>
             {currentTranslation.navCV}
-            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#cb9b51] group-hover:w-full transition-all duration-350" />
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#00bd95] group-hover:w-full transition-all duration-350" />
           </a>
           <a href="#projects-section" className={`transition-colors py-1 relative group ${
             theme === 'dark' ? 'hover:text-neutral-200' : 'hover:text-neutral-950'
           }`}>
             {currentTranslation.navProjects}
-            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#cb9b51] group-hover:w-full transition-all duration-350" />
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#00bd95] group-hover:w-full transition-all duration-350" />
           </a>
         </nav>
 
@@ -107,8 +107,8 @@ export default function Header({
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className={`p-2 rounded-lg border transition-all duration-300 cursor-pointer flex items-center justify-center ${
               theme === 'dark' 
-                ? 'bg-neutral-950/60 border-neutral-900 text-[#cb9b51] hover:text-[#e5bf7e] hover:bg-neutral-900/40' 
-                : 'bg-white border-neutral-200 text-[#cb9b51] hover:text-[#af8b61] hover:bg-neutral-100/30'
+                ? 'bg-neutral-950/60 border-neutral-900 text-[#00bd95] hover:text-[#2ae3c0] hover:bg-neutral-900/40' 
+                : 'bg-white border-neutral-200 text-[#008f70] hover:text-[#00aa85] hover:bg-neutral-100/30'
             }`}
             title={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
             id="theme-toggler"
@@ -165,7 +165,9 @@ export default function Header({
                         }}
                         className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-mono text-left rounded-md transition-all cursor-pointer ${
                           language === lng 
-                            ? 'bg-neutral-500/10 text-[#cb9b51] font-bold' 
+                            ? theme === 'dark'
+                              ? 'bg-neutral-900 text-[#00bd95] font-bold'
+                              : 'bg-neutral-100 text-[#008f70] font-bold' 
                             : theme === 'dark'
                               ? 'text-neutral-400 hover:text-white hover:bg-neutral-950/40'
                               : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'

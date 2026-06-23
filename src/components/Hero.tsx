@@ -18,7 +18,7 @@ export default function Hero({ theme, currentTranslation }: HeroProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className={`font-mono text-[10px] uppercase tracking-[0.3em] font-semibold ${
-              theme === 'dark' ? 'text-[#cb9b51]' : 'text-[#af8b61]'
+              theme === 'dark' ? 'text-[#00bd95]' : 'text-[#008f70]'
             }`}
           >
             {currentTranslation.status || "Alternant @ Cloud Temple"}
@@ -70,8 +70,8 @@ export default function Hero({ theme, currentTranslation }: HeroProps) {
             rel="noopener noreferrer"
             className={`px-6 py-3 font-mono font-bold text-xs tracking-widest uppercase rounded-lg transition-all flex items-center justify-center gap-2 group cursor-pointer duration-250 border ${
               theme === 'dark'
-                ? 'bg-[#cb9b51] border-[#af8b61] text-slate-950 hover:bg-[#e5bf7e] hover:border-[#cb9b51]'
-                : 'bg-[#1a1a1a] border-[#1a1a1a] text-white hover:bg-neutral-800'
+                ? 'bg-[#00bd95] border-[#00bd95] text-slate-950 hover:bg-[#2ae3c0] hover:border-[#2ae3c0]'
+                : 'bg-[#008f70] border-[#008f70] text-white hover:bg-[#00aa85] hover:border-[#00aa85]'
             }`}
           >
             <Linkedin className="h-3.5 w-3.5" />

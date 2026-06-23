@@ -31,7 +31,9 @@ export default function Footer({ theme }: FooterProps) {
             href="https://www.linkedin.com/in/melvin-cureau-83a812252/" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-neutral-500 hover:text-[#cb9b51] hover:-translate-y-[1px] transition-all flex items-center gap-1.5"
+            className={`hover:-translate-y-[1px] transition-all flex items-center gap-1.5 ${
+              theme === 'dark' ? 'text-neutral-500 hover:text-[#00bd95]' : 'text-neutral-500 hover:text-[#008f70]'
+            }`}
           >
             <Linkedin className="h-3.5 w-3.5 shrink-0" />
             <span>LinkedIn</span>
@@ -40,7 +42,9 @@ export default function Footer({ theme }: FooterProps) {
             href="https://github.com/MelvinCr1" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="text-neutral-500 hover:text-[#cb9b51] hover:-translate-y-[1px] transition-all flex items-center gap-1.5"
+            className={`hover:-translate-y-[1px] transition-all flex items-center gap-1.5 ${
+              theme === 'dark' ? 'text-neutral-500 hover:text-[#00bd95]' : 'text-neutral-500 hover:text-[#008f70]'
+            }`}
           >
             <Github className="h-3.5 w-3.5 shrink-0" />
             <span>GitHub</span>
