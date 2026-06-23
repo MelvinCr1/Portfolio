@@ -1,6 +1,6 @@
 # Workflow CI/CD — Déploiement Continu sur IONOS
 
-Ce dossier contient le workflow de Déploiement Continu (**CI/CD**) automatisé via **GitHub Actions** pour le portfolio de Melvin Cureau.
+Ce dossier contient le workflow de Déploiement Continu (**CI/CD**) automatisé via **GitHub Actions** pour le site.
 
 Le fichier principal de configuration est [`deploy.yml`](./deploy.yml).
 
