@@ -60,6 +60,7 @@ export interface TranslationSet {
   errEmail?: string;
   errSubject?: string;
   errMessage?: string;
+  copyright?: string;
   experiences: ExperienceItem[];
   educations: EducationItem[];
 }

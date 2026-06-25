@@ -48,6 +48,7 @@ export const translations: Record<Language, TranslationSet> = {
     iframeNoticeTitle: "Impression dans l'aperçu",
     iframeNoticeText: "Pour imprimer ou enregistrer en PDF depuis l'aperçu de l'éditeur, veuillez ouvrir l'application dans un nouvel onglet en cliquant sur le bouton en haut à droite de l'aperçu (icône d'ouverture externe), puis cliquez à nouveau sur le bouton Télécharger.",
     iframeNoticeClose: "Compris",
+    copyright: "© 2026 Melvin Cureau. Tous droits réservés. Protection de la propriété intellectuelle & lutte contre le plagiat.",
 
     // Experiences Data
     experiences: [
@@ -167,6 +168,7 @@ export const translations: Record<Language, TranslationSet> = {
     iframeNoticeTitle: "Printing from Preview",
     iframeNoticeText: "To print or save as PDF from the editor's live preview, please open the application in a new tab by clicking the icon at the top right of the preview frame, then click the Download button again.",
     iframeNoticeClose: "Got it",
+    copyright: "© 2026 Melvin Cureau. All rights reserved. Intellectual property protection & anti-plagiarism guard.",
 
     // Experiences Data
     experiences: [
@@ -286,6 +288,7 @@ export const translations: Record<Language, TranslationSet> = {
     iframeNoticeTitle: "Impresión en la Vista Previa",
     iframeNoticeText: "Para imprimir o guardar como PDF desde la vista previa del editor, por favor abre la aplicación en una pestaña nueva haciendo clic en el icono superior derecho de la vista previa, luego haz clic de nuevo en Descargar.",
     iframeNoticeClose: "Entendido",
+    copyright: "© 2026 Melvin Cureau. Todos los derechos reservados. Protección de propiedad intelectual y prevención del plagio.",
 
     // Experiences Data
     experiences: [

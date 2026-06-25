@@ -113,7 +113,7 @@ export default function App() {
       />
 
       {/* FOOTER Component */}
-      <Footer theme={theme} />
+      <Footer theme={theme} currentTranslation={currentTranslation} />
 
       {/* Floating Back to Top Button */}
       <AnimatePresence>
