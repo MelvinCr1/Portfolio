@@ -223,14 +223,14 @@ export default function TimelineSection({
                             ))}
                           </ul>
 
-                          <div className="flex flex-wrap gap-x-3.5 gap-y-1 pt-2">
+                          <div className="flex flex-wrap gap-1.5 pt-2">
                             {exp.tags.map((tag, tIdx) => (
-                              <span key={tIdx} className={`text-[10px] font-mono tracking-wider transition-colors ${
+                              <span key={tIdx} className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border font-semibold transition-colors duration-250 ${
                                 theme === 'dark' 
-                                  ? 'text-[#00bd95]/70 hover:text-[#00bd95]' 
-                                  : 'text-[#008f70]/80 hover:text-[#008f70]'
+                                  ? 'bg-neutral-900/40 border-neutral-800/40 text-[#00bd95]/80 hover:text-[#00bd95] hover:border-[#00bd95]/30' 
+                                  : 'bg-neutral-100/60 border-neutral-200 text-[#008f70]/95 hover:text-[#008f70] hover:border-[#008f70]/30'
                               }`}>
-                                #{tag.replace(/\s+/g, '').toLowerCase()}
+                                {tag}
                               </span>
                             ))}
                           </div>

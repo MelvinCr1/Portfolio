@@ -58,7 +58,7 @@ export default function App() {
         : 'bg-[#FAF9F5] text-neutral-800'
     }`}>
       
-      {/* Minimal clean background layout - Custom meteorological-isobar airflow outlines representing high-altitude clouds */}
+      {/* Minimal clean background layout - Beautiful minimalist cloud outline sketches */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="max-w-5xl mx-auto h-full px-6 relative">
           {/* Subtle vertical structural boundaries */}
@@ -66,20 +66,30 @@ export default function App() {
           <div className={`absolute top-0 bottom-0 right-6 w-[1px] transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-900/40' : 'bg-neutral-200/40'}`} />
         </div>
 
-        {/* Abstract highly professional technical "Cloud Airflow / Isobar" lines */}
-        <svg className="absolute right-0 top-12 w-[600px] h-[500px] opacity-25 dark:opacity-[0.12] transition-opacity pointer-events-none" viewBox="0 0 400 400" fill="none">
-          <path d="M50 150 C 120 110, 220 220, 350 130" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" strokeDasharray="4 4" />
-          <path d="M80 180 C 140 130, 240 250, 380 160" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="1" />
-          <path d="M110 210 C 160 160, 260 280, 410 190" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" />
-          {/* Faint cloud shape circles */}
-          <circle cx="280" cy="180" r="110" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" strokeDasharray="8 8" opacity="0.5" />
-          <circle cx="340" cy="140" r="70" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" opacity="0.3" />
+        {/* Elegant organic minimalist cloud drawings */}
+        <svg className="absolute right-[-100px] top-12 w-[650px] h-[450px] opacity-[0.15] dark:opacity-[0.05] transition-opacity pointer-events-none" viewBox="0 0 500 350" fill="none">
+          <path d="M150 240 C150 210, 180 180, 220 180 C230 180, 240 183, 250 188 C265 165, 295 150, 330 150 C380 150, 420 190, 420 240 C420 242, 420 245, 419 247 C435 255, 445 272, 445 290 C445 318, 422 340, 395 340 L175 340 C145 340, 120 315, 120 285 C120 263, 133 245, 150 240 Z" 
+            stroke={theme === 'dark' ? '#00bd95' : '#008f70'} 
+            strokeWidth="1" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+          />
+          <path d="M280 130 C280 110, 300 90, 325 90 C331 90, 337 92, 343 95 C352 80, 372 70, 395 70 C428 70, 455 97, 455 130 C455 131, 455 133, 455 134 C465 140, 472 151, 472 163 C472 182, 456 197, 438 197 L296 197 C276 197, 260 181, 260 161 C260 146, 269 134, 280 130 Z" 
+            stroke={theme === 'dark' ? '#00bd95' : '#008f70'} 
+            strokeWidth="0.8" 
+            opacity="0.5"
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+          />
         </svg>
 
-        <svg className="absolute left-[-100px] top-[45%] w-[500px] h-[500px] opacity-[0.18] dark:opacity-[0.08] transition-opacity pointer-events-none" viewBox="0 0 400 400" fill="none">
-          <path d="M0 220 C 100 180, 180 320, 300 240" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="1" />
-          <path d="M10 250 C 110 210, 190 350, 310 270" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" strokeDasharray="3 3" />
-          <circle cx="100" cy="260" r="90" stroke={theme === 'dark' ? '#00bd95' : '#008f70'} strokeWidth="0.5" opacity="0.4" />
+        <svg className="absolute left-[-150px] top-[40%] w-[550px] h-[400px] opacity-[0.12] dark:opacity-[0.04] transition-opacity pointer-events-none" viewBox="0 0 500 350" fill="none">
+          <path d="M100 210 C100 185, 122 160, 155 160 C163 160, 171 162, 179 166 C190 145, 215 130, 245 130 C285 130, 320 165, 320 210 C320 212, 320 214, 320 216 C333 223, 342 238, 342 254 C342 279, 322 300, 297 300 L120 300 C95 300, 75 278, 75 250 C75 230, 85 214, 100 210 Z" 
+            stroke={theme === 'dark' ? '#00bd95' : '#008f70'} 
+            strokeWidth="1" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+          />
         </svg>
       </div>
 
