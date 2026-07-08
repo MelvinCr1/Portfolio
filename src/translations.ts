@@ -4,7 +4,7 @@ export const translations: Record<Language, TranslationSet> = {
   FR: {
     role: "Ingénieur SysOps & Cloud",
     status: "Alternant chez Cloud Temple",
-    aboutText: "Étudiant de Master à SUPINFO Tours, je suis passionné par l'automatisation, la fiabilité et la sécurité des environnements Cloud. Je me spécialise dans la conception d'architectures à haute disponibilité (VMware, Azure, AWS, Private Cloud) et le maintien en conditions opérationnelles de systèmes critiques, tout en garantissant les bonnes pratiques réglementaires SecNumCloud.",
+    aboutText: "Étudiant de Master à SUPINFO Tours, je suis passionné par l'automatisation, la fiabilité et la sécurité des environnements Cloud. Je me spécialise dans la conception d'architectures à haute disponibilité (VMware, Azure, AWS, Private Cloud) et le maintien en conditions opérationnelles de systèmes critiques, tout en garantissant les bonnes pratiques réglementaires SecNumCloud et l'application rigoureuse des principes ITIL.",
     navCV: "Parcours",
     navProjects: "Projets",
     navContact: "Contact",
@@ -58,12 +58,12 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingénieur SysOps (Alternance)",
         location: "Tours, France · Sur site",
         details: [
-          "Maintien en conditions opérationnelles (MCO) d'environnements virtualisés VMware complexes et infrastructures Cloud.",
-          "Industrialisation des processus répétitifs via des scripts d'automatisation (Systems Management & Infrastructure-as-Code).",
-          "Suivi rigoureux et optimisation des performances réseau sous fortes contraintes de gouvernance.",
-          "Application continue des normes strictes de cybersécurité SecNumCloud et PAMS."
+          "Maintien en Conditions Opérationnelles (MCO) d'un pool de +7 clients récurrents : gestion autonome du RUN (changements systèmes/réseaux, supervision active) et résolution d'incidents complexes.",
+          "BUILD & Gestion de Projet : Pilotage autonome de projets techniques d'évolution d'infrastructure et d'intégration de nouvelles architectures, incluant la planification, le déploiement opérationnel et la relation client directe.",
+          "Shifts transverses : Prise en charge des flux entrants de l'ensemble des squads, assurant l'analyse rapide des incidents, la résolution ou l'escalade qualifiée.",
+          "Conformité & Architecture Cloud : Administration au sein d'environnements de Cloud Privé souverain, Cloud Public (Azure) et solutions hybrides, sous certifications exigeantes ISO-27001, SecNumCloud, PAMS, et HDS (Hébergement de Données de Santé)."
         ],
-        tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
+        tags: ["Haute Disponibilité", "SecNumCloud", "PAMS", "ISO 27001", "HDS", "Azure / Cloud Hybride", "VMware"]
       },
       {
         period: "Octobre 2024 - Septembre 2025",
@@ -71,11 +71,11 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingénieur de Production (Alternance)",
         location: "Tours, France · Sur site",
         details: [
-          "Gestion proactive des incidents complexes de production système de Niveaux 2 et 3 selon les SLAs définis (GTI/GTR).",
-          "Participation active aux projets transversaux de migration de SI clients et élaboration de documents d'architecture (DAT, DEX).",
-          "Aide au conseil en intégration d’éléments d'architecture complexe pour quantifier la charge projet du SI client."
+          "Prise en charge (PEC) de l'onboarding et intégration de nouveaux clients, conception de pipelines d'automatisation légers (scripts PowerShell/Bash).",
+          "Industrialisation des processus répétitifs et déploiement d'outils d'Infrastructure-as-Code (Terraform, configurations Ansible pour l'application automatique de code).",
+          "Résilience & Plan de Continuité d'Activité : Conduite et suivi d'un exercice complet de Plan de Reprise d'Activité (PRA) pour un client critique afin de valider et sécuriser les protocoles de bascule."
         ],
-        tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
+        tags: ["Terraform", "Ansible", "PRA (Disaster Recovery)", "Automation"]
       },
       {
         period: "Juillet 2024 - Septembre 2024",
@@ -83,9 +83,8 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingénieur de Production (Stage)",
         location: "Tours, France · Sur site",
         details: [
-          "Immersion technique centrée sur l'analyse, l'alerte d'incidents, et le maintien de la disponibilité client.",
-          "Développement de scripts d'exploitation d'infrastructure rapides en Bash et Python.",
-          "Résolution active de tickets de gestion d'incidents serveurs Nivesu 2 (systèmes virtualisés)."
+          "Immersion opérationnelle N2 sur l'analyse proactive des métriques de performance, réduction du MTTR (temps moyen de résolution) et maintien de l'uptime.",
+          "Développement de scripts d'automatisation rapides (Bash et Python) pour le monitoring actif et le traitement automatique des alertes récurrentes."
         ],
         tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
       },
@@ -124,7 +123,7 @@ export const translations: Record<Language, TranslationSet> = {
   EN: {
     role: "SysOps & Cloud Engineer",
     status: "Apprentice at Cloud Temple",
-    aboutText: "Master's student at SUPINFO Tours, I am driven by the automation, reliability, and security of modern Cloud Environments. I specialize in designing high-availability server topologies (VMware, Azure, AWS, Private Cloud) and executing the continuous maintenance (MCO) of highly critical systems while fully respecting regulatory standards like ANSSI SecNumCloud.",
+    aboutText: "Master's student at SUPINFO Tours, I am driven by the automation, reliability, and security of modern Cloud Environments. I specialize in designing high-availability server topologies (VMware, Azure, AWS, Private Cloud) and executing the continuous maintenance (MCO) of highly critical systems while fully respecting regulatory standards like ANSSI SecNumCloud and the core principles of ITIL.",
     navCV: "Background",
     navProjects: "Projects",
     navContact: "Contact",
@@ -178,12 +177,12 @@ export const translations: Record<Language, TranslationSet> = {
         role: "SysOps Engineer (Apprenticeship)",
         location: "Tours, France · On-site",
         details: [
-          "Coordinated maintenance (MCO) for highly dense corporate VMware clusters and cloud hypervisors.",
-          "Industrialized repetitive infrastructure workloads through automation (Systems Management & Infrastructure-as-code).",
-          "Supervised performance stats and system health diagnostics under intense availability constraints.",
-          "Aligned operations with strict SecNumCloud guidelines and privileged access management (PAMS)."
+          "Managed continuous operations (MCO) and the RUN phase for a dedicated pool of +7 recurring enterprise clients, handling complex systems/networks and incidents.",
+          "BUILD & Project Management: Autonomous leadership of technical transformation projects, infrastructure upgrades, and new architectures deployment while driving complete customer relations.",
+          "Rotation-based shifts: Handling all incoming cloud incidents from all squads, delivering fast triaging, L2/L3 resolution, or escalation.",
+          "Compliance & Cloud Architecture: System and network administration across sovereign Private Cloud, Public Cloud (Azure), and hybrid models under strict ISO-27001, SecNumCloud, PAMS, and HDS (Healthcare Data Hosting) regulatory certifications."
         ],
-        tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
+        tags: ["High Availability", "SecNumCloud", "PAMS", "ISO 27001", "HDS", "Azure / Hybrid Cloud", "VMware"]
       },
       {
         period: "October 2024 - September 2025",
@@ -191,11 +190,11 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Production Engineer (Apprenticeship)",
         location: "Tours, France · On-site",
         details: [
-          "Investigated and resolved complex system production alerts across L2 and L3 based on SLAs (GTI/GTR requirements).",
-          "Assisted clients during full migrations and compiled architectural documents (DAT, DEX blueprints).",
-          "Helped evaluate client project scopes and map precise resource demands across diverse SI."
+          "Managed client onboarding & system integration (PEC) processes, crafting automated helper pipelines via PowerShell and Bash scripts.",
+          "Industrialized routine operational tasks and deployed Infrastructure-as-Code setups (using Terraform and Ansible configurations for automated code application).",
+          "Resilience & Business Continuity: Successfully coordinated and executed a full Disaster Recovery (PRA) simulation for a critical client to validate failover protocols and secure systems."
         ],
-        tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
+        tags: ["Terraform", "Ansible", "Disaster Recovery (PRA)", "Automation"]
       },
       {
         period: "July 2024 - September 2024",
@@ -203,9 +202,8 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Production Engineer (Internship)",
         location: "Tours, France · On-site",
         details: [
-          "Dived deep into technical incident diagnostics, live system recovery, and hypervisor uptime analysis.",
-          "Wrote localized administrative tools and pipeline helpers utilizing Bash and Python.",
-          "Handled system incident queues (L2 tasks) to stabilize multi-tenant architectures."
+          "Dived into N2 operational diagnostics, proactive system performance analytics, and efforts targeting lower Mean Time to Resolution (MTTR).",
+          "Programmed quick administration tools in Python and Bash for continuous infrastructure health checks and automated incident mitigation."
         ],
         tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
       },
@@ -244,7 +242,7 @@ export const translations: Record<Language, TranslationSet> = {
   ES: {
     role: "Ingeniero SysOps y Cloud",
     status: "Aprendiz en Cloud Temple",
-    aboutText: "Estudiante de Máster en SUPINFO Tours, me apasiona la automatización, seguridad y fiabilidad en infraestructuras Cloud. Me especializo en el diseño de arquitecturas robustas de alta disponibilidad (VMware, Azure, AWS, Private Cloud) y en el mantenimiento en condiciones operativas de sistemas altamente críticos aplicando rigurosos estándares regulados como SecNumCloud.",
+    aboutText: "Estudiante de Máster en SUPINFO Tours, me apasiona la automatización, seguridad y fiabilidad en infraestructuras Cloud. Me especializo en el diseño de arquitecturas robustas de alta disponibilidad (VMware, Azure, AWS, Private Cloud) y en el mantenimiento en condiciones operativas de sistemas altamente críticos aplicando rigurosos estándares regulados como SecNumCloud y la aplicación de los principios de ITIL.",
     navCV: "Trayectoria",
     navProjects: "Proyectos",
     navContact: "Contacto",
@@ -298,12 +296,12 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingeniero SysOps (Aprendizaje)",
         location: "Tours, Francia · Presencial",
         details: [
-          "Mantenimiento en condiciones operativas (MCO) de clústeres complejos de VMware e infraestructuras del cloud privado.",
-          "Industrialización de cargas de trabajo habituales mediante el uso de automatizaciones de Infraestructura como Código (IaC).",
-          "Supervisión continua del estado de red bajo demandas críticas de rendimiento y disponibilidad.",
-          "Cumplimiento sistemático de las normativasSecNumCloud y de control de accesos directos PAMS."
+          "Mantenimiento en condiciones operativas (MCO) de un grupo de +7 clientes recurrentes: gestión autónoma del RUN (cambios de sistemas/redes, monitorización activa) y resolución de incidencias.",
+          "BUILD y Gestión de Proyectos: Liderazgo autónomo de proyectos técnicos de evolución de infraestructura e integración de nuevas arquitecturas, que incluye la planificación, el despliegue operativo y la relación directa con el cliente.",
+          "Shift rotativo: Soporte centralizado para todas las squads, asegurando un análisis rápido de alertas entrantes, remediación inmediata o escalado de nivel 2/3.",
+          "Cumplimiento y Arquitectura Cloud: Administración de sistemas y redes en entornos de Cloud Privado soberano, Cloud Público (Azure) y soluciones híbridas, bajo las exigentes certificaciones ISO-27001, SecNumCloud, PAMS y certificación HDS (Alojamiento de Datos de Salud)."
         ],
-        tags: ["PowerShell", "VMware", "Azure", "Automation", "SecNumCloud"]
+        tags: ["Alta Disponibilidad", "SecNumCloud", "PAMS", "ISO 27001", "HDS", "Azure / Cloud Híbrido", "VMware"]
       },
       {
         period: "Octubre de 2024 - Septiembre de 2025",
@@ -311,11 +309,11 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingeniero de Production (Aprendizaje)",
         location: "Tours, Francia · Presencial",
         details: [
-          "Análisis y solución de alertas críticas de producción correspondientes a niveles 2 y 3 basándose en SLAs (tiempos GTI/GTR).",
-          "Participación estrecha en proyectos de migración completa e integración para grandes clientes e informes de arquitectura (DAT, DEX).",
-          "Soporte en preventa técnica para la cuantificación y planificación de proyectos de TI para grandes organizaciones."
+          "Gestión del onboarding e integración de nuevos clientes (PEC), diseñando flujos automatizados de aprovisionamiento con PowerShell y Bash.",
+          "Industrialización de operaciones habituales y despliegue de Infraestructura como Código (usando Terraform y configuraciones Ansible para la aplicación automática de código).",
+          "Resiliencia y Continuidad de Negocio: Ejecución y seguimiento de una prueba completa de Plan de Recuperación ante Desastres (PRA) para un cliente crítico con el fin de validar y asegurar los protocolos de recuperación de sistemas."
         ],
-        tags: ["Linux", "Windows Server", "SLA Enforcement", "Architecture DAT/DEX"]
+        tags: ["Terraform", "Ansible", "Planes de Recuperación (PRA)", "Automation"]
       },
       {
         period: "Julio de 2024 - Septiembre de 2024",
@@ -323,9 +321,8 @@ export const translations: Record<Language, TranslationSet> = {
         role: "Ingeniero de Production (Prácticas)",
         location: "Tours, Francia · Presencial",
         details: [
-          "Inmersión técnica orientada a la rápida resolución de incidentes, análisis operativo y alta disponibilidad.",
-          "Construcción y empaquetado de herramientas internas utilizando Bash y Python.",
-          "Resolución directa de colas de incidencias operando sobre sistemas de producción virtualizados."
+          "Análisis operativo N2 centrado en la monitorización proactiva, optimización de alarmas y reducción del tiempo medio de resolución (MTTR).",
+          "Desarrollo de scripts de automatización rápidos (Bash y Python) para el diagnóstico continuo del estado del sistema y mitigación automática de alertas recurrentes."
         ],
         tags: ["Python", "Bash Scripting", "Proactive Alerting", "Incident Management"]
       },
@@ -333,7 +330,7 @@ export const translations: Record<Language, TranslationSet> = {
         period: "Julio de 2023 - Agosto de 2023",
         company: "Polyexpert Construction",
         role: "Prácticas de Gestión de Sistemas de Información",
-        location: "Tours, Francia · Presencial",
+        location: "Tours, France · Presencial",
         details: [
           "Actualización, limpieza de redundancia y rediseño completo de la base de datos central de negocios.",
           "Diseño de modelos analíticos sencillos del rendimiento empresarial para informes gráficos.",

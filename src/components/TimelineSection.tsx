@@ -394,7 +394,11 @@ export default function TimelineSection({
                 },
                 {
                   title: language === 'FR' ? 'Savoir-être & Méthodes' : language === 'EN' ? 'Soft-Skills & Methods' : 'Habilidades y Métodos',
-                  items: ["Résolution de problèmes", "Gestion de projet", "Documentation technique"]
+                  items: language === 'FR' 
+                    ? ["Résolution de problèmes", "Gestion de projet", "Documentation technique", "Principes ITIL"] 
+                    : language === 'EN'
+                    ? ["Problem Solving", "Project Management", "Technical Documentation", "ITIL Principles"]
+                    : ["Resolución de problemas", "Gestión de proyectos", "Documentación técnica", "Principios de ITIL"]
                 }
               ].map((category, cIdx) => (
                 <div key={cIdx} className="space-y-2">

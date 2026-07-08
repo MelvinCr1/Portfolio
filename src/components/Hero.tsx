@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Linkedin, Github, ArrowUpRight } from 'lucide-react';
 import { TranslationSet } from '../types';
+import ProfileImage from './ProfileImage';
 
 interface HeroProps {
   theme: 'dark' | 'light';
@@ -9,90 +10,98 @@ interface HeroProps {
 
 export default function Hero({ theme, currentTranslation }: HeroProps) {
   return (
-    <section className="relative py-24 md:py-36 max-w-4xl mx-auto px-6" id="hero-section">
-      <div className="space-y-10 text-left">
+    <section className="relative py-20 md:py-32 max-w-5xl mx-auto px-6" id="hero-section">
+      <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-12 md:gap-16">
         
-        <div className="space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className={`font-mono text-[10px] uppercase tracking-[0.3em] font-semibold ${
-              theme === 'dark' ? 'text-[#00bd95]' : 'text-[#008f70]'
-            }`}
-          >
-            {currentTranslation.status || "Alternant @ Cloud Temple"}
-          </motion.div>
+        {/* Left Side: Name and details */}
+        <div className="flex-1 space-y-10 text-left">
+          <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className={`font-mono text-[10px] uppercase tracking-[0.3em] font-semibold ${
+                theme === 'dark' ? 'text-[#00bd95]' : 'text-[#008f70]'
+              }`}
+            >
+              {currentTranslation.status || "Alternant @ Cloud Temple"}
+            </motion.div>
 
-          <motion.h1 
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className={`text-5xl sm:text-7xl font-light tracking-tighter leading-none ${
+                theme === 'dark' ? 'text-white' : 'text-neutral-900'
+              }`}
+            >
+              Melvin <span className="font-semibold text-stroke">Cureau</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className={`text-sm sm:text-base font-mono uppercase tracking-[0.18em] font-bold ${
+                theme === 'dark' ? 'text-neutral-300' : 'text-neutral-700'
+              }`}
+            >
+              — {currentTranslation.role}
+            </motion.p>
+          </div>
+
+          <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className={`text-5xl sm:text-7xl font-light tracking-tighter leading-none ${
-              theme === 'dark' ? 'text-white' : 'text-neutral-900'
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className={`max-w-2xl text-sm sm:text-base leading-relaxed font-sans font-light transition-colors ${
+              theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600 font-normal'
             }`}
           >
-            Melvin <span className="font-semibold text-stroke">Cureau</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className={`text-sm sm:text-base font-mono uppercase tracking-[0.18em] font-bold ${
-              theme === 'dark' ? 'text-neutral-300' : 'text-neutral-700'
-            }`}
-          >
-            — {currentTranslation.role}
+            {currentTranslation.aboutText}
           </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 auto-cols-max"
+          >
+            <a
+              href="https://www.linkedin.com/in/melvin-cureau-83a812252/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`px-6 py-3 font-mono font-bold text-xs tracking-widest uppercase rounded-lg transition-all flex items-center justify-center gap-2 group cursor-pointer duration-250 border ${
+                theme === 'dark'
+                  ? 'bg-[#00bd95] border-[#00bd95] text-slate-950 hover:bg-[#2ae3c0] hover:border-[#2ae3c0]'
+                  : 'bg-[#008f70] border-[#008f70] text-white hover:bg-[#00aa85] hover:border-[#00aa85]'
+              }`}
+            >
+              <Linkedin className="h-3.5 w-3.5" />
+              {currentTranslation.viewLinkedin}
+              <ArrowUpRight className="h-3 w-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+            
+            <a
+              href="https://github.com/MelvinCr1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`px-6 py-3 border font-mono font-bold text-xs tracking-widest uppercase rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white'
+                  : 'bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+              }`}
+            >
+              <Github className="h-3.5 w-3.5" />
+              {currentTranslation.viewGithub}
+            </a>
+          </motion.div>
         </div>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className={`max-w-2xl text-sm sm:text-base leading-relaxed font-sans font-light transition-colors ${
-            theme === 'dark' ? 'text-neutral-400' : 'text-neutral-600 font-normal'
-          }`}
-        >
-          {currentTranslation.aboutText}
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 auto-cols-max"
-        >
-          <a
-            href="https://www.linkedin.com/in/melvin-cureau-83a812252/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`px-6 py-3 font-mono font-bold text-xs tracking-widest uppercase rounded-lg transition-all flex items-center justify-center gap-2 group cursor-pointer duration-250 border ${
-              theme === 'dark'
-                ? 'bg-[#00bd95] border-[#00bd95] text-slate-950 hover:bg-[#2ae3c0] hover:border-[#2ae3c0]'
-                : 'bg-[#008f70] border-[#008f70] text-white hover:bg-[#00aa85] hover:border-[#00aa85]'
-            }`}
-          >
-            <Linkedin className="h-3.5 w-3.5" />
-            {currentTranslation.viewLinkedin}
-            <ArrowUpRight className="h-3 w-3 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-          
-          <a
-            href="https://github.com/MelvinCr1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`px-6 py-3 border font-mono font-bold text-xs tracking-widest uppercase rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              theme === 'dark'
-                ? 'bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white'
-                : 'bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
-            }`}
-          >
-            <Github className="h-3.5 w-3.5" />
-            {currentTranslation.viewGithub}
-          </a>
-        </motion.div>
+        {/* Right Side: Floating Profile Image with High-Tech Rings */}
+        <div className="flex justify-center md:justify-end flex-shrink-0">
+          <ProfileImage theme={theme} />
+        </div>
 
       </div>
     </section>
