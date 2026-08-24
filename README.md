@@ -1,6 +1,19 @@
-# 💻 Portfolio
+# 💻 Portfolio — Melvin Cureau
 
-Ce dépôt héberge le code complet de mon site portfolio. Conçu pour être ultra-rapide, moderne et accessible, ce portfolio me permet de présenter mes compétences en ingénierie système, cloud computing et DevOps, tout en servant de vitrine interactive pour mes réalisations.
+![Project Status](https://img.shields.io/badge/Status-Production%20%2F%20Active-00bd95?style=flat-square)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-gray?style=flat-square)
+
+---
+
+### 📌 Spécifications & Environnement Système
+
+| Paramètre | Valeur / Technologie |
+| :--- | :--- |
+| **Statut du Projet** | `Production / En ligne` |
+| **Pipeline CI/CD** | `GitHub Actions (Automated SFTP Deploy)` |
+| **Hébergement & Web Server** | `Apache (mod_rewrite / SSL forced)` |
+| **Architecture Logicielle** | `React 19` + `TypeScript` + `Tailwind CSS v4` |
 
 ---
 
