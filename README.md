@@ -1,4 +1,4 @@
-# 💻 Portfolio — Melvin Cureau
+# Portfolio — Melvin Cureau
 
 ![Project Status](https://img.shields.io/badge/Status-Production%20%2F%20Active-00bd95?style=flat-square)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
