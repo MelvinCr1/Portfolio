@@ -51,8 +51,6 @@
     <meta name="twitter:title" content="Melvin Cureau | Ingénieur SysOps & Cloud" />
     <meta name="twitter:description" content="Portfolio professionnel présentant mes expertises cloud, DevOps et automatisation système (SecNumCloud, IaC)." />
 
-    <!-- Production-Grade Client-Side Security Headers (W6 Audit Guidelines) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https: wss: ws:;" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Schema.org Rich Structured Data for rich search snippets -->
@@ -85,11 +83,20 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered successfully!', reg.scope))
-            .catch(err => console.error('Service Worker registration failed:', err));
-        });
+        if (window.location.hostname === 'melvincureau.com' || window.location.hostname === 'www.melvincureau.com') {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .then(reg => console.log('SW registered:', reg.scope))
+              .catch(err => console.error('SW failed:', err));
+          });
+        } else {
+          // Unregister any active service workers in dev/preview environments to avoid stale caching
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
       }
     </script>
   </body>

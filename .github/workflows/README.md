@@ -1,12 +1,12 @@
 # Workflow CI/CD — Déploiement Continu sur IONOS
 
-Ce dossier contient le workflow de Déploiement Continu (**CI/CD**) automatisé via **GitHub Actions** pour le portfolio de Melvin Cureau.
+Ce dossier contient le workflow de Déploiement Continu (**CI/CD**) automatisé via **GitHub Actions** pour mon portfolio.
 
 Le fichier principal de configuration est [`deploy.yml`](./deploy.yml).
 
 ---
 
-## 🚀 Fonctionnement du Workflow (`deploy.yml`)
+## Fonctionnement du Workflow (`deploy.yml`)
 
 À chaque fois qu'un commit ou une Pull Request est fusionné(e) sur la branche principale **`main`**, GitHub Actions déclenche automatiquement ce processus pour mettre le site en production.
 
@@ -44,4 +44,3 @@ Pour que la synchronisation SFTP s'effectue de manière sécurisée sans exposer
 
 - **Zéro Déchet** : Seul le dossier `./dist` de destination finale de compilation est déployé sur le serveur distant IONOS. Le code source de développement, les fichiers de configuration de l'éditeur et le dossier brut `node_modules` ne polluent pas votre espace d'hébergement.
 - **Cache & Performance** : Les scripts d'intégration tournent sur une image Ubuntu à jour (`ubuntu-latest`) pour assurer des temps de construction optimaux (généralement moins de 1m30s).
-- **Vérification** : Vous pouvez suivre l'état d'exécution en temps réel de vos déploiements en vous rendant dans l'onglet **Actions** de votre dépôt GitHub.
