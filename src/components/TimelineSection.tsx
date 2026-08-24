@@ -378,7 +378,7 @@ export default function TimelineSection({
               {[
                 {
                   title: "DevOps & Automation",
-                  items: ["Ansible", "Terraform", "Docker", "Gitlab / GitHub", "AWS CloudFormation"]
+                  items: ["Ansible", "Terraform", "Docker", "Gitlab / GitHub"]
                 },
                 {
                   title: "Cloud & Virtualisation",
@@ -395,10 +395,10 @@ export default function TimelineSection({
                 {
                   title: language === 'FR' ? 'Savoir-être & Méthodes' : language === 'EN' ? 'Soft-Skills & Methods' : 'Habilidades y Métodos',
                   items: language === 'FR' 
-                    ? ["Résolution de problèmes", "Gestion de projet", "Documentation technique", "Principes ITIL"] 
+                    ? ["Résolution de problèmes", "Gestion de projet", "Documentation technique", "Principes ITIL", "Relationnel client"] 
                     : language === 'EN'
-                    ? ["Problem Solving", "Project Management", "Technical Documentation", "ITIL Principles"]
-                    : ["Resolución de problemas", "Gestión de proyectos", "Documentación técnica", "Principios de ITIL"]
+                    ? ["Problem Solving", "Project Management", "Technical Documentation", "ITIL Principles", "Client Relations"]
+                    : ["Resolución de problemas", "Gestión de proyectos", "Documentación técnica", "Principios de ITIL", "Relación con clientes"]
                 }
               ].map((category, cIdx) => (
                 <div key={cIdx} className="space-y-2">
